@@ -726,15 +726,29 @@
   }
 
   const sampleTexts = [
+    // --- EASY ---
     { id: "easy1", level: "easy", title: "1. Basic Greeting & Intro", hanzi: "你好！我是学生，他是老师。我很喜欢学习汉语。", pinyin: "Nǐ hǎo! Wǒ shì xuésheng, tā shì lǎoshī. Wǒ hěn xǐhuan xuéxí Hànyǔ.", english: "Hello! I am a student, and he is a teacher. I really like studying Chinese." },
     { id: "easy2", level: "easy", title: "2. Family & Age", hanzi: "我爸爸妈妈都在家里。我有一个女儿，她九岁了。", pinyin: "Wǒ bàba māma dōu zài jiālǐ. Wǒ yǒu yí gè nǚ'ér, tā jiǔ suì le.", english: "My dad and mom are both at home. I have a daughter, she is nine years old." },
-    { id: "easy3", level: "easy", title: "3. Simple Weather & Tea", hanzi: "今天天气很热。我想喝水，不喝热茶。", pinyin: "Jīntiān tiānqì hěn rè. Wǒ xiǎng hē shuǐ, bù hē rè chá.", english: "The weather today is very hot. I want to drink water, not hot tea." },
+    { id: "easy3", level: "easy", title: "3. Simple Weather & Drinks", hanzi: "今天天气很热。我想喝水，不喝热茶。", pinyin: "Jīntiān tiānqì hěn rè. Wǒ xiǎng hē shuǐ, bù hē rè chá.", english: "The weather today is very hot. I want to drink water, not hot tea." },
+    { id: "easy4", level: "easy", title: "4. Cat & Table", hanzi: "桌子上有一只猫。它很小，很漂亮。", pinyin: "Zhuōzi shàng yǒu yì zhī māo. Tā hěn xiǎo, hěn piàoliang.", english: "There is a cat on the table. It is very small and very pretty." },
+    { id: "easy5", level: "easy", title: "5. Seeing Friends", hanzi: "今天是我生日。我和三个朋友去吃米饭。", pinyin: "Jīntiān shì wǒ shēngrì. Wǒ hé sān gè péngyou qù chī mǐfàn.", english: "Today is my birthday. My three friends and I are going to eat rice." },
+    { id: "easy6", level: "easy", title: "6. Sleep & Home", hanzi: "现在十点了。我很想去睡觉，回家里。", pinyin: "Xiànzài shí diǎn le. Wǒ hěn xiǎng qù shuìjiào, huí jiālǐ.", english: "It is 10 o'clock now. I really want to go to sleep and go back home." },
+
+    // --- MEDIUM ---
     { id: "med1", level: "medium", title: "1. Lunch & Taxi to Shop", hanzi: "今天中午我和朋友去饭店吃米饭，喝热茶。下午三点我们坐出租车去商店买东西。我很高兴！", pinyin: "Jīntiān zhōngwǔ wǒ hé péngyou qù fàndiàn chī mǐfàn, hē rè chá. Xiàwǔ sān diǎn wǒmen zuò chūzūchē qù shāngdiàn mǎi dōngxi. Wǒ hěn gāoxìng!", english: "Today at noon, my friend and I went to a restaurant to eat rice and drink hot tea. At 3 PM, we took a taxi to the store to buy things. I am very happy!" },
     { id: "med2", level: "medium", title: "2. School & Meeting Teacher", hanzi: "今天天气不冷，我和同学在学校看见了老师。我们都很高兴，请老师喝茶。", pinyin: "Jīntiān tiānqì bù lěng, wǒ hé tóngxué zài xuéxiào kànjiàn le lǎoshī. Wǒmen dōu hěn gāoxìng, qǐng lǎoshī hē chá.", english: "The weather today is not cold. My classmate and I saw the teacher at school. We were all very happy and invited the teacher to drink tea." },
     { id: "med3", level: "medium", title: "3. Hospital Visit & Movie", hanzi: "妈妈在家里做菜，我和爸爸在看电视。今天下午我们要去医院看朋友，晚上看电影。", pinyin: "Māma zài jiālǐ zuò cài, wǒ hé bàba zài kàn diànshì. Jīntiān xiàwǔ wǒmen yào qù yīyuàn kàn péngyou, wǎnshang kàn diànyǐng.", english: "Mom is cooking at home, while dad and I are watching TV. This afternoon we are going to the hospital to see a friend, and tonight we will watch a movie." },
+    { id: "med4", level: "medium", title: "4. Calling Classmates", hanzi: "昨天我没去学校。我和同学打电话说汉语，他说今天老师教了很多字。", pinyin: "Zuótiān wǒ méi qù xuéxiào. Wǒ hé tóngxué dǎ diànhuà shuō Hànyǔ, tā shuō jīntiān lǎoshī jiāo le hěn duō zì.", english: "I didn't go to school yesterday. I called my classmate to speak Chinese; he said the teacher taught a lot of characters today." },
+    { id: "med5", level: "medium", title: "5. Working on Computer", hanzi: "我在电脑上工作。儿子在桌子上面看书，女儿在听音乐。", pinyin: "Wǒ zài diànnǎo shàng gōngzuò. Érzi zài zhuōzi shàngmiàn kàn shū, nǚ'ér zài tīng yīnyuè.", english: "I am working on the computer. My son is reading a book at the table, and my daughter is listening to music." },
+    { id: "med6", level: "medium", title: "6. Cold Weather & Clothes", hanzi: "北京的天气很冷，下雨了。我们要去商店买新的衣服和杯子。", pinyin: "Běijīng de tiānqì hěn lěng, xiàyǔ le. Wǒmen yào qù shāngdiàn mǎi xīn de yīfu hé bēizi.", english: "The weather in Beijing is very cold and it rained. We need to go to the store to buy new clothes and cups." },
+
+    // --- HARD ---
     { id: "hard1", level: "hard", title: "1. Shopping Prices & Books", hanzi: "现在四点半，我和女儿去商店买苹果和水果。这个苹果太大了，一个五块钱。我买了一本书，三块钱。", pinyin: "Xiànzài sì diǎn bàn, wǒ hé nǚ'ér qù shāngdiàn mǎi píngguǒ hé shuǐguǒ. Zhè gè píngguǒ tài dà le, yí gè wǔ kuài qián. Wǒ mǎi le yì běn shū, sān kuài qián.", english: "It is 4:30 now. My daughter and I went to the store to buy apples and fruit. This apple is too big, one costs 5 yuan. I bought a book for 3 yuan." },
     { id: "hard2", level: "hard", title: "2. Work, Travel & Flights", hanzi: "我儿子是医生，在医院工作。他明天下午坐飞机去北京。北京的天气很冷，他要买衣服。", pinyin: "Wǒ érzi shì yīshēng, zài yīyuàn gōngzuò. Tā míngtiān xiàwǔ zuò fēijī qù Běijīng. Běijīng de tiānqì hěn lěng, tā yào mǎi yīfu.", english: "My son is a doctor working in a hospital. He will take a plane to Beijing tomorrow afternoon. The weather in Beijing is very cold, so he needs to buy clothes." },
-    { id: "hard3", level: "hard", title: "3. Weekend Routine & Calls", hanzi: "昨天下雨了，我没去学校。我和老朋友打电话说汉语，他说我写的字很漂亮。明天星期六，我们要在饭店吃菜。", pinyin: "Zuótiān xiàyǔ le, wǒ méi qù xuéxiào. Wǒ hé lǎo péngyou dǎ diànhuà shuō Hànyǔ, tā shuō wǒ xiě de zì hěn piàoliang. Míngtiān xīngqīliù, wǒmen yào zài fàndiàn chī cài.", english: "It rained yesterday, so I didn't go to school. I made a phone call to an old friend in Chinese; he said the characters I write are very pretty. Tomorrow is Saturday, and we will eat dishes at a restaurant." }
+    { id: "hard3", level: "hard", title: "3. Weekend Routine & Calls", hanzi: "昨天下雨了，我没去学校。我和老朋友打电话说汉语，他说我写的字很漂亮。明天星期六，我们要在饭店吃菜。", pinyin: "Zuótiān xiàyǔ le, wǒ méi qù xuéxiào. Wǒ hé lǎo péngyou dǎ diànhuà shuō Hànyǔ, tā shuō wǒ xiě de zì hěn piàoliang. Míngtiān xīngqīliù, wǒmen yào zài fàndiàn chī cài.", english: "It rained yesterday, so I didn't go to school. I made a phone call to an old friend in Chinese; he said the characters I write are very pretty. Tomorrow is Saturday, and we will eat dishes at a restaurant." },
+    { id: "hard4", level: "hard", title: "4. Restaurant Choice & Tea", hanzi: "今天中午我们去饭店吃米饭和水饺。这家饭店的茶非常好喝，也不太贵。我们吃了八十块钱，都很高兴。", pinyin: "Jīntiān zhōngwǔ wǒmen qù fàndiàn chī mǐfàn hé shuǐjiǎo. Zhè jiā fàndiàn de chá fēicháng hǎohē, yě bú tài guì. Wǒmen chī le bāshí kuài qián, dōu hěn gāoxìng.", english: "Today at noon we went to a restaurant to eat rice and dumplings. This restaurant's tea is very good to drink and not too expensive. We spent 80 yuan eating and were all very happy." },
+    { id: "hard5", level: "hard", title: "5. Doctor Advice & Health", hanzi: "爸爸身体不太好，医生叫他多喝热茶，少看电视。今天下午我们要坐出租车去医院看医生。", pinyin: "Bàba shēntǐ bú tài hǎo, yīshēng jiào tā duō hē rè chá, shǎo kàn diànshì. Jīntiān xiàwǔ wǒmen yào zuò chūzūchē qù yīyuàn kàn yīshēng.", english: "Dad isn't feeling very well; the doctor told him to drink more hot tea and watch less TV. This afternoon we are taking a taxi to the hospital to see the doctor." },
+    { id: "hard6", level: "hard", title: "6. Learning Progress & Books", hanzi: "我学会了很多汉语字，读书也越来越快。我的老师是从北京来的，她教我们怎么写漂亮的字。", pinyin: "Wǒ xuéhuì le hěn duō Hànyǔ zì, dú shū yě yuè lái yuè kuài. Wǒ de lǎoshī shì cóng Běijīng lái de, tā jiāo wǒmen zěnme xiě piàoliang de zì.", english: "I have learned many Chinese characters and read books faster and faster. My teacher comes from Beijing, and she teaches us how to write pretty characters." }
   ];
 
   const defaultVocabulary = [
@@ -951,6 +965,82 @@
         { hanzi: "三块钱", pinyin: "sān kuài qián" }
       ],
       correctOrder: ["我在商店", "买了一本书", "三块钱"]
+    },
+    {
+      english: "My son will fly to Beijing tomorrow afternoon.",
+      grammar: "[Subject] + [Time] + [Transportation] + 去 + [Place]",
+      tiles: [
+        { hanzi: "我儿子", pinyin: "Wǒ érzi" },
+        { hanzi: "明天下午", pinyin: "míngtiān xiàwǔ" },
+        { hanzi: "坐飞机", pinyin: "zuò fēijī" },
+        { hanzi: "去", pinyin: "qù" },
+        { hanzi: "北京", pinyin: "Běijīng" }
+      ],
+      correctOrder: ["我儿子", "明天下午", "坐飞机", "去", "北京"]
+    },
+    {
+      english: "I called an old friend yesterday to speak Chinese.",
+      grammar: "[Subject] + [Time] + 和 + [Person] + 打电话 + [Action]",
+      tiles: [
+        { hanzi: "我", pinyin: "Wǒ" },
+        { hanzi: "昨天", pinyin: "zuótiān" },
+        { hanzi: "和老朋友", pinyin: "hé lǎo péngyou" },
+        { hanzi: "打电话", pinyin: "dǎ diànhuà" },
+        { hanzi: "说汉语", pinyin: "shuō Hànyǔ" }
+      ],
+      correctOrder: ["我", "昨天", "和老朋友", "打电话", "说汉语"]
+    },
+    {
+      english: "My teacher comes from Beijing and teaches us Chinese.",
+      grammar: "[Subject] + 是从 + [Place] + 来的 + [Action]",
+      tiles: [
+        { hanzi: "我的老师", pinyin: "Wǒ de lǎoshī" },
+        { hanzi: "是从北京来的", pinyin: "shì cóng Běijīng lái de" },
+        { hanzi: "教我们汉语", pinyin: "jiāo wǒmen Hànyǔ" }
+      ],
+      correctOrder: ["我的老师", "是从北京来的", "教我们汉语"]
+    },
+    {
+      english: "We are going to eat dishes at the restaurant on Saturday.",
+      grammar: "[Subject] + [Time] + 要在 + [Place] + [Action]",
+      tiles: [
+        { hanzi: "我们", pinyin: "Wǒmen" },
+        { hanzi: "明天星期六", pinyin: "míngtiān xīngqīliù" },
+        { hanzi: "要在饭店", pinyin: "yào zài fàndiàn" },
+        { hanzi: "吃菜", pinyin: "chī cài" }
+      ],
+      correctOrder: ["我们", "明天星期六", "要在饭店", "吃菜"]
+    },
+    {
+      english: "There is a small cat on top of the table.",
+      grammar: "[Location] + 上面 + 有 + [Item]",
+      tiles: [
+        { hanzi: "桌子", pinyin: "Zhuōzi" },
+        { hanzi: "上面", pinyin: "shàngmiàn" },
+        { hanzi: "有一只", pinyin: "yǒu yì zhī" },
+        { hanzi: "小猫", pinyin: "xiǎo māo" }
+      ],
+      correctOrder: ["桌子", "上面", "有一只", "小猫"]
+    },
+    {
+      english: "I really want to drink cold water, not hot tea.",
+      grammar: "[Subject] + 想 + [Action 1], 不 + [Action 2]",
+      tiles: [
+        { hanzi: "我", pinyin: "Wǒ" },
+        { hanzi: "很想喝水", pinyin: "hěn xiǎng hē shuǐ" },
+        { hanzi: "不喝热茶", pinyin: "bù hē rè chá" }
+      ],
+      correctOrder: ["我", "很想喝水", "不喝热茶"]
+    },
+    {
+      english: "The doctor told dad to drink more hot tea.",
+      grammar: "[Subject 1] + 叫 + [Subject 2] + 多 + [Action]",
+      tiles: [
+        { hanzi: "医生", pinyin: "Yīshēng" },
+        { hanzi: "叫爸爸", pinyin: "jiào bàba" },
+        { hanzi: "多喝热茶", pinyin: "duō hē rè chá" }
+      ],
+      correctOrder: ["医生", "叫爸爸", "多喝热茶"]
     }
   ];
 
@@ -974,7 +1064,6 @@
     const bank = document.getElementById('builderTileBank');
     bank.innerHTML = "";
 
-    // Shuffle tiles for the user
     const shuffled = [...puzzle.tiles].sort(() => Math.random() - 0.5);
 
     shuffled.forEach(tile => {
@@ -996,7 +1085,6 @@
     const removed = assembledTiles.splice(index, 1)[0];
     renderWorkspace();
 
-    // Show button back in tile bank
     const bankButtons = document.querySelectorAll('#builderTileBank .tile-btn');
     bankButtons.forEach(btn => {
       if (btn.innerText.includes(removed.hanzi)) {
@@ -1043,7 +1131,6 @@
       feedback.style.color = 'var(--success)';
       feedback.innerText = "🎉 Excellent! Correct word order!";
       
-      // Play audio of complete sentence
       const fullHanzi = puzzle.correctOrder.join('');
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
