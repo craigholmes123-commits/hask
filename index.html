@@ -107,16 +107,19 @@
       color: var(--text) !important;
     }
 
+    /* 2x2 Header Controls Layout */
     .controls-top {
-      display: flex;
-      gap: 12px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
       margin-bottom: 20px;
     }
 
     .controls-top button {
-      flex: 1;
       background-color: var(--border);
       color: var(--text);
+      font-size: 0.85rem;
+      padding: 10px 8px;
     }
 
     .controls-top button:hover {
@@ -126,6 +129,59 @@
     .controls-top button.active-mode {
       border: 1px solid var(--primary);
       background-color: #1e3a8a;
+    }
+
+    .controls-top button.inactive-mode {
+      opacity: 0.6;
+    }
+
+    /* Active Paragraph & Word Highlighting UI */
+    .paragraph-card {
+      background-color: #18181b;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 15px;
+    }
+
+    .paragraph-title {
+      font-size: 0.85rem;
+      color: var(--subtext);
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .paragraph-body {
+      font-size: 1.15rem;
+      line-height: 1.8;
+      color: var(--text);
+      word-break: break-all;
+    }
+
+    .hl-word {
+      padding: 2px 5px;
+      border-radius: 4px;
+      margin: 0 1px;
+      transition: all 0.2s ease;
+      cursor: help;
+    }
+
+    .hl-current {
+      background-color: rgba(59, 130, 246, 0.25);
+      border: 1.5px solid var(--primary);
+      color: #93c5fd;
+      font-weight: bold;
+    }
+
+    .hl-learned {
+      background-color: rgba(16, 185, 129, 0.2);
+      border: 1px solid var(--success);
+      color: #6ee7b7;
+    }
+
+    .hl-unlearned {
+      background-color: rgba(255, 255, 255, 0.04);
+      border: 1px dashed var(--border);
     }
 
     .prompt-wrapper {
@@ -182,7 +238,6 @@
       margin-bottom: 10px;
     }
 
-    /* Self-Grading Button Area */
     .confidence-panel {
       display: none;
       flex-direction: column;
@@ -326,10 +381,18 @@
       <button onclick="resetScore()" class="reset-score-btn">Reset</button>
     </div>
 
-    <!-- Mode Controls -->
+    <!-- Toggles & Mode Controls -->
     <div class="controls-top">
       <button onclick="toggleMode()" id="modeBtn">Mode: Pinyin ➔ English/Hanzi</button>
       <button onclick="toggleRapidMode()" id="rapidBtn">⚡ Rapid: OFF</button>
+      <button onclick="toggleContext()" id="contextBtn">📖 Sentence Context: ON</button>
+      <button onclick="toggleSelfGrade()" id="selfGradeBtn">⭐ Self-Grade: ON</button>
+    </div>
+
+    <!-- Active Paragraph Display with Highlighted Words -->
+    <div class="paragraph-card" id="paragraphBox" style="display: none;">
+      <div class="paragraph-title">📜 Active Text Progress (Word Highlights):</div>
+      <div class="paragraph-body" id="paragraphDisplay"></div>
     </div>
 
     <!-- Word Prompt Area + Inline Audio -->
@@ -345,7 +408,7 @@
     <!-- Answer Grid -->
     <div class="options-grid" id="optionsGrid"></div>
 
-    <!-- Anki-style Self-Grading Confidence Panel -->
+    <!-- Self-Grading Confidence Panel -->
     <div class="confidence-panel" id="confidencePanel">
       <div style="text-align: center; font-size: 0.85rem; color: var(--subtext);">Rate your recall difficulty:</div>
       <div class="confidence-buttons">
@@ -520,6 +583,12 @@
   let currentVocabIndex = 0;
   let reverseMode = false;
   
+  // Toggles
+  let showContext = true;
+  let selfGradeMode = true;
+  let currentParagraphText = "";
+  let learnedWords = new Set();
+
   let rapidMode = false;
   let timerInterval = null;
   const RAPID_TIME_LIMIT = 3000;
@@ -560,6 +629,7 @@
         else if (item.repetition === 1) item.interval = 6;
         else item.interval = Math.round(item.interval * item.easeFactor);
         item.repetition += 1;
+        learnedWords.add(wordId);
       } else {
         item.repetition = 0;
         item.interval = 1;
@@ -572,6 +642,7 @@
 
       srsData[wordId] = item;
       localStorage.setItem('hsk_srs_data', JSON.stringify(srsData));
+      updateParagraphHighlighting();
     } catch (e) {
       console.error("Storage error:", e);
     }
@@ -659,7 +730,6 @@
     const subPromptDisplay = document.getElementById('subPromptDisplay');
     const contextDisplay = document.getElementById('contextDisplay');
 
-    // Hide the self-grading panel until user guesses
     document.getElementById('confidencePanel').style.display = 'none';
 
     if (!reverseMode) {
@@ -671,15 +741,54 @@
     }
 
     contextDisplay.innerText = currentWord.sentence || "...";
+    contextDisplay.style.display = showContext ? 'block' : 'none';
 
     generateOptions();
-
-    // Auto-play audio clip when card loads
+    updateParagraphHighlighting();
     playAudio();
 
     if (rapidMode) {
       startTimer();
     }
+  }
+
+  function updateParagraphHighlighting() {
+    const box = document.getElementById('paragraphBox');
+    const display = document.getElementById('paragraphDisplay');
+
+    if (!currentParagraphText.trim()) {
+      box.style.display = 'none';
+      return;
+    }
+
+    box.style.display = 'block';
+
+    const sortedVocab = [...activeVocab].sort((a, b) => b.hanzi.length - a.hanzi.length);
+    let rendered = currentParagraphText;
+
+    const tokens = [];
+    sortedVocab.forEach((word, index) => {
+      if (rendered.includes(word.hanzi)) {
+        const token = `___VOCAB_TOKEN_${index}___`;
+        rendered = rendered.split(word.hanzi).join(token);
+        tokens.push({ token, word });
+      }
+    });
+
+    tokens.forEach(({ token, word }) => {
+      const isCurrent = currentWord && currentWord.id === word.id;
+      const isLearned = learnedWords.has(word.id) || getWordSRS(word.id).repetition > 0;
+      
+      let className = "hl-word ";
+      if (isCurrent) className += "hl-current";
+      else if (isLearned) className += "hl-learned";
+      else className += "hl-unlearned";
+
+      const spanHtml = `<span class="${className}" title="${word.pinyin}: ${word.english}">${word.hanzi}</span>`;
+      rendered = rendered.split(token).join(spanHtml);
+    });
+
+    display.innerHTML = rendered;
   }
 
   function generateOptions() {
@@ -726,13 +835,14 @@
     if (isCorrect) {
       correctScore++;
       btnElement.classList.add('correct');
+      learnedWords.add(currentWord.id);
       updateScoreUI();
+      updateParagraphHighlighting();
       
-      if (rapidMode) {
+      if (rapidMode || !selfGradeMode) {
         updateWordSRS(currentWord.id, 4);
-        setTimeout(() => loadQuestion(), 300);
+        setTimeout(() => loadQuestion(), rapidMode ? 300 : 600);
       } else {
-        // Show confidence rating buttons for detailed SRS grading
         document.getElementById('confidencePanel').style.display = 'flex';
       }
     } else {
@@ -740,7 +850,7 @@
       btnElement.classList.add('wrong');
       updateWordSRS(currentWord.id, 1);
       updateScoreUI();
-      if (rapidMode) {
+      if (rapidMode || !selfGradeMode) {
         setTimeout(() => loadQuestion(), 600);
       }
     }
@@ -749,6 +859,35 @@
   function submitConfidence(grade) {
     updateWordSRS(currentWord.id, grade);
     loadQuestion();
+  }
+
+  function toggleContext() {
+    showContext = !showContext;
+    const btn = document.getElementById('contextBtn');
+    const contextDisplay = document.getElementById('contextDisplay');
+    
+    if (showContext) {
+      btn.innerText = "📖 Sentence Context: ON";
+      btn.classList.remove('inactive-mode');
+      contextDisplay.style.display = 'block';
+    } else {
+      btn.innerText = "📖 Sentence Context: OFF";
+      btn.classList.add('inactive-mode');
+      contextDisplay.style.display = 'none';
+    }
+  }
+
+  function toggleSelfGrade() {
+    selfGradeMode = !selfGradeMode;
+    const btn = document.getElementById('selfGradeBtn');
+    if (selfGradeMode) {
+      btn.innerText = "⭐ Self-Grade: ON";
+      btn.classList.remove('inactive-mode');
+    } else {
+      btn.innerText = "⭐ Self-Grade: OFF";
+      btn.classList.add('inactive-mode');
+      document.getElementById('confidencePanel').style.display = 'none';
+    }
   }
 
   function toggleMode() {
@@ -798,6 +937,7 @@
     if (matched.length > 0) {
       activeVocab = matched;
       currentVocabIndex = 0;
+      currentParagraphText = text;
       saveTextHistory(text);
       alert(`Parsed! Loaded ${matched.length} HSK 1 words for practice.`);
       loadQuestion();
