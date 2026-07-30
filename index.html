@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>HSK 1 Study & Builder Tool</title>
+  <title>Survival Chinese & Sentence Builder</title>
   <style>
     :root {
       --bg: #121212;
@@ -16,6 +16,7 @@
       --error: #ef4444;
       --warning: #f59e0b;
       --border: #374151;
+      --mastered: #8b5cf6;
     }
 
     body {
@@ -35,7 +36,6 @@
       max-width: 650px;
     }
 
-    /* Main Navigation Tabs */
     .tab-nav {
       display: flex;
       gap: 10px;
@@ -57,24 +57,10 @@
       transition: all 0.2s ease;
     }
 
-    .tab-btn:hover {
-      background-color: #27272a;
-      color: var(--text);
-    }
-
-    .tab-btn.active-tab {
-      background-color: var(--primary);
-      color: #ffffff;
-      border-color: var(--primary);
-    }
-
-    .tab-content {
-      display: none;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
+    .tab-btn:hover { background-color: #27272a; color: var(--text); }
+    .tab-btn.active-tab { background-color: var(--primary); color: #ffffff; border-color: var(--primary); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
 
     .card {
       background-color: var(--card);
@@ -87,75 +73,14 @@
       overflow: hidden;
     }
 
-    .timer-container {
-      width: 100%;
-      height: 6px;
-      background-color: var(--border);
-      position: absolute;
-      top: 0;
-      left: 0;
-      display: none;
-    }
-
-    .timer-bar {
-      height: 100%;
-      width: 100%;
-      background-color: var(--primary);
-      transition: width 0.1s linear;
-    }
-
-    h1, h2, h3, h4 {
-      color: var(--text);
-      text-align: center;
-      margin-top: 0;
-    }
-
-    .score-tracker {
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      background-color: #18181b;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 8px 12px;
-      margin-bottom: 12px;
-      font-size: 0.9rem;
-      font-weight: bold;
-    }
-
-    .score-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .score-correct { color: var(--success); }
-    .score-wrong { color: var(--error); }
-    .score-accuracy { color: var(--subtext); }
-
-    .reset-score-btn {
-      background: none !important;
-      border: none !important;
-      color: var(--subtext) !important;
-      font-size: 0.8rem !important;
-      padding: 2px 6px !important;
-      cursor: pointer;
-      text-decoration: underline;
-      width: auto !important;
-    }
+    h1, h2, h3, h4 { color: var(--text); text-align: center; margin-top: 0; }
 
     .controls-top {
       display: flex;
+      flex-wrap: wrap;
       gap: 8px;
       margin-bottom: 15px;
       align-items: center;
-    }
-
-    .mode-toggle-main {
-      flex: 2;
-      font-size: 0.85rem !important;
-      padding: 8px 6px !important;
-      white-space: nowrap;
     }
 
     .icon-btn {
@@ -168,145 +93,58 @@
       justify-content: center;
       align-items: center;
       min-width: 40px;
-    }
-
-    .icon-btn:hover {
-      background-color: #4b5563;
-    }
-
-    .icon-btn.active-mode {
-      border: 1px solid var(--primary);
-      background-color: #1e3a8a;
-    }
-
-    .icon-btn.inactive-mode {
-      opacity: 0.4;
-    }
-
-    .paragraph-card {
-      background-color: #18181b;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 12px 16px;
-      margin-bottom: 15px;
-    }
-
-    .paragraph-title {
-      font-size: 0.85rem;
-      color: var(--subtext);
-      font-weight: bold;
-      margin-bottom: 8px;
-    }
-
-    .paragraph-body {
-      font-size: 1.15rem;
-      line-height: 1.8;
-      color: var(--text);
-      word-break: break-word;
-    }
-
-    .hl-word {
-      padding: 3px 6px;
-      border-radius: 4px;
-      margin: 2px 2px;
-      transition: all 0.2s ease;
+      border-radius: 6px;
+      border: none;
       cursor: pointer;
-      display: inline-block;
     }
 
-    .hl-word:hover {
-      transform: scale(1.05);
-      filter: brightness(1.2);
-    }
-
-    .hl-current {
-      background-color: rgba(59, 130, 246, 0.3);
-      border: 1.5px solid var(--primary);
-      color: #93c5fd;
-      font-weight: bold;
-    }
-
-    .hl-learned {
-      background-color: rgba(16, 185, 129, 0.2);
-      border: 1px solid var(--success);
-      color: #6ee7b7;
-    }
-
-    .hl-unlearned {
-      background-color: rgba(255, 255, 255, 0.05);
-      border: 1px dashed var(--border);
-    }
+    .icon-btn:hover { background-color: #4b5563; }
+    .icon-btn.active-mode { border: 1px solid var(--primary); background-color: #1e3a8a; }
+    .icon-btn.inactive-mode { opacity: 0.4; }
+    
+    .btn-text { font-size: 0.85rem; padding: 8px 12px; background-color: var(--border); color: white; border: none; border-radius: 6px; cursor: pointer;}
+    .btn-text:hover { background-color: #4b5563; }
 
     .prompt-wrapper {
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       gap: 12px;
-      margin: 10px 0 5px 0;
+      margin: 20px 0 15px 0;
+      min-height: 80px;
     }
 
     .prompt-box {
-      font-size: 2.2rem;
+      font-size: 2.5rem;
       font-weight: bold;
       text-align: center;
       color: #ffffff;
       margin: 0;
-    }
-
-    .context-sentence {
-      font-size: 1.15rem;
-      color: #60a5fa;
-      background-color: #18181b;
-      border-left: 4px solid var(--primary);
-      padding: 10px 14px;
-      margin: 12px 0 16px 0;
-      border-radius: 4px;
-      text-align: center;
-      font-weight: 500;
+      letter-spacing: 1px;
     }
 
     .audio-inline-btn {
       width: auto !important;
-      padding: 8px 12px !important;
-      background-color: var(--border) !important;
-      font-size: 0.9rem !important;
+      padding: 8px 16px !important;
+      background-color: var(--primary) !important;
+      font-size: 1rem !important;
       border-radius: 6px;
-    }
-
-    .sub-prompt {
-      font-size: 1rem;
-      color: var(--subtext);
-      text-align: center;
-      margin-bottom: 16px;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
     }
 
     .options-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
-      margin-bottom: 10px;
+      margin-bottom: 15px;
     }
-
-    .confidence-panel {
-      display: none;
-      flex-direction: column;
-      gap: 10px;
-      margin-top: 10px;
-    }
-
-    .confidence-buttons {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-    }
-
-    .btn-again { background-color: #ef4444 !important; }
-    .btn-hard { background-color: #f59e0b !important; }
-    .btn-good { background-color: #3b82f6 !important; }
-    .btn-easy { background-color: #10b981 !important; }
 
     button {
-      background-color: var(--primary);
+      background-color: var(--border);
       color: #ffffff;
       border: none;
       padding: 14px 16px;
@@ -315,154 +153,24 @@
       border-radius: 6px;
       cursor: pointer;
       width: 100%;
-      transition: background-color 0.2s, transform 0.1s;
+      transition: all 0.15s ease;
     }
 
-    button:hover {
-      background-color: var(--primary-hover);
-    }
+    button:hover { background-color: #4b5563; }
+    button.correct { background-color: var(--success) !important; }
+    button.wrong { background-color: var(--error) !important; }
 
-    button:active {
-      transform: scale(0.98);
-    }
-
-    button.correct {
-      background-color: var(--success) !important;
-    }
-
-    button.wrong {
-      background-color: var(--error) !important;
-    }
-
-    .controls-bottom {
-      display: flex;
-      gap: 12px;
-      margin-top: 15px;
-      border-top: 1px solid var(--border);
-      padding-top: 15px;
-    }
-
-    .controls-bottom button {
-      flex: 1;
-      background-color: #2a2d32;
-      color: var(--text);
-    }
-
-    details {
-      background-color: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 12px 16px;
-    }
-
-    summary {
-      font-weight: bold;
-      cursor: pointer;
-      color: var(--text);
-    }
-
-    textarea {
-      width: 100%;
-      height: 90px;
-      margin-top: 10px;
-      background-color: var(--bg);
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 8px;
-      box-sizing: border-box;
-      font-family: inherit;
-    }
-
-    .difficulty-group { margin-top: 15px; }
-    .difficulty-title {
-      font-size: 0.9rem;
-      font-weight: bold;
-      padding: 4px 8px;
+    .mastered-badge {
+      font-size: 0.75rem;
+      background-color: var(--mastered);
+      color: white;
+      padding: 2px 6px;
       border-radius: 4px;
-      display: inline-block;
-      margin-bottom: 8px;
+      vertical-align: middle;
+      margin-left: 8px;
     }
 
-    .diff-easy { background-color: rgba(16, 185, 129, 0.2); color: var(--success); }
-    .diff-medium { background-color: rgba(245, 158, 11, 0.2); color: var(--warning); }
-    .diff-hard { background-color: rgba(239, 68, 68, 0.2); color: var(--error); }
-
-    .sample-texts-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .sample-card {
-      background-color: #18181b;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .sample-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.95rem;
-      font-weight: bold;
-      color: var(--text);
-    }
-
-    .sample-actions { display: flex; gap: 8px; }
-
-    .sample-btn-action {
-      font-size: 0.8rem !important;
-      padding: 6px 10px !important;
-      width: auto !important;
-      background-color: var(--border) !important;
-    }
-
-    .sample-text-content {
-      font-size: 0.95rem;
-      color: var(--subtext);
-      line-height: 1.5;
-    }
-
-    .sample-translation {
-      display: none;
-      font-size: 0.9rem;
-      color: #60a5fa;
-      background-color: #121212;
-      padding: 8px 10px;
-      border-radius: 4px;
-      border-left: 3px solid var(--primary);
-    }
-
-    .history-list {
-      list-style-type: none;
-      padding: 0;
-      margin-top: 10px;
-      max-height: 150px;
-      overflow-y: auto;
-    }
-
-    .history-item {
-      padding: 8px;
-      border-bottom: 1px solid var(--border);
-      cursor: pointer;
-      font-size: 0.9rem;
-      color: var(--subtext);
-    }
-
-    .sync-section {
-      margin-top: 15px;
-      border-top: 1px solid var(--border);
-      padding-top: 15px;
-    }
-
-    .sync-btn-group { display: flex; gap: 10px; margin-top: 10px; }
-
-    /* --- SENTENCE BUILDER TAB (PINYIN FOCUS) --- */
+    /* Builder Specific */
     .builder-grammar-hint {
       background-color: #18181b;
       border-left: 4px solid var(--warning);
@@ -519,184 +227,103 @@
       flex-direction: column;
       align-items: center;
       gap: 2px;
-      transition: all 0.15s ease;
     }
 
-    .tile-btn:hover {
-      background-color: #3f3f46;
-      border-color: var(--primary);
-    }
-
-    /* Pinyin is now bold and primary */
-    .tile-btn .tile-pinyin-main {
-      font-size: 1.1rem;
-      font-weight: bold;
-      color: #60a5fa;
-    }
-
-    .tile-btn .tile-hanzi-sub {
-      font-size: 0.9rem;
-      color: #e5e7eb;
-    }
-
-    .tile-btn .tile-english-sub {
-      font-size: 0.72rem;
-      color: var(--subtext);
-    }
-
+    .tile-btn:hover { border-color: var(--primary); }
+    .tile-pinyin-main { font-size: 1.1rem; font-weight: bold; color: #60a5fa; }
+    .tile-hanzi-sub { font-size: 1rem; color: #e5e7eb; }
+    
+    .faded-pinyin { color: #4b5563; font-style: italic; font-size: 0.8rem; text-decoration: line-through; }
+    
     .builder-feedback {
       text-align: center;
       font-weight: bold;
       min-height: 24px;
       margin-bottom: 15px;
     }
+
+    .controls-bottom {
+      display: flex;
+      gap: 12px;
+      margin-top: 15px;
+      border-top: 1px solid var(--border);
+      padding-top: 15px;
+    }
+    
+    .debug-tags {
+        font-size: 0.75rem;
+        color: var(--subtext);
+        text-align: center;
+        margin-top: 10px;
+    }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <h1>HSK 1 Study & Builder Tool</h1>
+  <h1>Survival Chinese & Builder</h1>
 
-  <!-- Top Tab Navigation -->
   <div class="tab-nav">
-    <button class="tab-btn active-tab" onclick="switchTab('flashcardTab')">🎴 Flashcards & Texts</button>
-    <button class="tab-btn" onclick="switchTab('builderTab')">🧱 Sentence Builder</button>
+    <button class="tab-btn active-tab" onclick="switchTab('flashcardTab')">🎴 SRS Flashcards</button>
+    <button class="tab-btn" onclick="switchTab('builderTab')">🧱 Grammar Builder</button>
   </div>
 
-  <!-- TAB 1: FLASHCARDS & TEXTS -->
+  <!-- TAB 1: FLASHCARDS -->
   <div id="flashcardTab" class="tab-content active">
     <div class="card">
-      <div class="timer-container" id="timerContainer">
-        <div class="timer-bar" id="timerBar"></div>
-      </div>
-
-      <!-- Score Bar -->
-      <div class="score-tracker">
-        <span class="score-item score-correct">✅ <span id="correctCount">0</span></span>
-        <span class="score-item score-wrong">❌ <span id="wrongCount">0</span></span>
-        <span class="score-item score-accuracy">🎯 <span id="accuracyPercent">0%</span></span>
-        <button onclick="resetScore()" class="reset-score-btn">Reset</button>
-      </div>
-
-      <!-- Toolbar -->
       <div class="controls-top">
-        <button onclick="toggleMode()" id="modeBtn" class="mode-toggle-main">Pinyin ➔ Eng/Hanzi</button>
-        <button onclick="toggleRapidMode()" id="rapidBtn" class="icon-btn inactive-mode" title="Toggle Rapid Timer (⚡)">⚡</button>
-        <button onclick="toggleContext()" id="contextBtn" class="icon-btn" title="Toggle Sentence Context (📖)">📖</button>
-        <button onclick="toggleSelfGrade()" id="selfGradeBtn" class="icon-btn" title="Toggle Self-Grade (⭐)">⭐</button>
-        <button onclick="toggleParagraphProgress()" id="paragraphToggleBtn" class="icon-btn" title="Toggle Text Progress (📜)">📜</button>
-        <button onclick="cycleParagraphDisplayMode()" id="displayModeBtn" class="icon-btn" title="Display Mode: Hanzi / Pinyin / English (🔤)">🔤</button>
+        <button onclick="toggleAudioOnly()" id="audioOnlyBtn" class="btn-text">🎧 Blind Mode (Audio Only)</button>
+        <button onclick="toggleMode()" id="modeBtn" class="btn-text">Pinyin ➔ Eng/Hanzi</button>
       </div>
 
-      <!-- Active Paragraph Tracker -->
-      <div class="paragraph-card" id="paragraphBox">
-        <div class="paragraph-title" id="paragraphTitle">📜 Active Text Progress (Click word to jump):</div>
-        <div class="paragraph-body" id="paragraphDisplay"></div>
-      </div>
-
-      <!-- Word Prompt Area + Inline Audio -->
       <div class="prompt-wrapper">
         <div class="prompt-box" id="promptDisplay">...</div>
-        <button onclick="playAudio()" class="audio-inline-btn" id="audioBtn" title="Listen">🔊 Listen</button>
+        <button onclick="playAudio()" class="audio-inline-btn" id="audioBtn">🔊 Play Audio</button>
       </div>
-      
-      <!-- Context Clue Sentence -->
-      <div class="context-sentence" id="contextDisplay">...</div>
-      <div class="sub-prompt" id="subPromptDisplay">Loading vocabulary...</div>
 
-      <!-- Answer Grid -->
       <div class="options-grid" id="optionsGrid"></div>
 
-      <!-- Confidence Panel -->
-      <div class="confidence-panel" id="confidencePanel">
-        <div style="text-align: center; font-size: 0.85rem; color: var(--subtext);">Rate your recall difficulty:</div>
-        <div class="confidence-buttons">
-          <button onclick="submitConfidence(1)" class="btn-again">Again (1)</button>
-          <button onclick="submitConfidence(2)" class="btn-hard">Hard (2)</button>
-          <button onclick="submitConfidence(4)" class="btn-good">Good (4)</button>
-          <button onclick="submitConfidence(5)" class="btn-easy">Easy (5)</button>
-        </div>
-      </div>
-
-      <!-- Footer Navigation Controls -->
       <div class="controls-bottom">
-        <button onclick="navigateVocab(-1)" id="prevBtn">⬅️ Prev</button>
-        <button onclick="navigateVocab(1)" id="nextBtn">Next ➡️</button>
+        <button onclick="navigateVocab(1)" id="nextBtn" style="background-color: var(--primary);">Next Word ➡️</button>
       </div>
     </div>
-
-    <details open>
-      <summary>Custom Text Parser & Tiered Practice Stories</summary>
-      
-      <h3>Parse Custom Text (Pinyin or Hanzi)</h3>
-      <textarea id="customTextInput" placeholder="Paste Chinese text or Pinyin here..."></textarea>
-      <button onclick="parseCustomText()" style="margin-top: 8px;">Filter & Practice Custom Words</button>
-
-      <h3 style="margin-top: 20px;">Leveled Sample Stories</h3>
-      <div id="sampleTextsContainer"></div>
-
-      <h3 style="margin-top: 20px;">Text History</h3>
-      <ul class="history-list" id="historyList"></ul>
-
-      <div class="sync-section">
-        <h4>Sync Data Between Devices</h4>
-        <div class="sync-btn-group">
-          <button type="button" onclick="exportData()">Export Progress (JSON)</button>
-          <button type="button" onclick="document.getElementById('importFile').click()">Import Progress (JSON)</button>
-        </div>
-        <input type="file" id="importFile" style="display: none;" onchange="importData(event)" accept=".json" />
-      </div>
-    </details>
   </div>
 
-  <!-- TAB 2: SENTENCE BUILDER (PINYIN FOCUS) -->
+  <!-- TAB 2: SENTENCE BUILDER -->
   <div id="builderTab" class="tab-content">
     <div class="card">
       <h2>Active Sentence Builder</h2>
       <div style="text-align: center; font-size: 0.85rem; color: var(--subtext); margin-bottom: 15px;">
-        🗣️ <strong>Focus:</strong> Assemble the sentence using <strong>Pinyin</strong> word tiles in the correct Chinese order!
+        🗣️ Assemble the sentence. Mastered words will have their Pinyin hidden!
       </div>
 
-      <div class="builder-grammar-hint" id="builderGrammarHint">
-        Pattern: [Subject] + [Time] + 去 + [Place]
-      </div>
+      <div class="builder-grammar-hint" id="builderGrammarHint">Pattern...</div>
+      <div class="builder-target-english" id="builderTargetEnglish">"..."</div>
 
-      <div class="builder-target-english" id="builderTargetEnglish">
-        "My friend and I are going to a restaurant at 3 o'clock."
-      </div>
-
-      <!-- Workspace -->
       <div class="builder-workspace" id="builderWorkspace">
-        <span style="color: var(--subtext); font-size: 0.9rem;" id="workspacePlaceholder">Click Pinyin tiles below to build sentence...</span>
+        <span style="color: var(--subtext); font-size: 0.9rem;" id="workspacePlaceholder">Click tiles below...</span>
       </div>
 
       <div class="builder-feedback" id="builderFeedback"></div>
-
-      <!-- Tile Bank -->
       <div class="builder-tile-bank" id="builderTileBank"></div>
 
-      <!-- Controls -->
       <div class="controls-bottom">
         <button onclick="clearBuilderWorkspace()" style="background-color: #374151;">🔄 Clear</button>
         <button onclick="checkBuilderAnswer()" style="background-color: var(--success);">✅ Check</button>
-        <button onclick="loadNextBuilderPuzzle()" style="background-color: var(--primary);">Next Puzzle ➡️</button>
+        <button onclick="loadNextBuilderPuzzle()" style="background-color: var(--primary);">Next ➡️</button>
       </div>
+      <div class="debug-tags" id="debugTagsDisplay"></div>
     </div>
   </div>
 
 </div>
 
 <script>
-  function normalizePinyin(p) {
-    return p.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z]/g, "");
-  }
-
   function switchTab(tabId) {
     document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active-tab'));
-
     document.getElementById(tabId).classList.add('active');
-
+    
     if (tabId === 'flashcardTab') {
       document.querySelectorAll('.tab-btn')[0].classList.add('active-tab');
     } else {
@@ -705,137 +332,267 @@
     }
   }
 
-  const sampleTexts = [
-    { id: "easy1", level: "easy", title: "1. Basic Greeting & Intro", hanzi: "你好！我是学生，他是老师。我很喜欢学习汉语。", pinyin: "Nǐ hǎo! Wǒ shì xuésheng, tā shì lǎoshī. Wǒ hěn xǐhuan xuéxí Hànyǔ.", english: "Hello! I am a student, and he is a teacher. I really like studying Chinese." },
-    { id: "easy2", level: "easy", title: "2. Family & Age", hanzi: "我爸爸妈妈都在家里。我有一个女儿，她九岁了。", pinyin: "Wǒ bàba māma dōu zài jiālǐ. Wǒ yǒu yí gè nǚ'ér, tā jiǔ suì le.", english: "My dad and mom are both at home. I have a daughter, she is nine years old." },
-    { id: "easy3", level: "easy", title: "3. Simple Weather & Tea", hanzi: "今天天气很热。我想喝水，不喝热茶。", pinyin: "Jīntiān tiānqì hěn rè. Wǒ xiǎng hē shuǐ, bù hē rè chá.", english: "The weather today is very hot. I want to drink water, not hot tea." },
-    { id: "med1", level: "medium", title: "1. Lunch & Taxi to Shop", hanzi: "今天中午我和朋友去饭店吃米饭，喝热茶。下午三点我们坐出租车去商店买东西。我很高兴！", pinyin: "Jīntiān zhōngwǔ wǒ hé péngyou qù fàndiàn chī mǐfàn, hē rè chá. Xiàwǔ sān diǎn wǒmen zuò chūzūchē qù shāngdiàn mǎi dōngxi. Wǒ hěn gāoxìng!", english: "Today at noon, my friend and I went to a restaurant to eat rice and drink hot tea. At 3 PM, we took a taxi to the store to buy things. I am very happy!" },
-    { id: "med2", level: "medium", title: "2. School & Meeting Teacher", hanzi: "今天天气不冷，我和同学在学校看见了老师。我们都很高兴，请老师喝茶。", pinyin: "Jīntiān tiānqì bù lěng, wǒ hé tóngxué zài xuéxiào kànjiàn le lǎoshī. Wǒmen dōu hěn gāoxìng, qǐng lǎoshī hē chá.", english: "The weather today is not cold. My classmate and I saw the teacher at school. We were all very happy and invited the teacher to drink tea." },
-    { id: "hard1", level: "hard", title: "1. Shopping Prices & Books", hanzi: "现在四点半，我和女儿去商店买苹果和水果。这个苹果太大了，一个五块钱。我买了一本书，三块钱。", pinyin: "Xiànzài sì diǎn bàn, wǒ hé nǚ'ér qù shāngdiàn mǎi píngguǒ hé shuǐguǒ. Zhè gè píngguǒ tài dà le, yí gè wǔ kuài qián. Wǒ mǎi le yì běn shū, sān kuài qián.", english: "It is 4:30 now. My daughter and I went to the store to buy apples and fruit. This apple is too big, one costs 5 yuan. I bought a book for 3 yuan." }
+  // --- SURVIVAL & EDUCATOR VOCABULARY DECK ---
+  const survivalVocabulary = [
+    { id: "1", hanzi: "你好", pinyin: "nǐ hǎo", english: "hello" },
+    { id: "2", hanzi: "英语", pinyin: "Yīngyǔ", english: "English language" },
+    { id: "3", hanzi: "老师", pinyin: "lǎoshī", english: "teacher" },
+    { id: "4", hanzi: "学生", pinyin: "xuésheng", english: "student" },
+    { id: "5", hanzi: "学校", pinyin: "xuéxiào", english: "school" },
+    { id: "6", hanzi: "大连", pinyin: "Dàlián", english: "Dalian (City)" },
+    { id: "7", hanzi: "银行", pinyin: "yínháng", english: "bank" },
+    { id: "8",护照: "护照", hanzi: "护照", pinyin: "hùzhào", english: "passport" },
+    { id: "9", hanzi: "多少钱", pinyin: "duōshao qián", english: "how much money" },
+    { id: "10", hanzi: "饭店", pinyin: "fàndiàn", english: "restaurant" },
+    { id: "11", hanzi: "酒吧", pinyin: "jiǔbā", english: "bar / pub" },
+    { id: "12", hanzi: "啤酒", pinyin: "píjiǔ", english: "beer" },
+    { id: "13", hanzi: "租房", pinyin: "zūfáng", english: "to rent an apartment" },
+    { id: "14", hanzi: "去", pinyin: "qù", english: "to go" },
+    { id: "15", hanzi: "想", pinyin: "xiǎng", english: "to want / would like" },
+    { id: "16", hanzi: "我", pinyin: "wǒ", english: "I / me" },
+    { id: "17", hanzi: "的", pinyin: "de", english: "[possessive particle]" },
+    { id: "18", hanzi: "在", pinyin: "zài", english: "at / in / on" },
+    { id: "19", hanzi: "明天", pinyin: "míngtiān", english: "tomorrow" },
+    { id: "20", hanzi: "上课", pinyin: "shàngkè", english: "to attend class / teach" },
+    { id: "21", hanzi: "冰", pinyin: "bīng", english: "ice / cold" },
+    { id: "22", hanzi: "外卖", pinyin: "wàimài", english: "takeout / delivery" }
   ];
 
-  const defaultVocabulary = [
-    { id: "爱", hanzi: "爱", pinyin: "ài", english: "to love / affection", sentence: "妈妈很 ___ 我。(Māma hěn ___ wǒ.)" },
-    { id: "爸爸", hanzi: "爸爸", pinyin: "bàba", english: "dad / father", sentence: "我的 ___ 是医生。(Wǒ de ___ shì yīshēng.)" },
-    { id: "北京", hanzi: "北京", pinyin: "Běijīng", english: "Beijing", sentence: "我想去 ___。(Wǒ xiǎng qù ___.)" },
-    { id: "吃", hanzi: "吃", pinyin: "chī", english: "to eat", sentence: "你想 ___ 米饭吗？(Nǐ xiǎng ___ mǐfàn ma?)" },
-    { id: "出租车", hanzi: "出租车", pinyin: "chūzūchē", english: "taxi", sentence: "我们坐 ___ 去商店。(Wǒmen zuò ___ qù shāngdiàn.)" },
-    { id: "打电话", hanzi: "打电话", pinyin: "dǎ diànhuà", english: "to make a phone call", sentence: "他在给朋友 ___。(Tā zài gěi péngyou ___.)" },
-    { id: "饭店", hanzi: "饭店", pinyin: "fàndiàn", english: "restaurant / hotel", sentence: "我去 ___ 吃米饭。(Wǒ qù ___ chī mǐfàn.)" },
-    { id: "汉语", hanzi: "汉语", pinyin: "Hànyǔ", english: "Chinese language", sentence: "我们学习 ___。(Wǒmen xuéxí ___.)" },
-    { id: "喝", hanzi: "喝", pinyin: "hē", english: "to drink", sentence: "你想 ___ 水吗？(Nǐ xiǎng ___ shuǐ ma?)" },
-    { id: "今天", hanzi: "今天", pinyin: "jīntiān", english: "today", sentence: "___ 天气冷。(____ tiānqì lěng.)" },
-    { id: "看", hanzi: "看", pinyin: "kàn", english: "to look / to watch / to read", sentence: "我想 ___ 书。(Wǒ xiǎng ___ shū.)" },
-    { id: "老师", hanzi: "老师", pinyin: "lǎoshī", english: "teacher", sentence: "她是我们的 ___。(Tā shì wǒmen de ___.)" },
-    { id: "买", hanzi: "买", pinyin: "mǎi", english: "to buy", sentence: "我去商店 ___ 东西。(Wǒ qù shāngdiàn ___ dōngxi.)" },
-    { id: "朋友", hanzi: "朋友", pinyin: "péngyou", english: "friend", sentence: "他是我的 ___。(Tā shì wǒ de ___.)" },
-    { id: "去", hanzi: "去", pinyin: "qù", english: "to go", sentence: "我想 ___ 饭店。(Wǒ xiǎng ___ fàndiàn.)" },
-    { id: "商店", hanzi: "商店", pinyin: "shāngdiàn", english: "shop / store", sentence: "我们去 ___ 买东西。(Wǒmen qù ___ mǎi dōngxi.)" },
-    { id: "学校", hanzi: "学校", pinyin: "xuéxiào", english: "school", sentence: "老师在 ___ 教书。(Lǎoshī zài ___ jiāoshū.)" }
-  ];
-
-  let activeVocab = [...defaultVocabulary];
+  let activeVocab = [...survivalVocabulary];
   let currentWord = null;
-  let currentVocabIndex = 0;
   let reverseMode = false;
-  let showContext = true;
-  let selfGradeMode = true;
-  let showParagraphProgress = true;
-  let paragraphDisplayMode = 'hanzi'; 
-  let currentParagraphText = "";
-  let learnedWords = new Set();
-  let rapidMode = false;
-  let timerInterval = null;
-  const RAPID_TIME_LIMIT = 3000;
-  let correctScore = 0;
-  let wrongScore = 0;
+  let audioOnlyMode = false;
+  
+  // SRS Logic
+  const MASTER_THRESHOLD = 3;
+  function getWordSRS(wordId) {
+    const data = JSON.parse(localStorage.getItem('survival_srs') || '{}');
+    return data[wordId] || { repetition: 0, easeFactor: 2.5, dueDate: Date.now() };
+  }
+  
+  function updateWordSRS(wordId, isCorrect) {
+    const data = JSON.parse(localStorage.getItem('survival_srs') || '{}');
+    let item = getWordSRS(wordId);
+    
+    if (isCorrect) {
+      item.repetition += 1;
+      item.dueDate = Date.now() + (Math.pow(2, item.repetition) * 60 * 60 * 1000); // Simple interval
+    } else {
+      item.repetition = 0;
+      item.dueDate = Date.now();
+    }
+    
+    data[wordId] = item;
+    localStorage.setItem('survival_srs', JSON.stringify(data));
+  }
+  
+  function isMastered(wordId) {
+    return getWordSRS(wordId).repetition >= MASTER_THRESHOLD;
+  }
 
-  // --- GRANULAR PINYIN-FIRST SENTENCE BUILDER PUZZLES ---
+  // Flashcard Core
+  function toggleAudioOnly() {
+    audioOnlyMode = !audioOnlyMode;
+    document.getElementById('audioOnlyBtn').classList.toggle('active-mode');
+    loadQuestion();
+  }
+
+  function toggleMode() {
+    reverseMode = !reverseMode;
+    document.getElementById('modeBtn').innerText = reverseMode ? "Eng/Hanzi ➔ Pinyin" : "Pinyin ➔ Eng/Hanzi";
+    loadQuestion();
+  }
+
+  function loadQuestion() {
+    const now = Date.now();
+    const dueWords = activeVocab.filter(w => getWordSRS(w.id).dueDate <= now);
+    currentWord = dueWords.length > 0 
+      ? dueWords[Math.floor(Math.random() * dueWords.length)]
+      : activeVocab[Math.floor(Math.random() * activeVocab.length)];
+
+    renderQuestionDisplay();
+  }
+
+  function renderQuestionDisplay() {
+    const promptDisplay = document.getElementById('promptDisplay');
+    const mastered = isMastered(currentWord.id);
+    
+    if (audioOnlyMode) {
+      promptDisplay.innerHTML = "🎧 <br/><span style='font-size: 1rem; color: #9ca3af;'>Listen carefully...</span>";
+      playAudio();
+    } else {
+      if (!reverseMode) {
+        // Pinyin to Eng/Hanzi. If mastered, hide pinyin.
+        promptDisplay.innerHTML = mastered 
+          ? `${currentWord.hanzi} <span class="mastered-badge">Mastered</span>` 
+          : `${currentWord.pinyin} (${currentWord.hanzi})`;
+      } else {
+        promptDisplay.innerHTML = `${currentWord.hanzi} - ${currentWord.english}`;
+      }
+    }
+
+    const grid = document.getElementById('optionsGrid');
+    grid.innerHTML = '';
+    
+    let options = [currentWord];
+    while(options.length < 4) {
+      let rand = activeVocab[Math.floor(Math.random() * activeVocab.length)];
+      if(!options.includes(rand)) options.push(rand);
+    }
+    options.sort(() => Math.random() - 0.5);
+
+    options.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.innerText = !reverseMode ? opt.english : `${opt.pinyin} (${opt.hanzi})`;
+      btn.onclick = () => {
+        const correct = opt.id === currentWord.id;
+        btn.classList.add(correct ? 'correct' : 'wrong');
+        updateWordSRS(currentWord.id, correct);
+        setTimeout(loadQuestion, 600);
+      };
+      grid.appendChild(btn);
+    });
+  }
+
+  function playAudio() {
+    if (!currentWord || !('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(currentWord.hanzi);
+    utterance.lang = 'zh-CN';
+    window.speechSynthesis.speak(utterance);
+  }
+
+  function navigateVocab() { loadQuestion(); }
+
+  // --- GRAMMAR SRS & BUILDER ---
   const builderPuzzles = [
     {
-      english: "My friend and I are going to a restaurant at 3 o'clock.",
-      grammar: "[Subject] + [Time] + 去 + [Place]",
+      id: "puz1",
+      english: "I am an English teacher.",
+      tags: ["basic_identification"],
+      grammar: "[Subject] + 是 + [Noun]",
       tiles: [
-        { pinyin: "Wǒ", hanzi: "我", english: "I / me" },
-        { pinyin: "hé", hanzi: "和", english: "and" },
-        { pinyin: "péngyou", hanzi: "朋友", english: "friend" },
-        { pinyin: "sān diǎn", hanzi: "三点", english: "3 o'clock" },
-        { pinyin: "qù", hanzi: "去", english: "go" },
-        { pinyin: "fàndiàn", hanzi: "饭店", english: "restaurant" }
+        { id: "16", hanzi: "我", pinyin: "wǒ" },
+        { id: "x1", hanzi: "是", pinyin: "shì" },
+        { id: "2", hanzi: "英语", pinyin: "Yīngyǔ" },
+        { id: "3", hanzi: "老师", pinyin: "lǎoshī" }
+      ],
+      validOrders: [["我", "是", "英语", "老师"]]
+    },
+    {
+      id: "puz2",
+      english: "I want to go to the bank tomorrow.",
+      tags: ["time_placement", "want_action"],
+      grammar: "[Subject] + [Time] + 想去 + [Place]",
+      tiles: [
+        { id: "16", hanzi: "我", pinyin: "wǒ" },
+        { id: "19", hanzi: "明天", pinyin: "míngtiān" },
+        { id: "15", hanzi: "想", pinyin: "xiǎng" },
+        { id: "14", hanzi: "去", pinyin: "qù" },
+        { id: "7", hanzi: "银行", pinyin: "yínháng" }
       ],
       validOrders: [
-        ["我", "和", "朋友", "三点", "去", "饭店"],
-        ["三点", "我", "和", "朋友", "去", "饭店"]
+        ["我", "明天", "想", "去", "银行"],
+        ["明天", "我", "想", "去", "银行"]
       ]
     },
     {
-      english: "My classmate saw the teacher at school today.",
-      grammar: "[Time] + [Subject] + 在 + [Place] + [Verb] + 了 + [Object]",
-      tiles: [
-        { pinyin: "Wǒ", hanzi: "我", english: "my" },
-        { pinyin: "de", hanzi: "的", english: "'s" },
-        { pinyin: "tóngxué", hanzi: "同学", english: "classmate" },
-        { pinyin: "jīntiān", hanzi: "今天", english: "today" },
-        { pinyin: "zài", hanzi: "在", english: "at" },
-        { pinyin: "xuéxiào", hanzi: "学校", english: "school" },
-        { pinyin: "kànjiàn", hanzi: "看见", english: "saw" },
-        { pinyin: "le", hanzi: "了", english: "[particle]" },
-        { pinyin: "lǎoshī", hanzi: "老师", english: "teacher" }
-      ],
-      validOrders: [
-        ["我", "的", "同学", "今天", "在", "学校", "看见", "了", "老师"],
-        ["今天", "我", "的", "同学", "在", "学校", "看见", "了", "老师"]
-      ]
-    },
-    {
-      english: "I will take a taxi to the store tomorrow afternoon.",
-      grammar: "[Subject] + [Time] + [Transport] + 去 + [Place]",
-      tiles: [
-        { pinyin: "Wǒ", hanzi: "我", english: "I" },
-        { pinyin: "míngtiān", hanzi: "明天", english: "tomorrow" },
-        { pinyin: "xiàwǔ", hanzi: "下午", english: "afternoon" },
-        { pinyin: "zuò", hanzi: "坐", english: "take" },
-        { pinyin: "chūzūchē", hanzi: "出租车", english: "taxi" },
-        { pinyin: "qù", hanzi: "去", english: "go to" },
-        { pinyin: "shāngdiàn", hanzi: "商店", english: "store" }
-      ],
-      validOrders: [
-        ["我", "明天", "下午", "坐", "出租车", "去", "商店"],
-        ["明天", "下午", "我", "坐", "出租车", "去", "商店"]
-      ]
-    },
-    {
-      english: "Mom is cooking at home.",
+      id: "puz3",
+      english: "I am teaching class at the school.",
+      tags: ["location_preposition"],
       grammar: "[Subject] + 在 + [Place] + [Action]",
       tiles: [
-        { pinyin: "Māma", hanzi: "妈妈", english: "Mom" },
-        { pinyin: "zài", hanzi: "在", english: "at" },
-        { pinyin: "jiālǐ", hanzi: "家里", english: "home" },
-        { pinyin: "zuò cài", hanzi: "做菜", english: "cooking" }
+        { id: "16", hanzi: "我", pinyin: "wǒ" },
+        { id: "18", hanzi: "在", pinyin: "zài" },
+        { id: "5", hanzi: "学校", pinyin: "xuéxiào" },
+        { id: "20", hanzi: "上课", pinyin: "shàngkè" }
       ],
-      validOrders: [
-        ["妈妈", "在", "家里", "做菜"]
-      ]
+      validOrders: [["我", "在", "学校", "上课"]]
+    },
+    {
+      id: "puz4",
+      english: "I want cold beer at the pub.",
+      tags: ["location_preposition", "adjective_noun"],
+      grammar: "[Subject] + 在 + [Place] + 想 + [Item]",
+      tiles: [
+        { id: "16", hanzi: "我", pinyin: "wǒ" },
+        { id: "18", hanzi: "在", pinyin: "zài" },
+        { id: "11", hanzi: "酒吧", pinyin: "jiǔbā" },
+        { id: "15", hanzi: "想", pinyin: "xiǎng" },
+        { id: "x3", hanzi: "喝", pinyin: "hē" },
+        { id: "21", hanzi: "冰", pinyin: "bīng" },
+        { id: "12", hanzi: "啤酒", pinyin: "píjiǔ" }
+      ],
+      validOrders: [["我", "在", "酒吧", "想", "喝", "冰", "啤酒"]]
+    },
+    {
+      id: "puz5",
+      english: "Where is my passport?",
+      tags: ["possession", "question_location"],
+      grammar: "[Subject] + 的 + [Noun] + 在哪儿",
+      tiles: [
+        { id: "16", hanzi: "我", pinyin: "wǒ" },
+        { id: "17", hanzi: "的", pinyin: "de" },
+        { id: "8", hanzi: "护照", pinyin: "hùzhào" },
+        { id: "18", hanzi: "在", pinyin: "zài" },
+        { id: "x2", hanzi: "哪儿", pinyin: "nǎ'er" }
+      ],
+      validOrders: [["我", "的", "护照", "在", "哪儿"]]
     }
   ];
 
-  let currentBuilderIdx = 0;
+  let currentBuilderPuz = null;
   let assembledTiles = [];
-
-  function initBuilderTab() {
-    loadBuilderPuzzle(currentBuilderIdx);
+  
+  function getGrammarErrors() {
+    return JSON.parse(localStorage.getItem('grammar_errors') || '{}');
   }
 
-  function loadBuilderPuzzle(idx) {
-    currentBuilderIdx = idx % builderPuzzles.length;
-    const puzzle = builderPuzzles[currentBuilderIdx];
+  function logGrammarError(tags, isCorrect) {
+    const errors = getGrammarErrors();
+    tags.forEach(tag => {
+      if (isCorrect) {
+        if(errors[tag]) errors[tag] = Math.max(0, errors[tag] - 1);
+      } else {
+        errors[tag] = (errors[tag] || 0) + 1;
+      }
+    });
+    localStorage.setItem('grammar_errors', JSON.stringify(errors));
+    updateDebugTags();
+  }
 
+  function selectNextPuzzle() {
+    const errors = getGrammarErrors();
+    
+    // Weight puzzles by how many failed tags they contain
+    let weightedPuzzles = builderPuzzles.map(p => {
+      let weight = 1;
+      p.tags.forEach(tag => { weight += (errors[tag] || 0); });
+      return { puzzle: p, weight: weight };
+    });
+    
+    // Simple weighted random selection
+    let totalWeight = weightedPuzzles.reduce((sum, item) => sum + item.weight, 0);
+    let random = Math.random() * totalWeight;
+    for (let item of weightedPuzzles) {
+      random -= item.weight;
+      if (random <= 0) return item.puzzle;
+    }
+    return builderPuzzles[0];
+  }
+
+  function initBuilderTab() {
+    updateDebugTags();
+    loadBuilderPuzzle(selectNextPuzzle());
+  }
+
+  function loadBuilderPuzzle(puzzle) {
+    currentBuilderPuz = puzzle;
     document.getElementById('builderGrammarHint').innerText = `Pattern: ${puzzle.grammar}`;
     document.getElementById('builderTargetEnglish').innerText = `"${puzzle.english}"`;
     document.getElementById('builderFeedback').innerText = "";
     
     clearBuilderWorkspace();
-
     const bank = document.getElementById('builderTileBank');
     bank.innerHTML = "";
 
@@ -844,11 +601,11 @@
     shuffled.forEach(tile => {
       const btn = document.createElement('button');
       btn.className = 'tile-btn';
-      btn.innerHTML = `
-        <span class="tile-pinyin-main">${tile.pinyin}</span>
-        <span class="tile-hanzi-sub">${tile.hanzi}</span>
-        <span class="tile-english-sub">${tile.english}</span>
-      `;
+      
+      const mastered = isMastered(tile.id);
+      const pinyinDisplay = mastered ? `<span class="faded-pinyin">Mastered</span>` : `<span class="tile-pinyin-main">${tile.pinyin}</span>`;
+      
+      btn.innerHTML = `${pinyinDisplay}<span class="tile-hanzi-sub">${tile.hanzi}</span>`;
       btn.onclick = () => addTileToWorkspace(tile, btn);
       bank.appendChild(btn);
     });
@@ -863,20 +620,16 @@
   function removeTileFromWorkspace(index) {
     const removed = assembledTiles.splice(index, 1)[0];
     renderWorkspace();
-
     const bankButtons = document.querySelectorAll('#builderTileBank .tile-btn');
     bankButtons.forEach(btn => {
-      if (btn.innerText.includes(removed.pinyin)) {
-        btn.style.display = 'inline-flex';
-      }
+      if (btn.innerHTML.includes(removed.hanzi)) btn.style.display = 'inline-flex';
     });
   }
 
   function clearBuilderWorkspace() {
     assembledTiles = [];
     renderWorkspace();
-    const bankButtons = document.querySelectorAll('#builderTileBank .tile-btn');
-    bankButtons.forEach(btn => btn.style.display = 'inline-flex');
+    document.querySelectorAll('#builderTileBank .tile-btn').forEach(btn => btn.style.display = 'inline-flex');
     document.getElementById('builderFeedback').innerText = "";
   }
 
@@ -885,7 +638,7 @@
     ws.innerHTML = "";
 
     if (assembledTiles.length === 0) {
-      ws.innerHTML = `<span style="color: var(--subtext); font-size: 0.9rem;">Click Pinyin tiles below to build sentence...</span>`;
+      ws.innerHTML = `<span style="color: var(--subtext); font-size: 0.9rem;">Click tiles below to build sentence...</span>`;
       return;
     }
 
@@ -893,407 +646,54 @@
       const btn = document.createElement('button');
       btn.className = 'tile-btn';
       btn.style.borderColor = 'var(--primary)';
-      btn.innerHTML = `
-        <span class="tile-pinyin-main">${tile.pinyin}</span>
-        <span class="tile-hanzi-sub">${tile.hanzi}</span>
-        <span class="tile-english-sub">${tile.english}</span>
-      `;
+      
+      const mastered = isMastered(tile.id);
+      const pinyinDisplay = mastered ? `<span class="faded-pinyin">Mastered</span>` : `<span class="tile-pinyin-main">${tile.pinyin}</span>`;
+      
+      btn.innerHTML = `${pinyinDisplay}<span class="tile-hanzi-sub">${tile.hanzi}</span>`;
       btn.onclick = () => removeTileFromWorkspace(index);
       ws.appendChild(btn);
     });
   }
 
   function checkBuilderAnswer() {
-    const puzzle = builderPuzzles[currentBuilderIdx];
+    if(!currentBuilderPuz) return;
     const feedback = document.getElementById('builderFeedback');
-
     const userHanziSequence = assembledTiles.map(t => t.hanzi).join('');
+    const isCorrect = currentBuilderPuz.validOrders.some(order => order.join('') === userHanziSequence);
 
-    const isCorrect = puzzle.validOrders.some(order => order.join('') === userHanziSequence);
+    logGrammarError(currentBuilderPuz.tags, isCorrect);
 
     if (isCorrect) {
       feedback.style.color = 'var(--success)';
-      feedback.innerText = "🎉 Excellent! Correct word order!";
-      
+      feedback.innerText = "🎉 Excellent! Grammar check passed.";
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(userHanziSequence);
-        utterance.lang = 'zh-CN';
-        window.speechSynthesis.speak(utterance);
+        let u = new SpeechSynthesisUtterance(userHanziSequence);
+        u.lang = 'zh-CN';
+        window.speechSynthesis.speak(u);
       }
     } else {
       feedback.style.color = 'var(--error)';
-      feedback.innerText = "❌ Word order isn't quite right yet. Check Pinyin order!";
+      feedback.innerText = "❌ Structure incorrect. Think about word order logic.";
     }
   }
 
   function loadNextBuilderPuzzle() {
-    loadBuilderPuzzle(currentBuilderIdx + 1);
+    loadBuilderPuzzle(selectNextPuzzle());
   }
-
-  // --- FLASHCARD ENGINE ---
-  function renderSampleTexts() {
-    const container = document.getElementById('sampleTextsContainer');
-    container.innerHTML = '';
-
-    const levels = [
-      { key: 'easy', title: '🟢 Easy (Basic Phrases)', class: 'diff-easy' },
-      { key: 'medium', title: '🟡 Medium (Daily Routines)', class: 'diff-medium' },
-      { key: 'hard', title: '🔴 Hard (Complex Sentences)', class: 'diff-hard' }
-    ];
-
-    levels.forEach(lvl => {
-      const group = document.createElement('div');
-      group.className = 'difficulty-group';
-
-      const label = document.createElement('div');
-      label.className = `difficulty-title ${lvl.class}`;
-      label.innerText = lvl.title;
-      group.appendChild(label);
-
-      const list = document.createElement('div');
-      list.className = 'sample-texts-list';
-
-      sampleTexts.filter(s => s.level === lvl.key).forEach(sample => {
-        const card = document.createElement('div');
-        card.className = 'sample-card';
-        card.innerHTML = `
-          <div class="sample-header">
-            <span>${sample.title}</span>
-            <div class="sample-actions">
-              <button class="sample-btn-action" onclick="toggleSampleTranslation('${sample.id}')">👁️ Translation</button>
-              <button class="sample-btn-action" style="background-color: var(--primary) !important;" onclick="loadSampleText('${sample.id}')">▶️ Practice</button>
-            </div>
-          </div>
-          <div class="sample-text-content">
-            <div><strong>Pinyin:</strong> ${sample.pinyin}</div>
-            <div style="font-size: 0.85rem; color: #9ca3af; margin-top: 4px;"><strong>Hanzi:</strong> ${sample.hanzi}</div>
-          </div>
-          <div class="sample-translation" id="trans_${sample.id}">${sample.english}</div>
-        `;
-        list.appendChild(card);
-      });
-
-      group.appendChild(list);
-      container.appendChild(group);
-    });
-  }
-
-  function toggleSampleTranslation(id) {
-    const el = document.getElementById(`trans_${id}`);
-    el.style.display = el.style.display === 'block' ? 'none' : 'block';
-  }
-
-  function loadSampleText(id) {
-    const sample = sampleTexts.find(s => s.id === id);
-    if (sample) {
-      document.getElementById('customTextInput').value = sample.hanzi;
-      parseCustomText();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  }
-
-  function updateScoreUI() {
-    document.getElementById('correctCount').innerText = correctScore;
-    document.getElementById('wrongCount').innerText = wrongScore;
-    const total = correctScore + wrongScore;
-    const accuracy = total > 0 ? Math.round((correctScore / total) * 100) : 0;
-    document.getElementById('accuracyPercent').innerText = `${accuracy}%`;
-  }
-
-  function resetScore() {
-    correctScore = 0; wrongScore = 0; updateScoreUI();
-  }
-
-  function getWordSRS(wordId) {
-    try {
-      const srsData = JSON.parse(localStorage.getItem('hsk_srs_data') || '{}');
-      return srsData[wordId] || { interval: 1, repetition: 0, easeFactor: 2.5, dueDate: Date.now() };
-    } catch (e) {
-      return { interval: 1, repetition: 0, easeFactor: 2.5, dueDate: Date.now() };
-    }
-  }
-
-  function updateWordSRS(wordId, grade) {
-    try {
-      const srsData = JSON.parse(localStorage.getItem('hsk_srs_data') || '{}');
-      let item = getWordSRS(wordId);
-
-      if (grade >= 3) {
-        if (item.repetition === 0) item.interval = 1;
-        else if (item.repetition === 1) item.interval = 6;
-        else item.interval = Math.round(item.interval * item.easeFactor);
-        item.repetition += 1;
-        learnedWords.add(wordId);
-      } else {
-        item.repetition = 0; item.interval = 1;
+  
+  function updateDebugTags() {
+      const errors = getGrammarErrors();
+      let html = "<strong>Targeted Weaknesses (Grammar Tags):</strong> ";
+      if(Object.keys(errors).length === 0) html += "None yet.";
+      for(let tag in errors) {
+          if(errors[tag] > 0) html += ` [${tag}: ${errors[tag]}] `;
       }
-
-      item.easeFactor = item.easeFactor + (0.1 - (5 - grade) * (0.08 + (5 - grade) * 0.02));
-      if (item.easeFactor < 1.3) item.easeFactor = 1.3;
-      item.dueDate = Date.now() + (item.interval * 24 * 60 * 60 * 1000);
-
-      srsData[wordId] = item;
-      localStorage.setItem('hsk_srs_data', JSON.stringify(srsData));
-      updateParagraphHighlighting();
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  function jumpToWord(wordId) {
-    stopTimer();
-    const targetIdx = activeVocab.findIndex(w => w.id === wordId);
-    if (targetIdx !== -1) {
-      currentVocabIndex = targetIdx;
-      currentWord = activeVocab[currentVocabIndex];
-      renderQuestionDisplay();
-    }
-  }
-
-  function selectNextWord() {
-    const now = Date.now();
-    const dueWords = activeVocab.filter(word => getWordSRS(word.id).dueDate <= now);
-    let selected = dueWords.length > 0 
-      ? dueWords[Math.floor(Math.random() * dueWords.length)]
-      : activeVocab[Math.floor(Math.random() * activeVocab.length)];
-
-    currentVocabIndex = activeVocab.findIndex(w => w.id === selected.id);
-    return selected;
-  }
-
-  function stopTimer() {
-    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-  }
-
-  function navigateVocab(direction) {
-    stopTimer();
-    if (!activeVocab || activeVocab.length === 0) return;
-    currentVocabIndex = (currentVocabIndex + direction + activeVocab.length) % activeVocab.length;
-    currentWord = activeVocab[currentVocabIndex];
-    renderQuestionDisplay();
-  }
-
-  function loadQuestion() {
-    stopTimer();
-    if (!activeVocab || activeVocab.length === 0) return;
-    currentWord = selectNextWord();
-    renderQuestionDisplay();
-  }
-
-  function renderQuestionDisplay() {
-    const promptDisplay = document.getElementById('promptDisplay');
-    const subPromptDisplay = document.getElementById('subPromptDisplay');
-    const contextDisplay = document.getElementById('contextDisplay');
-
-    document.getElementById('confidencePanel').style.display = 'none';
-
-    if (!reverseMode) {
-      promptDisplay.innerText = `${currentWord.pinyin} (${currentWord.hanzi})`;
-      subPromptDisplay.innerText = "Select the matching Meaning";
-    } else {
-      promptDisplay.innerText = `${currentWord.hanzi} - ${currentWord.english}`;
-      subPromptDisplay.innerText = "Select the matching Pinyin";
-    }
-
-    contextDisplay.innerText = currentWord.sentence || "...";
-    contextDisplay.style.display = showContext ? 'block' : 'none';
-
-    generateOptions();
-    updateParagraphHighlighting();
-    playAudio();
-  }
-
-  function updateParagraphHighlighting() {
-    const box = document.getElementById('paragraphBox');
-    const display = document.getElementById('paragraphDisplay');
-
-    if (!currentParagraphText.trim() || !showParagraphProgress) {
-      box.style.display = 'none';
-      return;
-    }
-
-    box.style.display = 'block';
-
-    const sortedVocab = [...activeVocab].sort((a, b) => b.hanzi.length - a.hanzi.length);
-    let rendered = currentParagraphText;
-    const tokens = [];
-
-    sortedVocab.forEach((word, index) => {
-      if (rendered.includes(word.hanzi)) {
-        const token = `___VOCAB_TOKEN_${index}___`;
-        rendered = rendered.split(word.hanzi).join(token);
-        tokens.push({ token, word });
-      }
-    });
-
-    tokens.forEach(({ token, word }) => {
-      const isCurrent = currentWord && currentWord.id === word.id;
-      const isLearned = learnedWords.has(word.id) || getWordSRS(word.id).repetition > 0;
-      
-      let className = "hl-word ";
-      if (isCurrent) className += "hl-current";
-      else if (isLearned) className += "hl-learned";
-      else className += "hl-unlearned";
-
-      let labelToDisplay = word.pinyin; // Pinyin default in paragraph tracker
-      if (paragraphDisplayMode === 'hanzi') labelToDisplay = word.hanzi;
-      else if (paragraphDisplayMode === 'english') labelToDisplay = word.english.split('/')[0].trim();
-
-      const spanHtml = `<span class="${className}" onclick="jumpToWord('${word.id}')">${labelToDisplay}</span>`;
-      rendered = rendered.split(token).join(spanHtml);
-    });
-
-    display.innerHTML = rendered;
-  }
-
-  function generateOptions() {
-    const grid = document.getElementById('optionsGrid');
-    grid.innerHTML = '';
-
-    const currentSRS = getWordSRS(currentWord.id);
-    const options = [currentWord];
-
-    const sortedDistractors = activeVocab
-      .filter(w => w.id !== currentWord.id)
-      .map(w => ({ word: w, srs: getWordSRS(w.id) }))
-      .sort((a, b) => Math.abs(a.srs.repetition - currentSRS.repetition) - Math.abs(b.srs.repetition - currentSRS.repetition));
-
-    for (let i = 0; i < sortedDistractors.length && options.length < 4; i++) {
-      options.push(sortedDistractors[i].word);
-    }
-
-    options.sort(() => Math.random() - 0.5);
-
-    options.forEach(opt => {
-      const btn = document.createElement('button');
-      btn.innerText = !reverseMode ? opt.english : `${opt.pinyin} (${opt.hanzi})`;
-      btn.onclick = () => checkAnswer(opt, btn);
-      grid.appendChild(btn);
-    });
-  }
-
-  function checkAnswer(selected, btnElement) {
-    stopTimer();
-    const isCorrect = selected.id === currentWord.id;
-
-    if (isCorrect) {
-      correctScore++;
-      btnElement.classList.add('correct');
-      learnedWords.add(currentWord.id);
-      updateScoreUI();
-      updateParagraphHighlighting();
-      
-      if (!selfGradeMode) {
-        updateWordSRS(currentWord.id, 4);
-        setTimeout(() => loadQuestion(), 600);
-      } else {
-        document.getElementById('confidencePanel').style.display = 'flex';
-      }
-    } else {
-      wrongScore++;
-      btnElement.classList.add('wrong');
-      updateWordSRS(currentWord.id, 1);
-      updateScoreUI();
-      if (!selfGradeMode) setTimeout(() => loadQuestion(), 600);
-    }
-  }
-
-  function submitConfidence(grade) {
-    updateWordSRS(currentWord.id, grade);
-    loadQuestion();
-  }
-
-  function cycleParagraphDisplayMode() {
-    const btn = document.getElementById('displayModeBtn');
-    if (paragraphDisplayMode === 'pinyin') {
-      paragraphDisplayMode = 'hanzi';
-      btn.classList.add('active-mode');
-    } else if (paragraphDisplayMode === 'hanzi') {
-      paragraphDisplayMode = 'english';
-      btn.classList.add('active-mode');
-    } else {
-      paragraphDisplayMode = 'pinyin';
-      btn.classList.remove('active-mode');
-    }
-    updateParagraphHighlighting();
-  }
-
-  function toggleParagraphProgress() {
-    showParagraphProgress = !showParagraphProgress;
-    updateParagraphHighlighting();
-  }
-
-  function toggleContext() {
-    showContext = !showContext;
-    document.getElementById('contextDisplay').style.display = showContext ? 'block' : 'none';
-  }
-
-  function toggleSelfGrade() {
-    selfGradeMode = !selfGradeMode;
-  }
-
-  function toggleMode() {
-    reverseMode = !reverseMode;
-    document.getElementById('modeBtn').innerText = reverseMode ? "Eng/Hanzi ➔ Pinyin" : "Pinyin ➔ Eng/Hanzi";
-    renderQuestionDisplay();
-  }
-
-  function toggleRapidMode() {
-    rapidMode = !rapidMode;
-    document.getElementById('timerContainer').style.display = rapidMode ? 'block' : 'none';
-    renderQuestionDisplay();
-  }
-
-  function playAudio() {
-    if (!currentWord || !('speechSynthesis' in window)) return;
-    try {
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(currentWord.hanzi);
-      utterance.lang = 'zh-CN';
-      window.speechSynthesis.speak(utterance);
-    } catch (e) {}
-  }
-
-  function parseCustomText() {
-    const text = document.getElementById('customTextInput').value;
-    if (!text.trim()) return;
-
-    const matched = defaultVocabulary.filter(item => text.includes(item.hanzi) || normalizePinyin(text).includes(normalizePinyin(item.pinyin)));
-
-    if (matched.length > 0) {
-      activeVocab = matched;
-      currentVocabIndex = 0;
-      currentParagraphText = text;
-      loadQuestion();
-    } else {
-      alert("No matching HSK 1 vocabulary found.");
-    }
-  }
-
-  function exportData() {
-    const data = { srs: localStorage.getItem('hsk_srs_data'), history: localStorage.getItem('hsk_history') };
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = `hsk_quiz_backup.json`; a.click();
-    URL.revokeObjectURL(url);
-  }
-
-  function importData(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const data = JSON.parse(e.target.result);
-      if (data.srs) localStorage.setItem('hsk_srs_data', data.srs);
-      location.reload();
-    };
-    reader.readAsText(file);
+      document.getElementById('debugTagsDisplay').innerHTML = html;
   }
 
   document.addEventListener('DOMContentLoaded', () => {
-    renderSampleTexts();
     loadQuestion();
   });
 </script>
