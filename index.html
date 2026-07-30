@@ -68,6 +68,45 @@
       margin-top: 0;
     }
 
+    /* Score Counter UI */
+    .score-tracker {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      background-color: #18181b;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      margin-bottom: 15px;
+      font-size: 0.9rem;
+      font-weight: bold;
+    }
+
+    .score-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .score-correct { color: var(--success); }
+    .score-wrong { color: var(--error); }
+    .score-accuracy { color: var(--subtext); }
+
+    .reset-score-btn {
+      background: none !important;
+      border: none !important;
+      color: var(--subtext) !important;
+      font-size: 0.8rem !important;
+      padding: 2px 6px !important;
+      cursor: pointer;
+      text-decoration: underline;
+      width: auto !important;
+    }
+
+    .reset-score-btn:hover {
+      color: var(--text) !important;
+    }
+
     /* Top Toolbar for Global Settings */
     .controls-top {
       display: flex;
@@ -249,6 +288,14 @@
   <div class="card">
     <div class="timer-container" id="timerContainer">
       <div class="timer-bar" id="timerBar"></div>
+    </div>
+
+    <!-- Score Bar -->
+    <div class="score-tracker">
+      <span class="score-item score-correct">✅ <span id="correctCount">0</span></span>
+      <span class="score-item score-wrong">❌ <span id="wrongCount">0</span></span>
+      <span class="score-item score-accuracy">🎯 <span id="accuracyPercent">0%</span></span>
+      <button onclick="resetScore()" class="reset-score-btn">Reset</button>
     </div>
 
     <!-- Mode Controls -->
@@ -435,6 +482,24 @@
   let timerInterval = null;
   const RAPID_TIME_LIMIT = 3000;
 
+  // Score Tracking State
+  let correctScore = 0;
+  let wrongScore = 0;
+
+  function updateScoreUI() {
+    document.getElementById('correctCount').innerText = correctScore;
+    document.getElementById('wrongCount').innerText = wrongScore;
+    const total = correctScore + wrongScore;
+    const accuracy = total > 0 ? Math.round((correctScore / total) * 100) : 0;
+    document.getElementById('accuracyPercent').innerText = `${accuracy}%`;
+  }
+
+  function resetScore() {
+    correctScore = 0;
+    wrongScore = 0;
+    updateScoreUI();
+  }
+
   function getWordSRS(wordId) {
     try {
       const srsData = JSON.parse(localStorage.getItem('hsk_srs_data') || '{}');
@@ -515,6 +580,8 @@
   }
 
   function handleTimeout() {
+    wrongScore++;
+    updateScoreUI();
     updateWordSRS(currentWord.id, 1);
     const buttons = document.querySelectorAll('#optionsGrid button');
     buttons.forEach(btn => {
@@ -607,15 +674,19 @@
     const isCorrect = selected.id === currentWord.id;
 
     if (isCorrect) {
+      correctScore++;
       btnElement.classList.add('correct');
       updateWordSRS(currentWord.id, 4);
       playAudio();
+      updateScoreUI();
       setTimeout(() => {
         loadQuestion();
       }, rapidMode ? 300 : 600);
     } else {
+      wrongScore++;
       btnElement.classList.add('wrong');
       updateWordSRS(currentWord.id, 1);
+      updateScoreUI();
       setTimeout(() => {
         if (rapidMode) loadQuestion();
       }, 600);
