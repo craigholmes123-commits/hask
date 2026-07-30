@@ -77,7 +77,7 @@
       border: 1px solid var(--border);
       border-radius: 8px;
       padding: 8px 12px;
-      margin-bottom: 15px;
+      margin-bottom: 12px;
       font-size: 0.9rem;
       font-weight: bold;
     }
@@ -107,32 +107,44 @@
       color: var(--text) !important;
     }
 
-    /* Controls Top Bar */
+    /* Compact Top Toolbar with Emoji Icons */
     .controls-top {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 20px;
+      display: flex;
+      gap: 8px;
+      margin-bottom: 15px;
+      align-items: center;
     }
 
-    .controls-top button {
+    .mode-toggle-main {
+      flex: 2;
+      font-size: 0.85rem !important;
+      padding: 8px 6px !important;
+      white-space: nowrap;
+    }
+
+    .icon-btn {
+      flex: 1;
+      padding: 8px 0 !important;
+      font-size: 1.1rem !important;
       background-color: var(--border);
       color: var(--text);
-      font-size: 0.85rem;
-      padding: 10px 8px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-width: 40px;
     }
 
-    .controls-top button:hover {
+    .icon-btn:hover {
       background-color: #4b5563;
     }
 
-    .controls-top button.active-mode {
+    .icon-btn.active-mode {
       border: 1px solid var(--primary);
       background-color: #1e3a8a;
     }
 
-    .controls-top button.inactive-mode {
-      opacity: 0.6;
+    .icon-btn.inactive-mode {
+      opacity: 0.4;
     }
 
     /* Paragraph Progress UI */
@@ -161,7 +173,7 @@
     .hl-word {
       padding: 3px 6px;
       border-radius: 4px;
-      margin: 0 2px;
+      margin: 2px 2px;
       transition: all 0.2s ease;
       cursor: pointer;
       display: inline-block;
@@ -387,18 +399,19 @@
       <button onclick="resetScore()" class="reset-score-btn">Reset</button>
     </div>
 
-    <!-- Toggles & Mode Controls -->
+    <!-- Compact Emoji Toolbar -->
     <div class="controls-top">
-      <button onclick="toggleMode()" id="modeBtn">Mode: Pinyin ➔ English/Hanzi</button>
-      <button onclick="toggleRapidMode()" id="rapidBtn">⚡ Rapid: OFF</button>
-      <button onclick="toggleContext()" id="contextBtn">📖 Sentence Context: ON</button>
-      <button onclick="toggleSelfGrade()" id="selfGradeBtn">⭐ Self-Grade: ON</button>
-      <button onclick="toggleParagraphProgress()" id="paragraphToggleBtn" style="grid-column: span 2;">📜 Text Progress: ON</button>
+      <button onclick="toggleMode()" id="modeBtn" class="mode-toggle-main">Pinyin ➔ Eng/Hanzi</button>
+      <button onclick="toggleRapidMode()" id="rapidBtn" class="icon-btn inactive-mode" title="Toggle Rapid Timer (⚡)">⚡</button>
+      <button onclick="toggleContext()" id="contextBtn" class="icon-btn" title="Toggle Sentence Context (📖)">📖</button>
+      <button onclick="toggleSelfGrade()" id="selfGradeBtn" class="icon-btn" title="Toggle Self-Grade (⭐)">⭐</button>
+      <button onclick="toggleParagraphProgress()" id="paragraphToggleBtn" class="icon-btn" title="Toggle Text Progress (📜)">📜</button>
+      <button onclick="togglePinyinParagraph()" id="pinyinDisplayBtn" class="icon-btn" title="Toggle Hanzi/Pinyin Display in Text (🔤)">🔤</button>
     </div>
 
     <!-- Active Paragraph Display with Highlighted Words -->
     <div class="paragraph-card" id="paragraphBox">
-      <div class="paragraph-title">📜 Active Text Progress (Click word to jump):</div>
+      <div class="paragraph-title" id="paragraphTitle">📜 Active Text Progress (Click word to jump):</div>
       <div class="paragraph-body" id="paragraphDisplay"></div>
     </div>
 
@@ -455,7 +468,6 @@
 </div>
 
 <script>
-  // Helper to normalize pinyin strings for comparison (removes tones and capitalization)
   function normalizePinyin(p) {
     return p.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z]/g, "");
   }
@@ -599,6 +611,7 @@
   let showContext = true;
   let selfGradeMode = true;
   let showParagraphProgress = true;
+  let displayPinyinInParagraph = false;
   let currentParagraphText = "";
   let learnedWords = new Set();
 
@@ -805,15 +818,14 @@
         
         if (containsHanzi) {
           rendered = rendered.split(word.hanzi).join(token);
-          tokens.push({ token, word, displayLabel: word.hanzi });
+          tokens.push({ token, word, origLabel: word.hanzi });
         } else {
-          // Replace matching Pinyin sequence flexibly
           const wordsInInput = rendered.split(/(\s+|[,.!?，。！？])/);
           for (let i = 0; i < wordsInInput.length; i++) {
             if (normalizePinyin(wordsInInput[i]) === normWordPinyin) {
               const origPinyinMatch = wordsInInput[i];
               wordsInInput[i] = token;
-              tokens.push({ token, word, displayLabel: origPinyinMatch });
+              tokens.push({ token, word, origLabel: origPinyinMatch });
               break;
             }
           }
@@ -822,7 +834,7 @@
       }
     });
 
-    tokens.forEach(({ token, word, displayLabel }) => {
+    tokens.forEach(({ token, word, origLabel }) => {
       const isCurrent = currentWord && currentWord.id === word.id;
       const isLearned = learnedWords.has(word.id) || getWordSRS(word.id).repetition > 0;
       
@@ -831,7 +843,9 @@
       else if (isLearned) className += "hl-learned";
       else className += "hl-unlearned";
 
-      const spanHtml = `<span class="${className}" onclick="jumpToWord('${word.id}')" title="Click to practice: ${word.pinyin} (${word.english})">${displayLabel}</span>`;
+      const labelToDisplay = displayPinyinInParagraph ? word.pinyin : origLabel;
+
+      const spanHtml = `<span class="${className}" onclick="jumpToWord('${word.id}')" title="Click to practice: ${word.pinyin} (${word.english})">${labelToDisplay}</span>`;
       rendered = rendered.split(token).join(spanHtml);
     });
 
@@ -908,14 +922,23 @@
     loadQuestion();
   }
 
+  function togglePinyinParagraph() {
+    displayPinyinInParagraph = !displayPinyinInParagraph;
+    const btn = document.getElementById('pinyinDisplayBtn');
+    if (displayPinyinInParagraph) {
+      btn.classList.add('active-mode');
+    } else {
+      btn.classList.remove('active-mode');
+    }
+    updateParagraphHighlighting();
+  }
+
   function toggleParagraphProgress() {
     showParagraphProgress = !showParagraphProgress;
     const btn = document.getElementById('paragraphToggleBtn');
     if (showParagraphProgress) {
-      btn.innerText = "📜 Text Progress: ON";
       btn.classList.remove('inactive-mode');
     } else {
-      btn.innerText = "📜 Text Progress: OFF";
       btn.classList.add('inactive-mode');
     }
     updateParagraphHighlighting();
@@ -927,11 +950,9 @@
     const contextDisplay = document.getElementById('contextDisplay');
     
     if (showContext) {
-      btn.innerText = "📖 Sentence Context: ON";
       btn.classList.remove('inactive-mode');
       contextDisplay.style.display = 'block';
     } else {
-      btn.innerText = "📖 Sentence Context: OFF";
       btn.classList.add('inactive-mode');
       contextDisplay.style.display = 'none';
     }
@@ -941,10 +962,8 @@
     selfGradeMode = !selfGradeMode;
     const btn = document.getElementById('selfGradeBtn');
     if (selfGradeMode) {
-      btn.innerText = "⭐ Self-Grade: ON";
       btn.classList.remove('inactive-mode');
     } else {
-      btn.innerText = "⭐ Self-Grade: OFF";
       btn.classList.add('inactive-mode');
       document.getElementById('confidencePanel').style.display = 'none';
     }
@@ -953,8 +972,8 @@
   function toggleMode() {
     reverseMode = !reverseMode;
     document.getElementById('modeBtn').innerText = reverseMode 
-      ? "Mode: English/Hanzi ➔ Pinyin" 
-      : "Mode: Pinyin ➔ English/Hanzi";
+      ? "Eng/Hanzi ➔ Pinyin" 
+      : "Pinyin ➔ Eng/Hanzi";
     renderQuestionDisplay();
   }
 
@@ -964,12 +983,12 @@
     const timerContainer = document.getElementById('timerContainer');
 
     if (rapidMode) {
-      rapidBtn.innerText = "⚡ Rapid: 3s";
+      rapidBtn.classList.remove('inactive-mode');
       rapidBtn.classList.add('active-mode');
       timerContainer.style.display = 'block';
     } else {
-      rapidBtn.innerText = "⚡ Rapid: OFF";
       rapidBtn.classList.remove('active-mode');
+      rapidBtn.classList.add('inactive-mode');
       timerContainer.style.display = 'none';
       stopTimer();
     }
