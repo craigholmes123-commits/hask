@@ -107,7 +107,7 @@
       color: var(--text) !important;
     }
 
-    /* 2x2 Header Controls Layout */
+    /* Controls Top Bar */
     .controls-top {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -135,7 +135,7 @@
       opacity: 0.6;
     }
 
-    /* Active Paragraph & Word Highlighting UI */
+    /* Paragraph Progress UI */
     .paragraph-card {
       background-color: #18181b;
       border: 1px solid var(--border);
@@ -155,19 +155,25 @@
       font-size: 1.15rem;
       line-height: 1.8;
       color: var(--text);
-      word-break: break-all;
+      word-break: break-word;
     }
 
     .hl-word {
-      padding: 2px 5px;
+      padding: 3px 6px;
       border-radius: 4px;
-      margin: 0 1px;
+      margin: 0 2px;
       transition: all 0.2s ease;
-      cursor: help;
+      cursor: pointer;
+      display: inline-block;
+    }
+
+    .hl-word:hover {
+      transform: scale(1.05);
+      filter: brightness(1.2);
     }
 
     .hl-current {
-      background-color: rgba(59, 130, 246, 0.25);
+      background-color: rgba(59, 130, 246, 0.3);
       border: 1.5px solid var(--primary);
       color: #93c5fd;
       font-weight: bold;
@@ -180,7 +186,7 @@
     }
 
     .hl-unlearned {
-      background-color: rgba(255, 255, 255, 0.04);
+      background-color: rgba(255, 255, 255, 0.05);
       border: 1px dashed var(--border);
     }
 
@@ -387,11 +393,12 @@
       <button onclick="toggleRapidMode()" id="rapidBtn">⚡ Rapid: OFF</button>
       <button onclick="toggleContext()" id="contextBtn">📖 Sentence Context: ON</button>
       <button onclick="toggleSelfGrade()" id="selfGradeBtn">⭐ Self-Grade: ON</button>
+      <button onclick="toggleParagraphProgress()" id="paragraphToggleBtn" style="grid-column: span 2;">📜 Text Progress: ON</button>
     </div>
 
     <!-- Active Paragraph Display with Highlighted Words -->
-    <div class="paragraph-card" id="paragraphBox" style="display: none;">
-      <div class="paragraph-title">📜 Active Text Progress (Word Highlights):</div>
+    <div class="paragraph-card" id="paragraphBox">
+      <div class="paragraph-title">📜 Active Text Progress (Click word to jump):</div>
       <div class="paragraph-body" id="paragraphDisplay"></div>
     </div>
 
@@ -429,8 +436,8 @@
   <details>
     <summary>Custom Text Parser & Data Sync Settings</summary>
     
-    <h3>Parse Custom Text</h3>
-    <textarea id="customTextInput" placeholder="Paste Chinese text here..."></textarea>
+    <h3>Parse Custom Text (Pinyin or Hanzi)</h3>
+    <textarea id="customTextInput" placeholder="Paste Chinese text or Pinyin here (e.g. 'Jīntiān zhōngwǔ wǒ xiǎng qù fàndiàn...')..."></textarea>
     <button onclick="parseCustomText()" style="margin-top: 8px;">Filter & Practice Custom Words</button>
 
     <h3>Text History</h3>
@@ -448,6 +455,11 @@
 </div>
 
 <script>
+  // Helper to normalize pinyin strings for comparison (removes tones and capitalization)
+  function normalizePinyin(p) {
+    return p.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z]/g, "");
+  }
+
   const defaultVocabulary = [
     { id: "爱", hanzi: "爱", pinyin: "ài", english: "to love / affection", sentence: "妈妈很 ___ 我。(Māma hěn ___ wǒ.)" },
     { id: "八", hanzi: "八", pinyin: "bā", english: "eight", sentence: "我有 ___ 个苹果。(Wǒ yǒu ___ gè píngguǒ.)" },
@@ -586,6 +598,7 @@
   // Toggles
   let showContext = true;
   let selfGradeMode = true;
+  let showParagraphProgress = true;
   let currentParagraphText = "";
   let learnedWords = new Set();
 
@@ -645,6 +658,16 @@
       updateParagraphHighlighting();
     } catch (e) {
       console.error("Storage error:", e);
+    }
+  }
+
+  function jumpToWord(wordId) {
+    stopTimer();
+    const targetIdx = activeVocab.findIndex(w => w.id === wordId);
+    if (targetIdx !== -1) {
+      currentVocabIndex = targetIdx;
+      currentWord = activeVocab[currentVocabIndex];
+      renderQuestionDisplay();
     }
   }
 
@@ -756,26 +779,50 @@
     const box = document.getElementById('paragraphBox');
     const display = document.getElementById('paragraphDisplay');
 
-    if (!currentParagraphText.trim()) {
+    if (!currentParagraphText.trim() || !showParagraphProgress) {
       box.style.display = 'none';
       return;
     }
 
     box.style.display = 'block';
 
-    const sortedVocab = [...activeVocab].sort((a, b) => b.hanzi.length - a.hanzi.length);
-    let rendered = currentParagraphText;
+    const sortedVocab = [...activeVocab].sort((a, b) => {
+      const lenA = Math.max(a.hanzi.length, a.pinyin.length);
+      const lenB = Math.max(b.hanzi.length, b.pinyin.length);
+      return lenB - lenA;
+    });
 
+    let rendered = currentParagraphText;
     const tokens = [];
+
     sortedVocab.forEach((word, index) => {
-      if (rendered.includes(word.hanzi)) {
+      const normWordPinyin = normalizePinyin(word.pinyin);
+      const containsHanzi = rendered.includes(word.hanzi);
+      const containsPinyin = normalizePinyin(rendered).includes(normWordPinyin);
+
+      if (containsHanzi || containsPinyin) {
         const token = `___VOCAB_TOKEN_${index}___`;
-        rendered = rendered.split(word.hanzi).join(token);
-        tokens.push({ token, word });
+        
+        if (containsHanzi) {
+          rendered = rendered.split(word.hanzi).join(token);
+          tokens.push({ token, word, displayLabel: word.hanzi });
+        } else {
+          // Replace matching Pinyin sequence flexibly
+          const wordsInInput = rendered.split(/(\s+|[,.!?，。！？])/);
+          for (let i = 0; i < wordsInInput.length; i++) {
+            if (normalizePinyin(wordsInInput[i]) === normWordPinyin) {
+              const origPinyinMatch = wordsInInput[i];
+              wordsInInput[i] = token;
+              tokens.push({ token, word, displayLabel: origPinyinMatch });
+              break;
+            }
+          }
+          rendered = wordsInInput.join('');
+        }
       }
     });
 
-    tokens.forEach(({ token, word }) => {
+    tokens.forEach(({ token, word, displayLabel }) => {
       const isCurrent = currentWord && currentWord.id === word.id;
       const isLearned = learnedWords.has(word.id) || getWordSRS(word.id).repetition > 0;
       
@@ -784,7 +831,7 @@
       else if (isLearned) className += "hl-learned";
       else className += "hl-unlearned";
 
-      const spanHtml = `<span class="${className}" title="${word.pinyin}: ${word.english}">${word.hanzi}</span>`;
+      const spanHtml = `<span class="${className}" onclick="jumpToWord('${word.id}')" title="Click to practice: ${word.pinyin} (${word.english})">${displayLabel}</span>`;
       rendered = rendered.split(token).join(spanHtml);
     });
 
@@ -861,6 +908,19 @@
     loadQuestion();
   }
 
+  function toggleParagraphProgress() {
+    showParagraphProgress = !showParagraphProgress;
+    const btn = document.getElementById('paragraphToggleBtn');
+    if (showParagraphProgress) {
+      btn.innerText = "📜 Text Progress: ON";
+      btn.classList.remove('inactive-mode');
+    } else {
+      btn.innerText = "📜 Text Progress: OFF";
+      btn.classList.add('inactive-mode');
+    }
+    updateParagraphHighlighting();
+  }
+
   function toggleContext() {
     showContext = !showContext;
     const btn = document.getElementById('contextBtn');
@@ -932,17 +992,21 @@
     const text = document.getElementById('customTextInput').value;
     if (!text.trim()) return;
 
-    const matched = defaultVocabulary.filter(item => text.includes(item.hanzi));
+    const matched = defaultVocabulary.filter(item => {
+      const matchHanzi = text.includes(item.hanzi);
+      const matchPinyin = normalizePinyin(text).includes(normalizePinyin(item.pinyin));
+      return matchHanzi || matchPinyin;
+    });
 
     if (matched.length > 0) {
       activeVocab = matched;
       currentVocabIndex = 0;
       currentParagraphText = text;
       saveTextHistory(text);
-      alert(`Parsed! Loaded ${matched.length} HSK 1 words for practice.`);
+      alert(`Parsed! Loaded ${matched.length} HSK 1 words from input.`);
       loadQuestion();
     } else {
-      alert("No HSK 1 vocabulary found in the provided text.");
+      alert("No matching HSK 1 vocabulary found in the provided text or Pinyin.");
     }
   }
 
