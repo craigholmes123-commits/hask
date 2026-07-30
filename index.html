@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Survival Chinese & Sentence Builder</title>
+  <title>Survival & HSK Chinese Study Tool</title>
   <style>
     :root {
       --bg: #121212;
@@ -100,10 +100,35 @@
 
     .icon-btn:hover { background-color: #4b5563; }
     .icon-btn.active-mode { border: 1px solid var(--primary); background-color: #1e3a8a; }
-    .icon-btn.inactive-mode { opacity: 0.4; }
     
-    .btn-text { font-size: 0.85rem; padding: 8px 12px; background-color: var(--border); color: white; border: none; border-radius: 6px; cursor: pointer;}
+    .btn-text { font-size: 0.85rem; padding: 8px 12px; background-color: var(--border); color: white; border: none; border-radius: 6px; cursor: pointer; flex: 1;}
     .btn-text:hover { background-color: #4b5563; }
+    .btn-text.active-mode { border: 1px solid var(--primary); background-color: #1e3a8a; }
+
+    .paragraph-card {
+      background-color: #18181b;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 15px;
+    }
+
+    .paragraph-title { font-size: 0.85rem; color: var(--subtext); font-weight: bold; margin-bottom: 8px; }
+    .paragraph-body { font-size: 1.15rem; line-height: 1.8; color: var(--text); word-break: break-word; }
+
+    .hl-word {
+      padding: 3px 6px;
+      border-radius: 4px;
+      margin: 2px 2px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      display: inline-block;
+    }
+
+    .hl-word:hover { transform: scale(1.05); filter: brightness(1.2); }
+    .hl-current { background-color: rgba(59, 130, 246, 0.3); border: 1.5px solid var(--primary); color: #93c5fd; font-weight: bold; }
+    .hl-learned { background-color: rgba(16, 185, 129, 0.2); border: 1px solid var(--success); color: #6ee7b7; }
+    .hl-unlearned { background-color: rgba(255, 255, 255, 0.05); border: 1px dashed var(--border); }
 
     .prompt-wrapper {
       display: flex;
@@ -111,24 +136,23 @@
       align-items: center;
       justify-content: center;
       gap: 12px;
-      margin: 20px 0 15px 0;
+      margin: 15px 0 15px 0;
       min-height: 80px;
     }
 
     .prompt-box {
-      font-size: 2.5rem;
+      font-size: 2.2rem;
       font-weight: bold;
       text-align: center;
       color: #ffffff;
       margin: 0;
-      letter-spacing: 1px;
     }
 
     .audio-inline-btn {
       width: auto !important;
       padding: 8px 16px !important;
       background-color: var(--primary) !important;
-      font-size: 1rem !important;
+      font-size: 0.95rem !important;
       border-radius: 6px;
       border: none;
       color: white;
@@ -169,6 +193,76 @@
       vertical-align: middle;
       margin-left: 8px;
     }
+
+    details {
+      background-color: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-top: 10px;
+    }
+
+    summary { font-weight: bold; cursor: pointer; color: var(--text); }
+
+    textarea {
+      width: 100%;
+      height: 90px;
+      margin-top: 10px;
+      background-color: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px;
+      box-sizing: border-box;
+      font-family: inherit;
+    }
+
+    .difficulty-group { margin-top: 15px; }
+    .difficulty-title {
+      font-size: 0.9rem;
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+
+    .diff-easy { background-color: rgba(16, 185, 129, 0.2); color: var(--success); }
+    .diff-medium { background-color: rgba(245, 158, 11, 0.2); color: var(--warning); }
+    .diff-hard { background-color: rgba(239, 68, 68, 0.2); color: var(--error); }
+
+    .sample-texts-list { display: flex; flex-direction: column; gap: 12px; }
+
+    .sample-card {
+      background-color: #18181b;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .sample-header { display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem; font-weight: bold; }
+    .sample-actions { display: flex; gap: 8px; }
+    .sample-btn-action { font-size: 0.8rem !important; padding: 6px 10px !important; width: auto !important; background-color: var(--border) !important; }
+    .sample-text-content { font-size: 0.95rem; color: var(--subtext); line-height: 1.5; }
+    .sample-translation {
+      display: none;
+      font-size: 0.9rem;
+      color: #60a5fa;
+      background-color: #121212;
+      padding: 8px 10px;
+      border-radius: 4px;
+      border-left: 3px solid var(--primary);
+    }
+
+    .history-list { list-style-type: none; padding: 0; margin-top: 10px; max-height: 150px; overflow-y: auto; }
+    .history-item { padding: 8px; border-bottom: 1px solid var(--border); cursor: pointer; font-size: 0.9rem; color: var(--subtext); }
+    .history-item:hover { background-color: var(--border); color: var(--text); }
+
+    .sync-section { margin-top: 15px; border-top: 1px solid var(--border); padding-top: 15px; }
+    .sync-btn-group { display: flex; gap: 10px; margin-top: 10px; }
 
     /* Builder Specific */
     .builder-grammar-hint {
@@ -232,61 +326,75 @@
     .tile-btn:hover { border-color: var(--primary); }
     .tile-pinyin-main { font-size: 1.1rem; font-weight: bold; color: #60a5fa; }
     .tile-hanzi-sub { font-size: 1rem; color: #e5e7eb; }
-    
     .faded-pinyin { color: #4b5563; font-style: italic; font-size: 0.8rem; text-decoration: line-through; }
     
-    .builder-feedback {
-      text-align: center;
-      font-weight: bold;
-      min-height: 24px;
-      margin-bottom: 15px;
-    }
+    .builder-feedback { text-align: center; font-weight: bold; min-height: 24px; margin-bottom: 15px; }
 
-    .controls-bottom {
-      display: flex;
-      gap: 12px;
-      margin-top: 15px;
-      border-top: 1px solid var(--border);
-      padding-top: 15px;
-    }
-    
-    .debug-tags {
-        font-size: 0.75rem;
-        color: var(--subtext);
-        text-align: center;
-        margin-top: 10px;
-    }
+    .controls-bottom { display: flex; gap: 12px; margin-top: 15px; border-top: 1px solid var(--border); padding-top: 15px; }
+    .debug-tags { font-size: 0.75rem; color: var(--subtext); text-align: center; margin-top: 10px; }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <h1>Survival Chinese & Builder</h1>
+  <h1>Survival & HSK Chinese Study Tool</h1>
 
   <div class="tab-nav">
-    <button class="tab-btn active-tab" onclick="switchTab('flashcardTab')">🎴 SRS Flashcards</button>
-    <button class="tab-btn" onclick="switchTab('builderTab')">🧱 Grammar Builder</button>
+    <button class="tab-btn active-tab" onclick="switchTab('flashcardTab')">🎴 Flashcards & Texts</button>
+    <button class="tab-btn" onclick="switchTab('builderTab')">🧱 Sentence Builder</button>
   </div>
 
-  <!-- TAB 1: FLASHCARDS -->
+  <!-- TAB 1: FLASHCARDS & TEXTS -->
   <div id="flashcardTab" class="tab-content active">
     <div class="card">
       <div class="controls-top">
-        <button onclick="toggleAudioOnly()" id="audioOnlyBtn" class="btn-text">🎧 Blind Mode (Audio Only)</button>
-        <button onclick="toggleMode()" id="modeBtn" class="btn-text">Pinyin ➔ Eng/Hanzi</button>
+        <button onclick="toggleAudioOnly()" id="audioOnlyBtn" class="btn-text">🎧 Blind Mode</button>
+        <button onclick="toggleMode()" id="modeBtn" class="btn-text">Pinyin/Hanzi ➔ English</button>
+        <button onclick="cycleParagraphDisplayMode()" id="displayModeBtn" class="icon-btn" title="Display Mode (🔤)">🔤</button>
+      </div>
+
+      <!-- Active Text Tracker -->
+      <div class="paragraph-card" id="paragraphBox" style="display:none;">
+        <div class="paragraph-title">📜 Active Story Progress (Click word to practice):</div>
+        <div class="paragraph-body" id="paragraphDisplay"></div>
       </div>
 
       <div class="prompt-wrapper">
         <div class="prompt-box" id="promptDisplay">...</div>
-        <button onclick="playAudio()" class="audio-inline-btn" id="audioBtn">🔊 Play Audio</button>
+        <button onclick="playAudio()" class="audio-inline-btn" id="audioBtn">🔊 Listen</button>
       </div>
 
       <div class="options-grid" id="optionsGrid"></div>
 
       <div class="controls-bottom">
-        <button onclick="navigateVocab(1)" id="nextBtn" style="background-color: var(--primary);">Next Word ➡️</button>
+        <button onclick="navigateVocab(-1)">⬅️ Prev</button>
+        <button onclick="navigateVocab(1)" style="background-color: var(--primary);">Next ➡️</button>
       </div>
     </div>
+
+    <!-- Custom Text Parser & Sample Stories Section -->
+    <details open>
+      <summary>Custom Text Parser & Tiered Practice Stories</summary>
+      
+      <h3>Parse Custom Text (Pinyin or Hanzi)</h3>
+      <textarea id="customTextInput" placeholder="Paste Chinese text or Pinyin here (e.g. 'Jīntiān zhōngwǔ wǒ xiǎng qù fàndiàn...')..."></textarea>
+      <button onclick="parseCustomText()" style="margin-top: 8px;">Filter & Practice Custom Words</button>
+
+      <h3 style="margin-top: 20px;">Leveled Sample Stories</h3>
+      <div id="sampleTextsContainer"></div>
+
+      <h3 style="margin-top: 20px;">Text History</h3>
+      <ul class="history-list" id="historyList"></ul>
+
+      <div class="sync-section">
+        <h4>Sync Data Between Devices</h4>
+        <div class="sync-btn-group">
+          <button type="button" onclick="exportData()">Export Progress (JSON)</button>
+          <button type="button" onclick="document.getElementById('importFile').click()">Import Progress (JSON)</button>
+        </div>
+        <input type="file" id="importFile" style="display: none;" onchange="importData(event)" accept=".json" />
+      </div>
+    </details>
   </div>
 
   <!-- TAB 2: SENTENCE BUILDER -->
@@ -294,7 +402,7 @@
     <div class="card">
       <h2>Active Sentence Builder</h2>
       <div style="text-align: center; font-size: 0.85rem; color: var(--subtext); margin-bottom: 15px;">
-        🗣️ Assemble the sentence. Mastered words will have their Pinyin hidden!
+        🗣️ Assemble the sentence. Words mastered in Flashcards will have Pinyin hidden!
       </div>
 
       <div class="builder-grammar-hint" id="builderGrammarHint">Pattern...</div>
@@ -319,6 +427,10 @@
 </div>
 
 <script>
+  function normalizePinyin(p) {
+    return p.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z]/g, "");
+  }
+
   function switchTab(tabId) {
     document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active-tab'));
@@ -332,8 +444,30 @@
     }
   }
 
-  // --- SURVIVAL & EDUCATOR VOCABULARY DECK ---
-  const survivalVocabulary = [
+  const sampleTexts = [
+    { id: "easy1", level: "easy", title: "1. Basic Greeting & Intro", hanzi: "你好！我是学生，他是老师。我很喜欢学习汉语。", pinyin: "Nǐ hǎo! Wǒ shì xuésheng, tā shì lǎoshī. Wǒ hěn xǐhuan xuéxí Hànyǔ.", english: "Hello! I am a student, and he is a teacher. I really like studying Chinese." },
+    { id: "easy2", level: "easy", title: "2. Family & Age", hanzi: "我爸爸妈妈都在家里。我有一个女儿，她九岁了。", pinyin: "Wǒ bàba māma dōu zài jiālǐ. Wǒ yǒu yí gè nǚ'ér, tā jiǔ suì le.", english: "My dad and mom are both at home. I have a daughter, she is nine years old." },
+    { id: "easy3", level: "easy", title: "3. Simple Weather & Drinks", hanzi: "今天天气很热。我想喝水，不喝热茶。", pinyin: "Jīntiān tiānqì hěn rè. Wǒ xiǎng hē shuǐ, bù hē rè chá.", english: "The weather today is very hot. I want to drink water, not hot tea." },
+    { id: "easy4", level: "easy", title: "4. Cat & Table", hanzi: "桌子上有一只猫。它很小，很漂亮。", pinyin: "Zhuōzi shàng yǒu yì zhī māo. Tā hěn xiǎo, hěn piàoliang.", english: "There is a cat on the table. It is very small and very pretty." },
+    { id: "easy5", level: "easy", title: "5. Seeing Friends", hanzi: "今天是我生日。我和三个朋友去吃米饭。", pinyin: "Jīntiān shì wǒ shēngrì. Wǒ hé sān gè péngyou qù chī mǐfàn.", english: "Today is my birthday. My three friends and I are going to eat rice." },
+    { id: "easy6", level: "easy", title: "6. Sleep & Home", hanzi: "现在十点了。我很想去睡觉，回家里。", pinyin: "Xiànzài shí diǎn le. Wǒ hěn xiǎng qù shuìjiào, huí jiālǐ.", english: "It is 10 o'clock now. I really want to go to sleep and go back home." },
+
+    { id: "med1", level: "medium", title: "1. Lunch & Taxi to Shop", hanzi: "今天中午我和朋友去饭店吃米饭，喝热茶。下午三点我们坐出租车去商店买东西。我很高兴！", pinyin: "Jīntiān zhōngwǔ wǒ hé péngyou qù fàndiàn chī mǐfàn, hē rè chá. Xiàwǔ sān diǎn wǒmen zuò chūzūchē qù shāngdiàn mǎi dōngxi. Wǒ hěn gāoxìng!", english: "Today at noon, my friend and I went to a restaurant to eat rice and drink hot tea. At 3 PM, we took a taxi to the store to buy things. I am very happy!" },
+    { id: "med2", level: "medium", title: "2. School & Meeting Teacher", hanzi: "今天天气不冷，我和同学在学校看见了老师。我们都很高兴，请老师喝茶。", pinyin: "Jīntiān tiānqì bù lěng, wǒ hé tóngxué zài xuéxiào kànjiàn le lǎoshī. Wǒmen dōu hěn gāoxìng, qǐng lǎoshī hē chá.", english: "The weather today is not cold. My classmate and I saw the teacher at school. We were all very happy and invited the teacher to drink tea." },
+    { id: "med3", level: "medium", title: "3. Hospital Visit & Movie", hanzi: "妈妈在家里做菜，我和爸爸在看电视。今天下午我们要去医院看朋友，晚上看电影。", pinyin: "Māma zài jiālǐ zuò cài, wǒ hé bàba zài kàn diànshì. Jīntiān xiàwǔ wǒmen yào qù yīyuàn kàn péngyou, wǎnshang kàn diànyǐng.", english: "Mom is cooking at home, while dad and I are watching TV. This afternoon we are going to the hospital to see a friend, and tonight we will watch a movie." },
+    { id: "med4", level: "medium", title: "4. Calling Classmates", hanzi: "昨天我没去学校。我和同学打电话说汉语，他说今天老师教了很多字。", pinyin: "Zuótiān wǒ méi qù xuéxiào. Wǒ hé tóngxué dǎ diànhuà shuō Hànyǔ, tā shuō jīntiān lǎoshī jiāo le hěn duō zì.", english: "I didn't go to school yesterday. I called my classmate to speak Chinese; he said the teacher taught a lot of characters today." },
+    { id: "med5", level: "medium", title: "5. Working on Computer", hanzi: "我在电脑上工作。儿子在桌子上面看书，女儿在听音乐。", pinyin: "Wǒ zài diànnǎo shàng gōngzuò. Érzi zài zhuōzi shàngmiàn kàn shū, nǚ'ér zài tīng yīnyuè.", english: "I am working on the computer. My son is reading a book at the table, and my daughter is listening to music." },
+    { id: "med6", level: "medium", title: "6. Cold Weather & Clothes", hanzi: "北京的天气很冷，下雨了。我们要去商店买新的衣服和杯子。", pinyin: "Běijīng de tiānqì hěn lěng, xiàyǔ le. Wǒmen yào qù shāngdiàn mǎi xīn de yīfu hé bēizi.", english: "The weather in Beijing is very cold and it rained. We need to go to the store to buy new clothes and cups." },
+
+    { id: "hard1", level: "hard", title: "1. Shopping Prices & Books", hanzi: "现在四点半，我和女儿去商店买苹果和水果。这个苹果太大了，一个五块钱。我买了一本书，三块钱。", pinyin: "Xiànzài sì diǎn bàn, wǒ hé nǚ'ér qù shāngdiàn mǎi píngguǒ hé shuǐguǒ. Zhè gè píngguǒ tài dà le, yí gè wǔ kuài qián. Wǒ mǎi le yì běn shū, sān kuài qián.", english: "It is 4:30 now. My daughter and I went to the store to buy apples and fruit. This apple is too big, one costs 5 yuan. I bought a book for 3 yuan." },
+    { id: "hard2", level: "hard", title: "2. Work, Travel & Flights", hanzi: "我儿子是医生，在医院工作。他明天下午坐飞机去北京。北京的天气很冷，他要买衣服。", pinyin: "Wǒ érzi shì yīshēng, zài yīyuàn gōngzuò. Tā míngtiān xiàwǔ zuò fēijī qù Běijīng. Běijīng de tiānqì hěn lěng, tā yào mǎi衣服。", english: "My son is a doctor working in a hospital. He will take a plane to Beijing tomorrow afternoon. The weather in Beijing is very cold, so he needs to buy clothes." },
+    { id: "hard3", level: "hard", title: "3. Weekend Routine & Calls", hanzi: "昨天下雨了，我没去学校。我和老朋友打电话说汉语，他说我写的字很漂亮。明天星期六，我们要在饭店吃菜。", pinyin: "Zuótiān xiàyǔ le, wǒ méi qù xuéxiào. Wǒ hé lǎo péngyou dǎ diànhuà shuō Hànyǔ, tā shuō wǒ xiě de zì hěn piàoliang. Míngtiān xīngqīliù, wǒmen yào zài fàndiàn chī cài.", english: "It rained yesterday, so I didn't go to school. I made a phone call to an old friend in Chinese; he said the characters I write are very pretty. Tomorrow is Saturday, and we will eat dishes at a restaurant." },
+    { id: "hard4", level: "hard", title: "4. Restaurant Choice & Tea", hanzi: "今天中午我们去饭店吃米饭和水饺。这家饭店的茶非常好喝，也不太贵。我们吃了八十块钱，都很高兴。", pinyin: "Jīntiān zhōngwǔ wǒmen qù fàndiàn chī mǐfàn hé shuǐjiǎo. Zhè jiā fàndiàn de chá fēicháng hǎohē, yě bú tài guì. Wǒmen chī le bāshí kuài qián, dōu hěn gāoxìng.", english: "Today at noon we went to a restaurant to eat rice and dumplings. This restaurant's tea is very good to drink and not too expensive. We spent 80 yuan eating and were all very happy." },
+    { id: "hard5", level: "hard", title: "5. Doctor Advice & Health", hanzi: "爸爸身体不太好，医生叫他多喝热茶，少看电视。今天下午我们要坐出租车去医院看医生。", pinyin: "Bàba shēntǐ bú tài hǎo, yīshēng jiào tā duō hē rè chá, shǎo kàn diànshì. Jīntiān xiàwǔ wǒmen yào zuò chūzūchē qù yīyuàn kàn yīshēng.", english: "Dad isn't feeling very well; the doctor told him to drink more hot tea and watch less TV. This afternoon we are taking a taxi to the hospital to see the doctor." },
+    { id: "hard6", level: "hard", title: "6. Learning Progress & Books", hanzi: "我学会了很多汉语字，读书也越来越快。我的老师是从北京来的，她教我们怎么写漂亮的字。", pinyin: "Wǒ xuéhuì le hěn duō Hànyǔ zì, dú shū yě yuè lái yuè kuài. Wǒ de lǎoshī shì cóng Běijīng lái de, tā jiāo wǒmen zěnme xiě piàoliang de zì.", english: "I have learned many Chinese characters and read books faster and faster. My teacher comes from Beijing, and she teaches us how to write pretty characters." }
+  ];
+
+  const masterVocabulary = [
     { id: "1", hanzi: "你好", pinyin: "nǐ hǎo", english: "hello" },
     { id: "2", hanzi: "英语", pinyin: "Yīngyǔ", english: "English language" },
     { id: "3", hanzi: "老师", pinyin: "lǎoshī", english: "teacher" },
@@ -341,7 +475,7 @@
     { id: "5", hanzi: "学校", pinyin: "xuéxiào", english: "school" },
     { id: "6", hanzi: "大连", pinyin: "Dàlián", english: "Dalian (City)" },
     { id: "7", hanzi: "银行", pinyin: "yínháng", english: "bank" },
-    { id: "8",护照: "护照", hanzi: "护照", pinyin: "hùzhào", english: "passport" },
+    { id: "8", hanzi: "护照", pinyin: "hùzhào", english: "passport" },
     { id: "9", hanzi: "多少钱", pinyin: "duōshao qián", english: "how much money" },
     { id: "10", hanzi: "饭店", pinyin: "fàndiàn", english: "restaurant" },
     { id: "11", hanzi: "酒吧", pinyin: "jiǔbā", english: "bar / pub" },
@@ -355,16 +489,26 @@
     { id: "19", hanzi: "明天", pinyin: "míngtiān", english: "tomorrow" },
     { id: "20", hanzi: "上课", pinyin: "shàngkè", english: "to attend class / teach" },
     { id: "21", hanzi: "冰", pinyin: "bīng", english: "ice / cold" },
-    { id: "22", hanzi: "外卖", pinyin: "wàimài", english: "takeout / delivery" }
+    { id: "22", hanzi: "外卖", pinyin: "wàimài", english: "takeout / delivery" },
+    { id: "23", hanzi: "苹果", pinyin: "píngguǒ", english: "apple" },
+    { id: "24", hanzi: "茶", pinyin: "chá", english: "tea" },
+    { id: "25", hanzi: "水", pinyin: "shuǐ", english: "water" },
+    { id: "26", hanzi: "今天", pinyin: "jīntiān", english: "today" },
+    { id: "27", hanzi: "下午", pinyin: "xiàwǔ", english: "afternoon" },
+    { id: "28", hanzi: "出租车", pinyin: "chūzūchē", english: "taxi" },
+    { id: "29", hanzi: "商店", pinyin: "shāngdiàn", english: "store / shop" }
   ];
 
-  let activeVocab = [...survivalVocabulary];
+  let activeVocab = [...masterVocabulary];
   let currentWord = null;
+  let currentVocabIndex = 0;
   let reverseMode = false;
   let audioOnlyMode = false;
-  
-  // SRS Logic
+  let currentParagraphText = "";
+  let paragraphDisplayMode = 'pinyin';
+
   const MASTER_THRESHOLD = 3;
+
   function getWordSRS(wordId) {
     const data = JSON.parse(localStorage.getItem('survival_srs') || '{}');
     return data[wordId] || { repetition: 0, easeFactor: 2.5, dueDate: Date.now() };
@@ -376,7 +520,7 @@
     
     if (isCorrect) {
       item.repetition += 1;
-      item.dueDate = Date.now() + (Math.pow(2, item.repetition) * 60 * 60 * 1000); // Simple interval
+      item.dueDate = Date.now() + (Math.pow(2, item.repetition) * 60 * 60 * 1000);
     } else {
       item.repetition = 0;
       item.dueDate = Date.now();
@@ -384,13 +528,13 @@
     
     data[wordId] = item;
     localStorage.setItem('survival_srs', JSON.stringify(data));
+    updateParagraphHighlighting();
   }
   
   function isMastered(wordId) {
     return getWordSRS(wordId).repetition >= MASTER_THRESHOLD;
   }
 
-  // Flashcard Core
   function toggleAudioOnly() {
     audioOnlyMode = !audioOnlyMode;
     document.getElementById('audioOnlyBtn').classList.toggle('active-mode');
@@ -399,7 +543,7 @@
 
   function toggleMode() {
     reverseMode = !reverseMode;
-    document.getElementById('modeBtn').innerText = reverseMode ? "Eng/Hanzi ➔ Pinyin" : "Pinyin ➔ Eng/Hanzi";
+    document.getElementById('modeBtn').innerText = reverseMode ? "English ➔ Pinyin/Hanzi" : "Pinyin/Hanzi ➔ English";
     loadQuestion();
   }
 
@@ -410,6 +554,7 @@
       ? dueWords[Math.floor(Math.random() * dueWords.length)]
       : activeVocab[Math.floor(Math.random() * activeVocab.length)];
 
+    currentVocabIndex = activeVocab.findIndex(w => w.id === currentWord.id);
     renderQuestionDisplay();
   }
 
@@ -422,12 +567,13 @@
       playAudio();
     } else {
       if (!reverseMode) {
-        // Pinyin to Eng/Hanzi. If mastered, hide pinyin.
+        // Mode 1: Chinese Prompt -> Guess English
         promptDisplay.innerHTML = mastered 
           ? `${currentWord.hanzi} <span class="mastered-badge">Mastered</span>` 
           : `${currentWord.pinyin} (${currentWord.hanzi})`;
       } else {
-        promptDisplay.innerHTML = `${currentWord.hanzi} - ${currentWord.english}`;
+        // Mode 2: English Prompt -> Guess Chinese
+        promptDisplay.innerHTML = `${currentWord.english}`;
       }
     }
 
@@ -435,7 +581,7 @@
     grid.innerHTML = '';
     
     let options = [currentWord];
-    while(options.length < 4) {
+    while(options.length < 4 && options.length < activeVocab.length) {
       let rand = activeVocab[Math.floor(Math.random() * activeVocab.length)];
       if(!options.includes(rand)) options.push(rand);
     }
@@ -443,7 +589,14 @@
 
     options.forEach(opt => {
       const btn = document.createElement('button');
-      btn.innerText = !reverseMode ? opt.english : `${opt.pinyin} (${opt.hanzi})`;
+      
+      // FIXED: NO MORE PARENTHESES / ENGLISH CHEATING IN BUTTONS
+      if (!reverseMode) {
+        btn.innerText = opt.english; // Prompt was Chinese, so options are English
+      } else {
+        btn.innerText = `${opt.pinyin} (${opt.hanzi})`; // Prompt was English, so options are ONLY Chinese (Pinyin + Hanzi)
+      }
+
       btn.onclick = () => {
         const correct = opt.id === currentWord.id;
         btn.classList.add(correct ? 'correct' : 'wrong');
@@ -452,6 +605,8 @@
       };
       grid.appendChild(btn);
     });
+
+    updateParagraphHighlighting();
   }
 
   function playAudio() {
@@ -462,9 +617,194 @@
     window.speechSynthesis.speak(utterance);
   }
 
-  function navigateVocab() { loadQuestion(); }
+  function navigateVocab(direction) {
+    currentVocabIndex = (currentVocabIndex + direction + activeVocab.length) % activeVocab.length;
+    currentWord = activeVocab[currentVocabIndex];
+    renderQuestionDisplay();
+  }
 
-  // --- GRAMMAR SRS & BUILDER ---
+  function renderSampleTexts() {
+    const container = document.getElementById('sampleTextsContainer');
+    container.innerHTML = '';
+
+    const levels = [
+      { key: 'easy', title: '🟢 Easy (Basic Phrases)', class: 'diff-easy' },
+      { key: 'medium', title: '🟡 Medium (Daily Routines)', class: 'diff-medium' },
+      { key: 'hard', title: '🔴 Hard (Complex Sentences)', class: 'diff-hard' }
+    ];
+
+    levels.forEach(lvl => {
+      const group = document.createElement('div');
+      group.className = 'difficulty-group';
+
+      const label = document.createElement('div');
+      label.className = `difficulty-title ${lvl.class}`;
+      label.innerText = lvl.title;
+      group.appendChild(label);
+
+      const list = document.createElement('div');
+      list.className = 'sample-texts-list';
+
+      sampleTexts.filter(s => s.level === lvl.key).forEach(sample => {
+        const card = document.createElement('div');
+        card.className = 'sample-card';
+        card.innerHTML = `
+          <div class="sample-header">
+            <span>${sample.title}</span>
+            <div class="sample-actions">
+              <button class="sample-btn-action" onclick="toggleSampleTranslation('${sample.id}')">👁️ Translation</button>
+              <button class="sample-btn-action" style="background-color: var(--primary) !important;" onclick="loadSampleText('${sample.id}')">▶️ Practice</button>
+            </div>
+          </div>
+          <div class="sample-text-content">
+            <div><strong>Hanzi:</strong> ${sample.hanzi}</div>
+            <div style="font-size: 0.85rem; color: #9ca3af; margin-top: 4px;"><strong>Pinyin:</strong> ${sample.pinyin}</div>
+          </div>
+          <div class="sample-translation" id="trans_${sample.id}">${sample.english}</div>
+        `;
+        list.appendChild(card);
+      });
+
+      group.appendChild(list);
+      container.appendChild(group);
+    });
+  }
+
+  function toggleSampleTranslation(id) {
+    const el = document.getElementById(`trans_${id}`);
+    el.style.display = el.style.display === 'block' ? 'none' : 'block';
+  }
+
+  function loadSampleText(id) {
+    const sample = sampleTexts.find(s => s.id === id);
+    if (sample) {
+      document.getElementById('customTextInput').value = sample.hanzi;
+      parseCustomText();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  function parseCustomText() {
+    const text = document.getElementById('customTextInput').value;
+    if (!text.trim()) return;
+
+    const matched = masterVocabulary.filter(item => {
+      return text.includes(item.hanzi) || normalizePinyin(text).includes(normalizePinyin(item.pinyin));
+    });
+
+    if (matched.length > 0) {
+      activeVocab = matched;
+      currentVocabIndex = 0;
+      currentParagraphText = text;
+      saveTextHistory(text);
+      loadQuestion();
+    } else {
+      alert("No matching vocabulary found in the provided text.");
+    }
+  }
+
+  function updateParagraphHighlighting() {
+    const box = document.getElementById('paragraphBox');
+    const display = document.getElementById('paragraphDisplay');
+
+    if (!currentParagraphText.trim()) {
+      box.style.display = 'none';
+      return;
+    }
+
+    box.style.display = 'block';
+    let rendered = currentParagraphText;
+    const sortedVocab = [...activeVocab].sort((a, b) => b.hanzi.length - a.hanzi.length);
+
+    sortedVocab.forEach((word) => {
+      if (rendered.includes(word.hanzi)) {
+        const isCurrent = currentWord && currentWord.id === word.id;
+        const mastered = isMastered(word.id);
+
+        let className = "hl-word ";
+        if (isCurrent) className += "hl-current";
+        else if (mastered) className += "hl-learned";
+        else className += "hl-unlearned";
+
+        let labelToDisplay = word.hanzi;
+        if (paragraphDisplayMode === 'pinyin') labelToDisplay = word.pinyin;
+        else if (paragraphDisplayMode === 'english') labelToDisplay = word.english;
+
+        const spanHtml = `<span class="${className}" onclick="jumpToWord('${word.id}')">${labelToDisplay}</span>`;
+        rendered = rendered.split(word.hanzi).join(spanHtml);
+      }
+    });
+
+    display.innerHTML = rendered;
+  }
+
+  function jumpToWord(wordId) {
+    const targetIdx = activeVocab.findIndex(w => w.id === wordId);
+    if (targetIdx !== -1) {
+      currentVocabIndex = targetIdx;
+      currentWord = activeVocab[currentVocabIndex];
+      renderQuestionDisplay();
+    }
+  }
+
+  function cycleParagraphDisplayMode() {
+    if (paragraphDisplayMode === 'hanzi') paragraphDisplayMode = 'pinyin';
+    else if (paragraphDisplayMode === 'pinyin') paragraphDisplayMode = 'english';
+    else paragraphDisplayMode = 'hanzi';
+    updateParagraphHighlighting();
+  }
+
+  function saveTextHistory(text) {
+    try {
+      let history = JSON.parse(localStorage.getItem('hsk_history') || '[]');
+      history.unshift({ text, date: new Date().toLocaleTimeString() });
+      if (history.length > 10) history.pop();
+      localStorage.setItem('hsk_history', JSON.stringify(history));
+      renderHistory();
+    } catch (e) {}
+  }
+
+  function renderHistory() {
+    try {
+      const historyList = document.getElementById('historyList');
+      const history = JSON.parse(localStorage.getItem('hsk_history') || '[]');
+      historyList.innerHTML = '';
+      history.forEach((item) => {
+        const li = document.createElement('li');
+        li.className = 'history-item';
+        li.innerText = `[${item.date}] ${item.text.substring(0, 30)}...`;
+        li.onclick = () => {
+          document.getElementById('customTextInput').value = item.text;
+          parseCustomText();
+        };
+        historyList.appendChild(li);
+      });
+    } catch (e) {}
+  }
+
+  function exportData() {
+    const data = { srs: localStorage.getItem('survival_srs'), history: localStorage.getItem('hsk_history') };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `hsk_survival_backup.json`; a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function importData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const data = JSON.parse(e.target.result);
+      if (data.srs) localStorage.setItem('survival_srs', data.srs);
+      if (data.history) localStorage.setItem('hsk_history', data.history);
+      location.reload();
+    };
+    reader.readAsText(file);
+  }
+
+  // BUILDER ENGINE
   const builderPuzzles = [
     {
       id: "puz1",
@@ -524,20 +864,6 @@
         { id: "12", hanzi: "啤酒", pinyin: "píjiǔ" }
       ],
       validOrders: [["我", "在", "酒吧", "想", "喝", "冰", "啤酒"]]
-    },
-    {
-      id: "puz5",
-      english: "Where is my passport?",
-      tags: ["possession", "question_location"],
-      grammar: "[Subject] + 的 + [Noun] + 在哪儿",
-      tiles: [
-        { id: "16", hanzi: "我", pinyin: "wǒ" },
-        { id: "17", hanzi: "的", pinyin: "de" },
-        { id: "8", hanzi: "护照", pinyin: "hùzhào" },
-        { id: "18", hanzi: "在", pinyin: "zài" },
-        { id: "x2", hanzi: "哪儿", pinyin: "nǎ'er" }
-      ],
-      validOrders: [["我", "的", "护照", "在", "哪儿"]]
     }
   ];
 
@@ -551,11 +877,8 @@
   function logGrammarError(tags, isCorrect) {
     const errors = getGrammarErrors();
     tags.forEach(tag => {
-      if (isCorrect) {
-        if(errors[tag]) errors[tag] = Math.max(0, errors[tag] - 1);
-      } else {
-        errors[tag] = (errors[tag] || 0) + 1;
-      }
+      if (isCorrect) errors[tag] = Math.max(0, (errors[tag] || 0) - 1);
+      else errors[tag] = (errors[tag] || 0) + 1;
     });
     localStorage.setItem('grammar_errors', JSON.stringify(errors));
     updateDebugTags();
@@ -563,15 +886,12 @@
 
   function selectNextPuzzle() {
     const errors = getGrammarErrors();
-    
-    // Weight puzzles by how many failed tags they contain
     let weightedPuzzles = builderPuzzles.map(p => {
       let weight = 1;
       p.tags.forEach(tag => { weight += (errors[tag] || 0); });
       return { puzzle: p, weight: weight };
     });
     
-    // Simple weighted random selection
     let totalWeight = weightedPuzzles.reduce((sum, item) => sum + item.weight, 0);
     let random = Math.random() * totalWeight;
     for (let item of weightedPuzzles) {
@@ -601,10 +921,8 @@
     shuffled.forEach(tile => {
       const btn = document.createElement('button');
       btn.className = 'tile-btn';
-      
       const mastered = isMastered(tile.id);
       const pinyinDisplay = mastered ? `<span class="faded-pinyin">Mastered</span>` : `<span class="tile-pinyin-main">${tile.pinyin}</span>`;
-      
       btn.innerHTML = `${pinyinDisplay}<span class="tile-hanzi-sub">${tile.hanzi}</span>`;
       btn.onclick = () => addTileToWorkspace(tile, btn);
       bank.appendChild(btn);
@@ -646,10 +964,8 @@
       const btn = document.createElement('button');
       btn.className = 'tile-btn';
       btn.style.borderColor = 'var(--primary)';
-      
       const mastered = isMastered(tile.id);
       const pinyinDisplay = mastered ? `<span class="faded-pinyin">Mastered</span>` : `<span class="tile-pinyin-main">${tile.pinyin}</span>`;
-      
       btn.innerHTML = `${pinyinDisplay}<span class="tile-hanzi-sub">${tile.hanzi}</span>`;
       btn.onclick = () => removeTileFromWorkspace(index);
       ws.appendChild(btn);
@@ -684,16 +1000,18 @@
   }
   
   function updateDebugTags() {
-      const errors = getGrammarErrors();
-      let html = "<strong>Targeted Weaknesses (Grammar Tags):</strong> ";
-      if(Object.keys(errors).length === 0) html += "None yet.";
-      for(let tag in errors) {
-          if(errors[tag] > 0) html += ` [${tag}: ${errors[tag]}] `;
-      }
-      document.getElementById('debugTagsDisplay').innerHTML = html;
+    const errors = getGrammarErrors();
+    let html = "<strong>Targeted Weaknesses (Grammar Tags):</strong> ";
+    if(Object.keys(errors).length === 0) html += "None yet.";
+    for(let tag in errors) {
+        if(errors[tag] > 0) html += ` [${tag}: ${errors[tag]}] `;
+    }
+    document.getElementById('debugTagsDisplay').innerHTML = html;
   }
 
   document.addEventListener('DOMContentLoaded', () => {
+    renderSampleTexts();
+    renderHistory();
     loadQuestion();
   });
 </script>
