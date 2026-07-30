@@ -211,7 +211,6 @@
   <h1>HSK 1 Vocabulary Practice</h1>
 
   <div class="card">
-    <!-- Top Countdown Bar -->
     <div class="timer-container" id="timerContainer">
       <div class="timer-bar" id="timerBar"></div>
     </div>
@@ -384,10 +383,9 @@
   let currentWord = null;
   let reverseMode = false;
   
-  // Rapid Mode State & Timer
   let rapidMode = false;
   let timerInterval = null;
-  const RAPID_TIME_LIMIT = 3000; // Time in milliseconds (3 seconds)
+  const RAPID_TIME_LIMIT = 3000;
 
   function getWordSRS(wordId) {
     try {
@@ -501,11 +499,28 @@
     }
   }
 
+  // --- SMART DISTRACTOR SELECTION ---
   function generateOptions() {
     const grid = document.getElementById('optionsGrid');
     grid.innerHTML = '';
 
+    const currentSRS = getWordSRS(currentWord.id);
     const options = [currentWord];
+
+    // Pick distractors with similar SRS mastery/repetition level to avoid easy elimination
+    const sortedDistractors = activeVocab
+      .filter(w => w.id !== currentWord.id)
+      .map(w => ({ word: w, srs: getWordSRS(w.id) }))
+      .sort((a, b) => {
+        const diffA = Math.abs(a.srs.repetition - currentSRS.repetition);
+        const diffB = Math.abs(b.srs.repetition - currentSRS.repetition);
+        return diffA - diffB;
+      });
+
+    for (let i = 0; i < sortedDistractors.length && options.length < 4; i++) {
+      options.push(sortedDistractors[i].word);
+    }
+
     while (options.length < 4 && options.length < activeVocab.length) {
       const rand = activeVocab[Math.floor(Math.random() * activeVocab.length)];
       if (!options.some(o => o.id === rand.id)) {
@@ -533,7 +548,7 @@
       playAudio();
       setTimeout(() => {
         loadQuestion();
-      }, rapidMode ? 300 : 600); // Quicker turn-around in rapid mode
+      }, rapidMode ? 300 : 600);
     } else {
       btnElement.classList.add('wrong');
       updateWordSRS(currentWord.id, 1);
