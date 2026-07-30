@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>HSK 1 Practice & Sentence Builder Tool</title>
+  <title>HSK 1 Study & Builder Tool</title>
   <style>
     :root {
       --bg: #121212;
@@ -32,7 +32,7 @@
 
     .container {
       width: 100%;
-      max-width: 600px;
+      max-width: 650px;
     }
 
     /* Main Navigation Tabs */
@@ -142,10 +142,6 @@
       cursor: pointer;
       text-decoration: underline;
       width: auto !important;
-    }
-
-    .reset-score-btn:hover {
-      color: var(--text) !important;
     }
 
     .controls-top {
@@ -277,10 +273,6 @@
       border-radius: 6px;
     }
 
-    .audio-inline-btn:hover {
-      background-color: #4b5563 !important;
-    }
-
     .sub-prompt {
       font-size: 1rem;
       color: var(--subtext);
@@ -356,10 +348,6 @@
       color: var(--text);
     }
 
-    .controls-bottom button:hover {
-      background-color: #3b3e45;
-    }
-
     details {
       background-color: var(--card);
       border: 1px solid var(--border);
@@ -386,10 +374,7 @@
       font-family: inherit;
     }
 
-    .difficulty-group {
-      margin-top: 15px;
-    }
-
+    .difficulty-group { margin-top: 15px; }
     .difficulty-title {
       font-size: 0.9rem;
       font-weight: bold;
@@ -428,20 +413,13 @@
       color: var(--text);
     }
 
-    .sample-actions {
-      display: flex;
-      gap: 8px;
-    }
+    .sample-actions { display: flex; gap: 8px; }
 
     .sample-btn-action {
       font-size: 0.8rem !important;
       padding: 6px 10px !important;
       width: auto !important;
       background-color: var(--border) !important;
-    }
-
-    .sample-btn-action:hover {
-      background-color: #4b5563 !important;
     }
 
     .sample-text-content {
@@ -476,27 +454,17 @@
       color: var(--subtext);
     }
 
-    .history-item:hover {
-      background-color: var(--border);
-      color: var(--text);
-    }
-
     .sync-section {
       margin-top: 15px;
       border-top: 1px solid var(--border);
       padding-top: 15px;
     }
 
-    .sync-btn-group {
-      display: flex;
-      gap: 10px;
-      margin-top: 10px;
-    }
+    .sync-btn-group { display: flex; gap: 10px; margin-top: 10px; }
 
-    /* --- SENTENCE BUILDER TAB STYLES --- */
+    /* --- SENTENCE BUILDER TAB (PINYIN FOCUS) --- */
     .builder-grammar-hint {
       background-color: #18181b;
-      border: 1px border-box var(--border);
       border-left: 4px solid var(--warning);
       padding: 10px;
       font-size: 0.85rem;
@@ -507,7 +475,7 @@
     }
 
     .builder-target-english {
-      font-size: 1.3rem;
+      font-size: 1.2rem;
       font-weight: bold;
       color: #ffffff;
       text-align: center;
@@ -519,7 +487,7 @@
     }
 
     .builder-workspace {
-      min-height: 60px;
+      min-height: 70px;
       background-color: #121212;
       border: 2px dashed var(--border);
       border-radius: 8px;
@@ -544,14 +512,14 @@
       border: 1px solid var(--border);
       color: var(--text);
       padding: 10px 14px;
-      font-size: 1.1rem;
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
       width: auto !important;
       display: inline-flex;
       flex-direction: column;
       align-items: center;
       gap: 2px;
+      transition: all 0.15s ease;
     }
 
     .tile-btn:hover {
@@ -559,8 +527,20 @@
       border-color: var(--primary);
     }
 
-    .tile-btn .tile-pinyin {
-      font-size: 0.75rem;
+    /* Pinyin is now bold and primary */
+    .tile-btn .tile-pinyin-main {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #60a5fa;
+    }
+
+    .tile-btn .tile-hanzi-sub {
+      font-size: 0.9rem;
+      color: #e5e7eb;
+    }
+
+    .tile-btn .tile-english-sub {
+      font-size: 0.72rem;
       color: var(--subtext);
     }
 
@@ -598,7 +578,7 @@
         <button onclick="resetScore()" class="reset-score-btn">Reset</button>
       </div>
 
-      <!-- Compact Emoji Toolbar -->
+      <!-- Toolbar -->
       <div class="controls-top">
         <button onclick="toggleMode()" id="modeBtn" class="mode-toggle-main">Pinyin ➔ Eng/Hanzi</button>
         <button onclick="toggleRapidMode()" id="rapidBtn" class="icon-btn inactive-mode" title="Toggle Rapid Timer (⚡)">⚡</button>
@@ -608,7 +588,7 @@
         <button onclick="cycleParagraphDisplayMode()" id="displayModeBtn" class="icon-btn" title="Display Mode: Hanzi / Pinyin / English (🔤)">🔤</button>
       </div>
 
-      <!-- Active Paragraph Display with Highlighted Words -->
+      <!-- Active Paragraph Tracker -->
       <div class="paragraph-card" id="paragraphBox">
         <div class="paragraph-title" id="paragraphTitle">📜 Active Text Progress (Click word to jump):</div>
         <div class="paragraph-body" id="paragraphDisplay"></div>
@@ -627,7 +607,7 @@
       <!-- Answer Grid -->
       <div class="options-grid" id="optionsGrid"></div>
 
-      <!-- Self-Grading Confidence Panel -->
+      <!-- Confidence Panel -->
       <div class="confidence-panel" id="confidencePanel">
         <div style="text-align: center; font-size: 0.85rem; color: var(--subtext);">Rate your recall difficulty:</div>
         <div class="confidence-buttons">
@@ -649,7 +629,7 @@
       <summary>Custom Text Parser & Tiered Practice Stories</summary>
       
       <h3>Parse Custom Text (Pinyin or Hanzi)</h3>
-      <textarea id="customTextInput" placeholder="Paste Chinese text or Pinyin here (e.g. 'Jīntiān zhōngwǔ wǒ xiǎng qù fàndiàn...')..."></textarea>
+      <textarea id="customTextInput" placeholder="Paste Chinese text or Pinyin here..."></textarea>
       <button onclick="parseCustomText()" style="margin-top: 8px;">Filter & Practice Custom Words</button>
 
       <h3 style="margin-top: 20px;">Leveled Sample Stories</h3>
@@ -669,33 +649,33 @@
     </details>
   </div>
 
-  <!-- TAB 2: SENTENCE BUILDER -->
+  <!-- TAB 2: SENTENCE BUILDER (PINYIN FOCUS) -->
   <div id="builderTab" class="tab-content">
     <div class="card">
       <h2>Active Sentence Builder</h2>
       <div style="text-align: center; font-size: 0.85rem; color: var(--subtext); margin-bottom: 15px;">
-        🗣️ <strong>Challenge:</strong> Say the Chinese sentence out loud <em>first</em>, then assemble the tiles below!
+        🗣️ <strong>Focus:</strong> Assemble the sentence using <strong>Pinyin</strong> word tiles in the correct Chinese order!
       </div>
 
       <div class="builder-grammar-hint" id="builderGrammarHint">
-        Pattern: [Subject] + [Time] + 去 + [Place] + [Action]
+        Pattern: [Subject] + [Time] + 去 + [Place]
       </div>
 
       <div class="builder-target-english" id="builderTargetEnglish">
-        "I am going to the restaurant at 3 o'clock to eat."
+        "My friend and I are going to a restaurant at 3 o'clock."
       </div>
 
-      <!-- Active Assembled Sentence Area -->
+      <!-- Workspace -->
       <div class="builder-workspace" id="builderWorkspace">
-        <span style="color: var(--subtext); font-size: 0.9rem;" id="workspacePlaceholder">Click words below to build sentence...</span>
+        <span style="color: var(--subtext); font-size: 0.9rem;" id="workspacePlaceholder">Click Pinyin tiles below to build sentence...</span>
       </div>
 
       <div class="builder-feedback" id="builderFeedback"></div>
 
-      <!-- Word Tile Bank -->
+      <!-- Tile Bank -->
       <div class="builder-tile-bank" id="builderTileBank"></div>
 
-      <!-- Builder Navigation -->
+      <!-- Controls -->
       <div class="controls-bottom">
         <button onclick="clearBuilderWorkspace()" style="background-color: #374151;">🔄 Clear</button>
         <button onclick="checkBuilderAnswer()" style="background-color: var(--success);">✅ Check</button>
@@ -726,321 +706,116 @@
   }
 
   const sampleTexts = [
-    // --- EASY ---
     { id: "easy1", level: "easy", title: "1. Basic Greeting & Intro", hanzi: "你好！我是学生，他是老师。我很喜欢学习汉语。", pinyin: "Nǐ hǎo! Wǒ shì xuésheng, tā shì lǎoshī. Wǒ hěn xǐhuan xuéxí Hànyǔ.", english: "Hello! I am a student, and he is a teacher. I really like studying Chinese." },
     { id: "easy2", level: "easy", title: "2. Family & Age", hanzi: "我爸爸妈妈都在家里。我有一个女儿，她九岁了。", pinyin: "Wǒ bàba māma dōu zài jiālǐ. Wǒ yǒu yí gè nǚ'ér, tā jiǔ suì le.", english: "My dad and mom are both at home. I have a daughter, she is nine years old." },
-    { id: "easy3", level: "easy", title: "3. Simple Weather & Drinks", hanzi: "今天天气很热。我想喝水，不喝热茶。", pinyin: "Jīntiān tiānqì hěn rè. Wǒ xiǎng hē shuǐ, bù hē rè chá.", english: "The weather today is very hot. I want to drink water, not hot tea." },
-    { id: "easy4", level: "easy", title: "4. Cat & Table", hanzi: "桌子上有一只猫。它很小，很漂亮。", pinyin: "Zhuōzi shàng yǒu yì zhī māo. Tā hěn xiǎo, hěn piàoliang.", english: "There is a cat on the table. It is very small and very pretty." },
-    { id: "easy5", level: "easy", title: "5. Seeing Friends", hanzi: "今天是我生日。我和三个朋友去吃米饭。", pinyin: "Jīntiān shì wǒ shēngrì. Wǒ hé sān gè péngyou qù chī mǐfàn.", english: "Today is my birthday. My three friends and I are going to eat rice." },
-    { id: "easy6", level: "easy", title: "6. Sleep & Home", hanzi: "现在十点了。我很想去睡觉，回家里。", pinyin: "Xiànzài shí diǎn le. Wǒ hěn xiǎng qù shuìjiào, huí jiālǐ.", english: "It is 10 o'clock now. I really want to go to sleep and go back home." },
-
-    // --- MEDIUM ---
+    { id: "easy3", level: "easy", title: "3. Simple Weather & Tea", hanzi: "今天天气很热。我想喝水，不喝热茶。", pinyin: "Jīntiān tiānqì hěn rè. Wǒ xiǎng hē shuǐ, bù hē rè chá.", english: "The weather today is very hot. I want to drink water, not hot tea." },
     { id: "med1", level: "medium", title: "1. Lunch & Taxi to Shop", hanzi: "今天中午我和朋友去饭店吃米饭，喝热茶。下午三点我们坐出租车去商店买东西。我很高兴！", pinyin: "Jīntiān zhōngwǔ wǒ hé péngyou qù fàndiàn chī mǐfàn, hē rè chá. Xiàwǔ sān diǎn wǒmen zuò chūzūchē qù shāngdiàn mǎi dōngxi. Wǒ hěn gāoxìng!", english: "Today at noon, my friend and I went to a restaurant to eat rice and drink hot tea. At 3 PM, we took a taxi to the store to buy things. I am very happy!" },
     { id: "med2", level: "medium", title: "2. School & Meeting Teacher", hanzi: "今天天气不冷，我和同学在学校看见了老师。我们都很高兴，请老师喝茶。", pinyin: "Jīntiān tiānqì bù lěng, wǒ hé tóngxué zài xuéxiào kànjiàn le lǎoshī. Wǒmen dōu hěn gāoxìng, qǐng lǎoshī hē chá.", english: "The weather today is not cold. My classmate and I saw the teacher at school. We were all very happy and invited the teacher to drink tea." },
-    { id: "med3", level: "medium", title: "3. Hospital Visit & Movie", hanzi: "妈妈在家里做菜，我和爸爸在看电视。今天下午我们要去医院看朋友，晚上看电影。", pinyin: "Māma zài jiālǐ zuò cài, wǒ hé bàba zài kàn diànshì. Jīntiān xiàwǔ wǒmen yào qù yīyuàn kàn péngyou, wǎnshang kàn diànyǐng.", english: "Mom is cooking at home, while dad and I are watching TV. This afternoon we are going to the hospital to see a friend, and tonight we will watch a movie." },
-    { id: "med4", level: "medium", title: "4. Calling Classmates", hanzi: "昨天我没去学校。我和同学打电话说汉语，他说今天老师教了很多字。", pinyin: "Zuótiān wǒ méi qù xuéxiào. Wǒ hé tóngxué dǎ diànhuà shuō Hànyǔ, tā shuō jīntiān lǎoshī jiāo le hěn duō zì.", english: "I didn't go to school yesterday. I called my classmate to speak Chinese; he said the teacher taught a lot of characters today." },
-    { id: "med5", level: "medium", title: "5. Working on Computer", hanzi: "我在电脑上工作。儿子在桌子上面看书，女儿在听音乐。", pinyin: "Wǒ zài diànnǎo shàng gōngzuò. Érzi zài zhuōzi shàngmiàn kàn shū, nǚ'ér zài tīng yīnyuè.", english: "I am working on the computer. My son is reading a book at the table, and my daughter is listening to music." },
-    { id: "med6", level: "medium", title: "6. Cold Weather & Clothes", hanzi: "北京的天气很冷，下雨了。我们要去商店买新的衣服和杯子。", pinyin: "Běijīng de tiānqì hěn lěng, xiàyǔ le. Wǒmen yào qù shāngdiàn mǎi xīn de yīfu hé bēizi.", english: "The weather in Beijing is very cold and it rained. We need to go to the store to buy new clothes and cups." },
-
-    // --- HARD ---
-    { id: "hard1", level: "hard", title: "1. Shopping Prices & Books", hanzi: "现在四点半，我和女儿去商店买苹果和水果。这个苹果太大了，一个五块钱。我买了一本书，三块钱。", pinyin: "Xiànzài sì diǎn bàn, wǒ hé nǚ'ér qù shāngdiàn mǎi píngguǒ hé shuǐguǒ. Zhè gè píngguǒ tài dà le, yí gè wǔ kuài qián. Wǒ mǎi le yì běn shū, sān kuài qián.", english: "It is 4:30 now. My daughter and I went to the store to buy apples and fruit. This apple is too big, one costs 5 yuan. I bought a book for 3 yuan." },
-    { id: "hard2", level: "hard", title: "2. Work, Travel & Flights", hanzi: "我儿子是医生，在医院工作。他明天下午坐飞机去北京。北京的天气很冷，他要买衣服。", pinyin: "Wǒ érzi shì yīshēng, zài yīyuàn gōngzuò. Tā míngtiān xiàwǔ zuò fēijī qù Běijīng. Běijīng de tiānqì hěn lěng, tā yào mǎi yīfu.", english: "My son is a doctor working in a hospital. He will take a plane to Beijing tomorrow afternoon. The weather in Beijing is very cold, so he needs to buy clothes." },
-    { id: "hard3", level: "hard", title: "3. Weekend Routine & Calls", hanzi: "昨天下雨了，我没去学校。我和老朋友打电话说汉语，他说我写的字很漂亮。明天星期六，我们要在饭店吃菜。", pinyin: "Zuótiān xiàyǔ le, wǒ méi qù xuéxiào. Wǒ hé lǎo péngyou dǎ diànhuà shuō Hànyǔ, tā shuō wǒ xiě de zì hěn piàoliang. Míngtiān xīngqīliù, wǒmen yào zài fàndiàn chī cài.", english: "It rained yesterday, so I didn't go to school. I made a phone call to an old friend in Chinese; he said the characters I write are very pretty. Tomorrow is Saturday, and we will eat dishes at a restaurant." },
-    { id: "hard4", level: "hard", title: "4. Restaurant Choice & Tea", hanzi: "今天中午我们去饭店吃米饭和水饺。这家饭店的茶非常好喝，也不太贵。我们吃了八十块钱，都很高兴。", pinyin: "Jīntiān zhōngwǔ wǒmen qù fàndiàn chī mǐfàn hé shuǐjiǎo. Zhè jiā fàndiàn de chá fēicháng hǎohē, yě bú tài guì. Wǒmen chī le bāshí kuài qián, dōu hěn gāoxìng.", english: "Today at noon we went to a restaurant to eat rice and dumplings. This restaurant's tea is very good to drink and not too expensive. We spent 80 yuan eating and were all very happy." },
-    { id: "hard5", level: "hard", title: "5. Doctor Advice & Health", hanzi: "爸爸身体不太好，医生叫他多喝热茶，少看电视。今天下午我们要坐出租车去医院看医生。", pinyin: "Bàba shēntǐ bú tài hǎo, yīshēng jiào tā duō hē rè chá, shǎo kàn diànshì. Jīntiān xiàwǔ wǒmen yào zuò chūzūchē qù yīyuàn kàn yīshēng.", english: "Dad isn't feeling very well; the doctor told him to drink more hot tea and watch less TV. This afternoon we are taking a taxi to the hospital to see the doctor." },
-    { id: "hard6", level: "hard", title: "6. Learning Progress & Books", hanzi: "我学会了很多汉语字，读书也越来越快。我的老师是从北京来的，她教我们怎么写漂亮的字。", pinyin: "Wǒ xuéhuì le hěn duō Hànyǔ zì, dú shū yě yuè lái yuè kuài. Wǒ de lǎoshī shì cóng Běijīng lái de, tā jiāo wǒmen zěnme xiě piàoliang de zì.", english: "I have learned many Chinese characters and read books faster and faster. My teacher comes from Beijing, and she teaches us how to write pretty characters." }
+    { id: "hard1", level: "hard", title: "1. Shopping Prices & Books", hanzi: "现在四点半，我和女儿去商店买苹果和水果。这个苹果太大了，一个五块钱。我买了一本书，三块钱。", pinyin: "Xiànzài sì diǎn bàn, wǒ hé nǚ'ér qù shāngdiàn mǎi píngguǒ hé shuǐguǒ. Zhè gè píngguǒ tài dà le, yí gè wǔ kuài qián. Wǒ mǎi le yì běn shū, sān kuài qián.", english: "It is 4:30 now. My daughter and I went to the store to buy apples and fruit. This apple is too big, one costs 5 yuan. I bought a book for 3 yuan." }
   ];
 
   const defaultVocabulary = [
     { id: "爱", hanzi: "爱", pinyin: "ài", english: "to love / affection", sentence: "妈妈很 ___ 我。(Māma hěn ___ wǒ.)" },
-    { id: "八", hanzi: "八", pinyin: "bā", english: "eight", sentence: "我有 ___ 个苹果。(Wǒ yǒu ___ gè píngguǒ.)" },
     { id: "爸爸", hanzi: "爸爸", pinyin: "bàba", english: "dad / father", sentence: "我的 ___ 是医生。(Wǒ de ___ shì yīshēng.)" },
-    { id: "半", hanzi: "半", pinyin: "bàn", english: "half", sentence: "现在四点 ___。(Xiànzài sì diǎn ___.)" },
-    { id: "杯子", hanzi: "杯子", pinyin: "bēizi", english: "cup / glass", sentence: "桌子上有一个 ___。(Zhuōzi shàng yǒu yí gè ___.)" },
     { id: "北京", hanzi: "北京", pinyin: "Běijīng", english: "Beijing", sentence: "我想去 ___。(Wǒ xiǎng qù ___.)" },
-    { id: "本", hanzi: "本", pinyin: "běn", english: "measure word for books", sentence: "我买了一 ___ 书。(Wǒ mǎi le yì ___ shū.)" },
-    { id: "不客气", hanzi: "不客气", pinyin: "bú kèqi", english: "you're welcome", sentence: "谢谢你！— ___。(Xièxie nǐ! — ___.)" },
-    { id: "不", hanzi: "不", pinyin: "bù", english: "not / no", sentence: "我 ___ 吃菜。(Wǒ ___ chī cài.)" },
-    { id: "菜", hanzi: "菜", pinyin: "cài", english: "dish / vegetable", sentence: "今天有很热的 ___。(Jīntiān yǒu hěn rè de ___.)" },
-    { id: "茶", hanzi: "茶", pinyin: "chá", english: "tea", sentence: "我想喝热 ___。(Wǒ xiǎng hē rè ___.)" },
     { id: "吃", hanzi: "吃", pinyin: "chī", english: "to eat", sentence: "你想 ___ 米饭吗？(Nǐ xiǎng ___ mǐfàn ma?)" },
     { id: "出租车", hanzi: "出租车", pinyin: "chūzūchē", english: "taxi", sentence: "我们坐 ___ 去商店。(Wǒmen zuò ___ qù shāngdiàn.)" },
     { id: "打电话", hanzi: "打电话", pinyin: "dǎ diànhuà", english: "to make a phone call", sentence: "他在给朋友 ___。(Tā zài gěi péngyou ___.)" },
-    { id: "大", hanzi: "大", pinyin: "dà", english: "big / large", sentence: "这个苹果很 ___。(Zhè gè píngguǒ hěn ___.)" },
-    { id: "的", hanzi: "的", pinyin: "de", english: "possessive particle", sentence: "这是我 ___ 书。(Zhè shì wǒ ___ shū.)" },
-    { id: "点", hanzi: "点", pinyin: "diǎn", english: "o'clock / point", sentence: "现在三 ___。(Xiànzài sān ___.)" },
-    { id: "电脑", hanzi: "电脑", pinyin: "diànnǎo", english: "computer", sentence: "我喜欢在 ___ 上工作。(Wǒ xǐhuan zài ___ shàng gōngzuò.)" },
-    { id: "电视", hanzi: "电视", pinyin: "diànshì", english: "television", sentence: "我喜欢看 ___。(Wǒ xǐhuan kàn ___.)" },
-    { id: "电影", hanzi: "电影", pinyin: "diànyǐng", english: "movie / film", sentence: "今天下午看 ___。(Jīntiān xiàwǔ kàn ___.)" },
-    { id: "东西", hanzi: "东西", pinyin: "dōngxi", english: "thing / stuff", sentence: "去商店买 ___。(Qù shāngdiàn mǎi ___.)" },
-    { id: "都", hanzi: "都", pinyin: "dōu", english: "all / both", sentence: "我们 ___ 喜欢汉语。(Wǒmen ___ xǐhuan Hànyǔ.)" },
-    { id: "读", hanzi: "读", pinyin: "dú", english: "to read", sentence: "你在 ___ 书吗？(Nǐ zài ___ shū ma?)" },
-    { id: "对不起", hanzi: "对不起", pinyin: "duìbuqǐ", english: "sorry", sentence: "___，没关系。(____, méi guānxi.)" },
-    { id: "多", hanzi: "多", pinyin: "duō", english: "many / much", sentence: "商店里有很 ___ 人。(Shāngdiàn lǐ yǒu hěn ___ rén.)" },
-    { id: "多少", hanzi: "多少", pinyin: "duōshao", english: "how many / how much", sentence: "这个 ___ 钱？(Zhè gè ___ qián?)" },
-    { id: "儿子", hanzi: "儿子", pinyin: "érzi", english: "son", sentence: "他的 ___ 是学生。(Tā de ___ shì xuésheng.)" },
-    { id: "二", hanzi: "二", pinyin: "èr", english: "two", sentence: "一、___、三。(Yī, ___, sān.)" },
     { id: "饭店", hanzi: "饭店", pinyin: "fàndiàn", english: "restaurant / hotel", sentence: "我去 ___ 吃米饭。(Wǒ qù ___ chī mǐfàn.)" },
-    { id: "飞机", hanzi: "飞机", pinyin: "fēijī", english: "airplane", sentence: "他坐 ___ 去北京。(Tā zuò ___ qù Běijīng.)" },
-    { id: "高兴", hanzi: "高兴", pinyin: "gāoxìng", english: "happy / glad", sentence: "认识你我很高兴。(Rènshi nǐ wǒ hěn ___.)" },
-    { id: "个", hanzi: "个", pinyin: "gè", english: "general measure word", sentence: "一 ___ 苹果。(Yī ___ píngguǒ.)" },
-    { id: "工作", hanzi: "工作", pinyin: "gōngzuò", english: "job / to work", sentence: "你喜欢你的 ___ 吗？(Nǐ xǐhuan nǐ de ___ ma?)" },
     { id: "汉语", hanzi: "汉语", pinyin: "Hànyǔ", english: "Chinese language", sentence: "我们学习 ___。(Wǒmen xuéxí ___.)" },
-    { id: "好", hanzi: "好", pinyin: "hǎo", english: "good / well", sentence: "今天天气很 ___。(Jīntiān tiānqì hěn ___.)" },
     { id: "喝", hanzi: "喝", pinyin: "hē", english: "to drink", sentence: "你想 ___ 水吗？(Nǐ xiǎng ___ shuǐ ma?)" },
-    { id: "和", hanzi: "和", pinyin: "hé", english: "and", sentence: "我 ___ 他是同学。(Wǒ ___ tā shì tóngxué.)" },
-    { id: "很", hanzi: "很", pinyin: "hěn", english: "very", sentence: "天气 ___ 热。(Tiānqì ___ rè.)" },
-    { id: "回", hanzi: "回", pinyin: "huí", english: "to return", sentence: "我三点 ___ 家。(Wǒ sān diǎn ___ jiā.)" },
-    { id: "会", hanzi: "会", pinyin: "huì", english: "can / know how to", sentence: "我 ___ 说汉语。(Wǒ ___ shuō Hànyǔ.)" },
-    { id: "家", hanzi: "家", pinyin: "jiā", english: "home / family", sentence: "我回 ___ 睡觉。(Wǒ huí ___ shuìjiào.)" },
-    { id: "叫", hanzi: "叫", pinyin: "jiào", english: "to be called", sentence: "你 ___ 什么名字？(Nǐ ___ shénme míngzi?)" },
     { id: "今天", hanzi: "今天", pinyin: "jīntiān", english: "today", sentence: "___ 天气冷。(____ tiānqì lěng.)" },
-    { id: "九", hanzi: "九", pinyin: "jiǔ", english: "nine", sentence: "商店里有 ___ 个人。(Shāngdiàn lǐ yǒu ___ gè rén.)" },
-    { id: "开", hanzi: "开", pinyin: "kāi", english: "to open / to drive", sentence: "他会 ___ 出租车。(Tā huì ___ chūzūchē.)" },
     { id: "看", hanzi: "看", pinyin: "kàn", english: "to look / to watch / to read", sentence: "我想 ___ 书。(Wǒ xiǎng ___ shū.)" },
-    { id: "看见", hanzi: "看见", pinyin: "kànjiàn", english: "to see", sentence: "我 ___ 老师了。(Wǒ ___ lǎoshī le.)" },
-    { id: "块", hanzi: "块", pinyin: "kuài", english: "piece / yuan", sentence: "十 ___ 钱。(Shí ___ qián.)" },
-    { id: "来", hanzi: "来", pinyin: "lái", english: "to come", sentence: "今天医生 ___ 我家。(Jīntiān yīshēng ___ wǒ jiā.)" },
-    { id: "老", hanzi: "老", pinyin: "lǎo", english: "old / experienced", sentence: "我和 ___ 朋友打电话。(Wǒ hé ___ péngyou dǎ diànhuà.)" },
     { id: "老师", hanzi: "老师", pinyin: "lǎoshī", english: "teacher", sentence: "她是我们的 ___。(Tā shì wǒmen de ___.)" },
-    { id: "了", hanzi: "了", pinyin: "le", english: "completed action particle", sentence: "昨天下雨 ___。(Zuótiān xiàyǔ ___.)" },
-    { id: "冷", hanzi: "冷", pinyin: "lěng", english: "cold", sentence: "今天天气不 ___。(Jīntiān tiānqì bù ___.)" },
-    { id: "里", hanzi: "里", pinyin: "lǐ", english: "inside", sentence: "学校 ___ 有很多学生。(Xuéxiào ___ yǒu hěn duō xuésheng.)" },
-    { id: "六", hanzi: "六", pinyin: "liù", english: "six", sentence: "下个星期 ___。(Xià gè xīngqī ___.)" },
-    { id: "妈妈", hanzi: "妈妈", pinyin: "māma", english: "mom / mother", sentence: "我的 ___ 喜欢喝茶。(Wǒ de ___ xǐhuan hē chá.)" },
-    { id: "吗", hanzi: "吗", pinyin: "ma", english: "question particle", sentence: "你是医生 ___？(Nǐ shì yīshēng ___?)" },
     { id: "买", hanzi: "买", pinyin: "mǎi", english: "to buy", sentence: "我去商店 ___ 东西。(Wǒ qù shāngdiàn ___ dōngxi.)" },
-    { id: "猫", hanzi: "猫", pinyin: "māo", english: "cat", sentence: "我家有一只 ___。(Wǒ jiā yǒu yì zhī ___.)" },
-    { id: "没", hanzi: "没", pinyin: "méi", english: "not / have not", sentence: "我 ___ 去学校。(Wǒ ___ qù xuéxiào.)" },
-    { id: "没关系", hanzi: "没关系", pinyin: "méi guānxi", english: "it doesn't matter", sentence: "对不起！— ___。(Duìbuqǐ! — ___.)" },
-    { id: "米饭", hanzi: "米饭", pinyin: "mǐfàn", english: "cooked rice", sentence: "我想吃 ___。(Wǒ xiǎng chī ___.)" },
-    { id: "明天", hanzi: "明天", pinyin: "míngtiān", english: "tomorrow", sentence: "___ 我去学校。(____ wǒ qù xuéxiào.)" },
-    { id: "名字", hanzi: "名字", pinyin: "míngzi", english: "name", sentence: "你的 ___ 是什么？(Nǐ de ___ shì shénme?)" },
-    { id: "哪", hanzi: "哪", pinyin: "nǎ", english: "which", sentence: "你是 ___ 国人？(Nǐ shì ___ guó rén?)" },
-    { id: "那", hanzi: "那", pinyin: "nà", english: "that", sentence: "___ 是我的电脑。(___ shì wǒ de diànnǎo.)" },
-    { id: "你", hanzi: "你", pinyin: "nǐ", english: "you", sentence: "___ 好！( ___ hǎo!)" },
-    { id: "你好", hanzi: "你好", pinyin: "nǐ hǎo", english: "hello", sentence: "___！我是学生。( ___! Wǒ shì xuésheng.)" },
-    { id: "年", hanzi: "年", pinyin: "nián", english: "year", sentence: "我不去 ___。(Wǒ bù qù ___.)" },
-    { id: "女儿", hanzi: "女儿", pinyin: "nǚ'ér", english: "daughter", sentence: "她是我 ___。(Tā shì wǒ ___.)" },
-    { id: "朋友", hanzi: "朋友", pinyin: "péngyou", english: "friend", sentence: "他想喝水，他是我的 ___。(Tā xiǎng hē shuǐ, tā shì wǒ de ___.)" },
-    { id: "漂亮", hanzi: "漂亮", pinyin: "piàoliang", english: "pretty / beautiful", sentence: "这里的衣服很 ___。(Zhèlǐ de yīfu hěn ___.)" },
-    { id: "苹果", hanzi: "苹果", pinyin: "píngguǒ", english: "apple", sentence: "她给我买 ___。(Tā gěi wǒ mǎi ___.)" },
-    { id: "七", hanzi: "七", pinyin: "qī", english: "seven", sentence: "今天 ___ 号。(Jīntiān ___ hào.)" },
-    { id: "钱", hanzi: "钱", pinyin: "qián", english: "money", sentence: "我没有很多 ___。(Wǒ méiyǒu hěn duō ___.)" },
-    { id: "请", hanzi: "请", pinyin: "qǐng", english: "please / to invite", sentence: "___ 喝水。(___ hē shuǐ.)" },
+    { id: "朋友", hanzi: "朋友", pinyin: "péngyou", english: "friend", sentence: "他是我的 ___。(Tā shì wǒ de ___.)" },
     { id: "去", hanzi: "去", pinyin: "qù", english: "to go", sentence: "我想 ___ 饭店。(Wǒ xiǎng ___ fàndiàn.)" },
-    { id: "热", hanzi: "热", pinyin: "rè", english: "hot", sentence: "我想喝 ___ 茶。(Wǒ xiǎng hē ___ chá.)" },
-    { id: "人", hanzi: "人", pinyin: "rén", english: "person / people", sentence: "他是中国 ___。(Tā shì Zhōngguó ___.)" },
-    { id: "认识", hanzi: "认识", pinyin: "rènshi", english: "to know / to recognize", sentence: "很高兴 ___ 你。(Hěn gāoxìng ___ nǐ.)" },
-    { id: "三", hanzi: "三", pinyin: "sān", english: "three", sentence: "下午 ___ 点去商店。(Xiàwǔ ___ diǎn qù shāngdiàn.)" },
     { id: "商店", hanzi: "商店", pinyin: "shāngdiàn", english: "shop / store", sentence: "我们去 ___ 买东西。(Wǒmen qù ___ mǎi dōngxi.)" },
-    { id: "上", hanzi: "上", pinyin: "shàng", english: "above / up", sentence: "桌子 ___ 有书。(Zhuōzi ___ yǒu shū.)" },
-    { id: "谁", hanzi: "谁", pinyin: "shéi", english: "who / whom", sentence: "他是 ___？(Tā shì ___?)" },
-    { id: "什么", hanzi: "什么", pinyin: "shénme", english: "what", sentence: "你喜欢买 ___？(Nǐ xǐhuan mǎi ___?)" },
-    { id: "十", hanzi: "十", pinyin: "shí", english: "ten", sentence: "我要买 ___ 个。(Wǒ yào mǎi ___ gè.)" },
-    { id: "是", hanzi: "是", pinyin: "shì", english: "to be", sentence: "这 ___ 我的书。(Zhè ___ wǒ de shū.)" },
-    { id: "书", hanzi: "书", pinyin: "shū", english: "book", sentence: "我看 ___。(Wǒ kàn ___.)" },
-    { id: "水", hanzi: "水", pinyin: "shuǐ", english: "water", sentence: "他想喝 ___。(Tā xiǎng hē ___.)" },
-    { id: "水果", hanzi: "水果", pinyin: "shuǐguǒ", english: "fruit", sentence: "去商店买 ___。(Qù shāngdiàn mǎi ___.)" },
-    { id: "说", hanzi: "说", pinyin: "shuō", english: "to speak / to say", sentence: "他 ___ 我写得很好。(Tā ___ wǒ xiě de hěn hǎo.)" },
-    { id: "睡觉", hanzi: "睡觉", pinyin: "shuìjiào", english: "to sleep", sentence: "我现在去 ___。(Wǒ xiànzài qù ___.)" },
-    { id: "四", hanzi: "四", pinyin: "sì", english: "four", sentence: "今天星期 ___。(Jīntiān xīngqī ___.)" },
-    { id: "岁", hanzi: "岁", pinyin: "suì", english: "years old", sentence: "他的女儿十 ___。(Tā de nǚ'ér shí ___.)" },
-    { id: "他", hanzi: "他", pinyin: "tā", english: "he / him", sentence: "___ 想喝水。(___ xiǎng hē shuǐ.)" },
-    { id: "她", hanzi: "她", pinyin: "tā", english: "she / her", sentence: "___ 是我老师。(___ shì wǒ lǎoshī.)" },
-    { id: "太", hanzi: "太", pinyin: "tài", english: "too / excessively", sentence: "天气 ___ 热了。(Tiānqì ___ rè le.)" },
-    { id: "天气", hanzi: "天气", pinyin: "tiānqì", english: "weather", sentence: "今天 ___ 不冷。(Jīntiān ___ bù lěng.)" },
-    { id: "听", hanzi: "听", pinyin: "tīng", english: "to listen", sentence: "你 ___ 老师说话。(Nǐ ___ lǎoshī shuōhuà.)" },
-    { id: "同学", hanzi: "同学", pinyin: "tóngxué", english: "classmate", sentence: "我和他是 ___。(Wǒ hé tā shì ___.)" },
-    { id: "我", hanzi: "我", pinyin: "wǒ", english: "I / me", sentence: "___ 想去饭店。(___ xiǎng qù fàndiàn.)" },
-    { id: "我们", hanzi: "我们", pinyin: "wǒmen", english: "we / us", sentence: "___ 下午去商店。(___ xiàwǔ qù shāngdiàn.)" },
-    { id: "五", hanzi: "五", pinyin: "wǔ", english: "five", sentence: "我有 ___ 块钱。(Wǒ yǒu ___ kuài qián.)" },
-    { id: "喜欢", hanzi: "喜欢", pinyin: "xǐhuan", english: "to like", sentence: "你 ___ 买什么？(Nǐ ___ mǎi shénme?)" },
-    { id: "下", hanzi: "下", pinyin: "xià", english: "below / down", sentence: "桌子 ___ 有猫。(Zhuōzi ___ yǒu māo.)" },
-    { id: "下午", hanzi: "下午", pinyin: "xiàwǔ", english: "afternoon", sentence: "我们 ___ 三点去。(Wǒmen ___ sān diǎn qù.)" },
-    { id: "下雨", hanzi: "下雨", pinyin: "xiàyǔ", english: "to rain", sentence: "昨天 ___ 了。(Zuótiān ___ le.)" },
-    { id: "现在", hanzi: "现在", pinyin: "xiànzài", english: "now", sentence: "我 ___ 去睡觉。(Wǒ ___ qù shuìjiào.)" },
-    { id: "想", hanzi: "想", pinyin: "xiǎng", english: "to think / to want", sentence: "我 ___ 去饭店。(Wǒ ___ qù fàndiàn.)" },
-    { id: "小", hanzi: "小", pinyin: "xiǎo", english: "small / little", sentence: "那只猫很 ___。(Nà zhī māo hěn ___.)" },
-    { id: "写", hanzi: "写", pinyin: "xiě", english: "to write", sentence: "我们在 ___ 字。(Wǒmen zài ___ zì.)" },
-    { id: "谢谢", hanzi: "谢谢", pinyin: "xièxie", english: "thanks", sentence: "___ 你！( ___ nǐ!)" },
-    { id: "星期", hanzi: "星期", pinyin: "xīngqī", english: "week", sentence: "今天 ___ 三。(Jīntiān ___ sān.)" },
-    { id: "星期六", hanzi: "星期六", pinyin: "xīngqīliù", english: "Saturday", sentence: "明天 ___。(Míngtiān ___.)" },
-    { id: "学生", hanzi: "学生", pinyin: "xuésheng", english: "student", sentence: "他是我的 ___。(Tā shì wǒ de ___.)" },
-    { id: "学习", hanzi: "学习", pinyin: "xuéxí", english: "to study / to learn", sentence: "我们要 ___ 汉语。(Wǒmen yào ___ Hànyǔ.)" },
-    { id: "学校", hanzi: "学校", pinyin: "xuéxiào", english: "school", sentence: "老师在 ___ 教书。(Lǎoshī zài ___ jiāoshū.)" },
-    { id: "要", hanzi: "要", pinyin: "yào", english: "to want / will / must", sentence: "我们 ___ 去北京。(Wǒmen ___ qù Běijīng.)" },
-    { id: "也", hanzi: "也", pinyin: "yě", english: "also / too", sentence: "我 ___ 喜欢学习。(Wǒ ___ xǐhuan xuéxí.)" },
-    { id: "一", hanzi: "一", pinyin: "yī", english: "one", sentence: "这是 ___ 个苹果。(Zhè shì ___ gè píngguǒ.)" },
-    { id: "衣服", hanzi: "衣服", pinyin: "yīfu", english: "clothes", sentence: "我想买新 ___。(Wǒ xiǎng mǎi xīn ___.)" },
-    { id: "医生", hanzi: "医生", pinyin: "yīshēng", english: "doctor", sentence: "我是 ___。(Wǒ shì ___.)" },
-    { id: "医院", hanzi: "医院", pinyin: "yīyuàn", english: "hospital", sentence: "医生在 ___。(Yīshēng zài ___.)" },
-    { id: "椅子", hanzi: "椅子", pinyin: "yǐzi", english: "chair", sentence: "请坐 ___。(Qǐng zuò ___.)" },
-    { id: "有", hanzi: "有", pinyin: "yǒu", english: "to have", sentence: "商店 ___ 苹果。(Shāngdiàn ___ píngguǒ.)" },
-    { id: "月", hanzi: "月", pinyin: "yuè", english: "month / moon", sentence: "三 ___ 四号。(Sān ___ sì hào.)" },
-    { id: "再见", hanzi: "再见", pinyin: "zàijiàn", english: "goodbye", sentence: "老师，___！(Lǎoshī, ___!)" },
-    { id: "在", hanzi: "在", pinyin: "zài", english: "at / in / located", sentence: "我 ___ 学校看书。(Wǒ ___ xuéxiào kàn shū.)" },
-    { id: "怎么", hanzi: "怎么", pinyin: "zěnme", english: "how", sentence: "这个字 ___ 读？(Zhè gè zì ___ dú?)" },
-    { id: "这", hanzi: "这", pinyin: "zhè", english: "this", sentence: "___ 是我的杯子。(___ shì wǒ de bēizi.)" },
-    { id: "中国", hanzi: "中国", pinyin: "Zhōngguó", english: "China", sentence: "我喜欢 ___。(Wǒ xǐhuan ___.)" },
-    { id: "中午", hanzi: "中午", pinyin: "zhōngwǔ", english: "noon", sentence: "今天 ___ 吃米饭。(Jīntiān ___ chī mǐfàn.)" },
-    { id: "住", hanzi: "住", pinyin: "zhù", english: "to live / to stay", sentence: "我 ___ 在北京。(Wǒ ___ zài Běijīng.)" },
-    { id: "桌子", hanzi: "桌子", pinyin: "zhuōzi", english: "table / desk", sentence: "书在 ___ 上。(Shū zài ___ shàng.)" },
-    { id: "字", hanzi: "字", pinyin: "zì", english: "character / word", sentence: "我会写 ___。(Wǒ huì xiě ___.)" },
-    { id: "昨天", hanzi: "昨天", pinyin: "zuótiān", english: "yesterday", sentence: "___ 我没去学校。(____ wǒ méi qù xuéxiào.)" },
-    { id: "做", hanzi: "做", pinyin: "zuò", english: "to do / to make", sentence: "你在 ___ 什么？(Nǐ zài ___ shénme?)" },
-    { id: "坐", hanzi: "坐", pinyin: "zuò", english: "to sit", sentence: "我们 ___ 出租车。(Wǒmen zuò ___ chūzūchē.)" }
+    { id: "学校", hanzi: "学校", pinyin: "xuéxiào", english: "school", sentence: "老师在 ___ 教书。(Lǎoshī zài ___ jiāoshū.)" }
   ];
 
   let activeVocab = [...defaultVocabulary];
   let currentWord = null;
   let currentVocabIndex = 0;
   let reverseMode = false;
-  
   let showContext = true;
   let selfGradeMode = true;
   let showParagraphProgress = true;
   let paragraphDisplayMode = 'hanzi'; 
   let currentParagraphText = "";
   let learnedWords = new Set();
-
   let rapidMode = false;
   let timerInterval = null;
   const RAPID_TIME_LIMIT = 3000;
-
   let correctScore = 0;
   let wrongScore = 0;
 
-  // --- SENTENCE BUILDER ENGINE DATA ---
+  // --- GRANULAR PINYIN-FIRST SENTENCE BUILDER PUZZLES ---
   const builderPuzzles = [
     {
       english: "My friend and I are going to a restaurant at 3 o'clock.",
       grammar: "[Subject] + [Time] + 去 + [Place]",
       tiles: [
-        { hanzi: "我和朋友", pinyin: "Wǒ hé péngyou" },
-        { hanzi: "三点", pinyin: "sān diǎn" },
-        { hanzi: "去", pinyin: "qù" },
-        { hanzi: "饭店", pinyin: "fàndiàn" }
+        { pinyin: "Wǒ", hanzi: "我", english: "I / me" },
+        { pinyin: "hé", hanzi: "和", english: "and" },
+        { pinyin: "péngyou", hanzi: "朋友", english: "friend" },
+        { pinyin: "sān diǎn", hanzi: "三点", english: "3 o'clock" },
+        { pinyin: "qù", hanzi: "去", english: "go" },
+        { pinyin: "fàndiàn", hanzi: "饭店", english: "restaurant" }
       ],
-      correctOrder: ["我和朋友", "三点", "去", "饭店"]
-    },
-    {
-      english: "I will take a taxi to the store tomorrow afternoon.",
-      grammar: "[Subject] + [Time] + [Transportation] + 去 + [Place]",
-      tiles: [
-        { hanzi: "我", pinyin: "Wǒ" },
-        { hanzi: "明天下午", pinyin: "míngtiān xiàwǔ" },
-        { hanzi: "坐出租车", pinyin: "zuò chūzūchē" },
-        { hanzi: "去", pinyin: "qù" },
-        { hanzi: "商店", pinyin: "shāngdiàn" }
-      ],
-      correctOrder: ["我", "明天下午", "坐出租车", "去", "商店"]
+      validOrders: [
+        ["我", "和", "朋友", "三点", "去", "饭店"],
+        ["三点", "我", "和", "朋友", "去", "饭店"]
+      ]
     },
     {
       english: "My classmate saw the teacher at school today.",
-      grammar: "[Subject] + [Time] + 在 + [Place] + [Action]",
+      grammar: "[Time] + [Subject] + 在 + [Place] + [Verb] + 了 + [Object]",
       tiles: [
-        { hanzi: "我的同学", pinyin: "Wǒ de tóngxué" },
-        { hanzi: "今天", pinyin: "jīntiān" },
-        { hanzi: "在学校", pinyin: "zài xuéxiào" },
-        { hanzi: "看见了老师", pinyin: "kànjiàn le lǎoshī" }
+        { pinyin: "Wǒ", hanzi: "我", english: "my" },
+        { pinyin: "de", hanzi: "的", english: "'s" },
+        { pinyin: "tóngxué", hanzi: "同学", english: "classmate" },
+        { pinyin: "jīntiān", hanzi: "今天", english: "today" },
+        { pinyin: "zài", hanzi: "在", english: "at" },
+        { pinyin: "xuéxiào", hanzi: "学校", english: "school" },
+        { pinyin: "kànjiàn", hanzi: "看见", english: "saw" },
+        { pinyin: "le", hanzi: "了", english: "[particle]" },
+        { pinyin: "lǎoshī", hanzi: "老师", english: "teacher" }
       ],
-      correctOrder: ["我的同学", "今天", "在学校", "看见了老师"]
+      validOrders: [
+        ["我", "的", "同学", "今天", "在", "学校", "看见", "了", "老师"],
+        ["今天", "我", "的", "同学", "在", "学校", "看见", "了", "老师"]
+      ]
     },
     {
-      english: "Mom is cooking at home, while dad watches TV.",
-      grammar: "[Subject 1] + 在 + [Place] + [Action 1], [Subject 2] + 在 + [Action 2]",
+      english: "I will take a taxi to the store tomorrow afternoon.",
+      grammar: "[Subject] + [Time] + [Transport] + 去 + [Place]",
       tiles: [
-        { hanzi: "妈妈在家里做菜", pinyin: "Māma zài jiālǐ zuò cài" },
-        { hanzi: "爸爸在看电视", pinyin: "bàba zài kàn diànshì" }
+        { pinyin: "Wǒ", hanzi: "我", english: "I" },
+        { pinyin: "míngtiān", hanzi: "明天", english: "tomorrow" },
+        { pinyin: "xiàwǔ", hanzi: "下午", english: "afternoon" },
+        { pinyin: "zuò", hanzi: "坐", english: "take" },
+        { pinyin: "chūzūchē", hanzi: "出租车", english: "taxi" },
+        { pinyin: "qù", hanzi: "去", english: "go to" },
+        { pinyin: "shāngdiàn", hanzi: "商店", english: "store" }
       ],
-      correctOrder: ["妈妈在家里做菜", "爸爸在看电视"]
+      validOrders: [
+        ["我", "明天", "下午", "坐", "出租车", "去", "商店"],
+        ["明天", "下午", "我", "坐", "出租车", "去", "商店"]
+      ]
     },
     {
-      english: "I bought a book for 3 yuan at the store.",
+      english: "Mom is cooking at home.",
       grammar: "[Subject] + 在 + [Place] + [Action]",
       tiles: [
-        { hanzi: "我在商店", pinyin: "Wǒ zài shāngdiàn" },
-        { hanzi: "买了一本书", pinyin: "mǎi le yì běn shū" },
-        { hanzi: "三块钱", pinyin: "sān kuài qián" }
+        { pinyin: "Māma", hanzi: "妈妈", english: "Mom" },
+        { pinyin: "zài", hanzi: "在", english: "at" },
+        { pinyin: "jiālǐ", hanzi: "家里", english: "home" },
+        { pinyin: "zuò cài", hanzi: "做菜", english: "cooking" }
       ],
-      correctOrder: ["我在商店", "买了一本书", "三块钱"]
-    },
-    {
-      english: "My son will fly to Beijing tomorrow afternoon.",
-      grammar: "[Subject] + [Time] + [Transportation] + 去 + [Place]",
-      tiles: [
-        { hanzi: "我儿子", pinyin: "Wǒ érzi" },
-        { hanzi: "明天下午", pinyin: "míngtiān xiàwǔ" },
-        { hanzi: "坐飞机", pinyin: "zuò fēijī" },
-        { hanzi: "去", pinyin: "qù" },
-        { hanzi: "北京", pinyin: "Běijīng" }
-      ],
-      correctOrder: ["我儿子", "明天下午", "坐飞机", "去", "北京"]
-    },
-    {
-      english: "I called an old friend yesterday to speak Chinese.",
-      grammar: "[Subject] + [Time] + 和 + [Person] + 打电话 + [Action]",
-      tiles: [
-        { hanzi: "我", pinyin: "Wǒ" },
-        { hanzi: "昨天", pinyin: "zuótiān" },
-        { hanzi: "和老朋友", pinyin: "hé lǎo péngyou" },
-        { hanzi: "打电话", pinyin: "dǎ diànhuà" },
-        { hanzi: "说汉语", pinyin: "shuō Hànyǔ" }
-      ],
-      correctOrder: ["我", "昨天", "和老朋友", "打电话", "说汉语"]
-    },
-    {
-      english: "My teacher comes from Beijing and teaches us Chinese.",
-      grammar: "[Subject] + 是从 + [Place] + 来的 + [Action]",
-      tiles: [
-        { hanzi: "我的老师", pinyin: "Wǒ de lǎoshī" },
-        { hanzi: "是从北京来的", pinyin: "shì cóng Běijīng lái de" },
-        { hanzi: "教我们汉语", pinyin: "jiāo wǒmen Hànyǔ" }
-      ],
-      correctOrder: ["我的老师", "是从北京来的", "教我们汉语"]
-    },
-    {
-      english: "We are going to eat dishes at the restaurant on Saturday.",
-      grammar: "[Subject] + [Time] + 要在 + [Place] + [Action]",
-      tiles: [
-        { hanzi: "我们", pinyin: "Wǒmen" },
-        { hanzi: "明天星期六", pinyin: "míngtiān xīngqīliù" },
-        { hanzi: "要在饭店", pinyin: "yào zài fàndiàn" },
-        { hanzi: "吃菜", pinyin: "chī cài" }
-      ],
-      correctOrder: ["我们", "明天星期六", "要在饭店", "吃菜"]
-    },
-    {
-      english: "There is a small cat on top of the table.",
-      grammar: "[Location] + 上面 + 有 + [Item]",
-      tiles: [
-        { hanzi: "桌子", pinyin: "Zhuōzi" },
-        { hanzi: "上面", pinyin: "shàngmiàn" },
-        { hanzi: "有一只", pinyin: "yǒu yì zhī" },
-        { hanzi: "小猫", pinyin: "xiǎo māo" }
-      ],
-      correctOrder: ["桌子", "上面", "有一只", "小猫"]
-    },
-    {
-      english: "I really want to drink cold water, not hot tea.",
-      grammar: "[Subject] + 想 + [Action 1], 不 + [Action 2]",
-      tiles: [
-        { hanzi: "我", pinyin: "Wǒ" },
-        { hanzi: "很想喝水", pinyin: "hěn xiǎng hē shuǐ" },
-        { hanzi: "不喝热茶", pinyin: "bù hē rè chá" }
-      ],
-      correctOrder: ["我", "很想喝水", "不喝热茶"]
-    },
-    {
-      english: "The doctor told dad to drink more hot tea.",
-      grammar: "[Subject 1] + 叫 + [Subject 2] + 多 + [Action]",
-      tiles: [
-        { hanzi: "医生", pinyin: "Yīshēng" },
-        { hanzi: "叫爸爸", pinyin: "jiào bàba" },
-        { hanzi: "多喝热茶", pinyin: "duō hē rè chá" }
-      ],
-      correctOrder: ["医生", "叫爸爸", "多喝热茶"]
+      validOrders: [
+        ["妈妈", "在", "家里", "做菜"]
+      ]
     }
   ];
 
@@ -1069,7 +844,11 @@
     shuffled.forEach(tile => {
       const btn = document.createElement('button');
       btn.className = 'tile-btn';
-      btn.innerHTML = `<span>${tile.hanzi}</span><span class="tile-pinyin">${tile.pinyin}</span>`;
+      btn.innerHTML = `
+        <span class="tile-pinyin-main">${tile.pinyin}</span>
+        <span class="tile-hanzi-sub">${tile.hanzi}</span>
+        <span class="tile-english-sub">${tile.english}</span>
+      `;
       btn.onclick = () => addTileToWorkspace(tile, btn);
       bank.appendChild(btn);
     });
@@ -1087,7 +866,7 @@
 
     const bankButtons = document.querySelectorAll('#builderTileBank .tile-btn');
     bankButtons.forEach(btn => {
-      if (btn.innerText.includes(removed.hanzi)) {
+      if (btn.innerText.includes(removed.pinyin)) {
         btn.style.display = 'inline-flex';
       }
     });
@@ -1106,7 +885,7 @@
     ws.innerHTML = "";
 
     if (assembledTiles.length === 0) {
-      ws.innerHTML = `<span style="color: var(--subtext); font-size: 0.9rem;">Click words below to build sentence...</span>`;
+      ws.innerHTML = `<span style="color: var(--subtext); font-size: 0.9rem;">Click Pinyin tiles below to build sentence...</span>`;
       return;
     }
 
@@ -1114,7 +893,11 @@
       const btn = document.createElement('button');
       btn.className = 'tile-btn';
       btn.style.borderColor = 'var(--primary)';
-      btn.innerHTML = `<span>${tile.hanzi}</span><span class="tile-pinyin">${tile.pinyin}</span>`;
+      btn.innerHTML = `
+        <span class="tile-pinyin-main">${tile.pinyin}</span>
+        <span class="tile-hanzi-sub">${tile.hanzi}</span>
+        <span class="tile-english-sub">${tile.english}</span>
+      `;
       btn.onclick = () => removeTileFromWorkspace(index);
       ws.appendChild(btn);
     });
@@ -1124,23 +907,23 @@
     const puzzle = builderPuzzles[currentBuilderIdx];
     const feedback = document.getElementById('builderFeedback');
 
-    const userOrder = assembledTiles.map(t => t.hanzi);
-    const isCorrect = JSON.stringify(userOrder) === JSON.stringify(puzzle.correctOrder);
+    const userHanziSequence = assembledTiles.map(t => t.hanzi).join('');
+
+    const isCorrect = puzzle.validOrders.some(order => order.join('') === userHanziSequence);
 
     if (isCorrect) {
       feedback.style.color = 'var(--success)';
       feedback.innerText = "🎉 Excellent! Correct word order!";
       
-      const fullHanzi = puzzle.correctOrder.join('');
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(fullHanzi);
+        const utterance = new SpeechSynthesisUtterance(userHanziSequence);
         utterance.lang = 'zh-CN';
         window.speechSynthesis.speak(utterance);
       }
     } else {
       feedback.style.color = 'var(--error)';
-      feedback.innerText = "❌ Word order isn't quite right yet. Keep trying!";
+      feedback.innerText = "❌ Word order isn't quite right yet. Check Pinyin order!";
     }
   }
 
@@ -1148,7 +931,7 @@
     loadBuilderPuzzle(currentBuilderIdx + 1);
   }
 
-  // --- FLASHCARD ENGINE FUNCTIONS ---
+  // --- FLASHCARD ENGINE ---
   function renderSampleTexts() {
     const container = document.getElementById('sampleTextsContainer');
     container.innerHTML = '';
@@ -1156,7 +939,7 @@
     const levels = [
       { key: 'easy', title: '🟢 Easy (Basic Phrases)', class: 'diff-easy' },
       { key: 'medium', title: '🟡 Medium (Daily Routines)', class: 'diff-medium' },
-      { key: 'hard', title: '🔴 Hard (Complex Sentences & Prices)', class: 'diff-hard' }
+      { key: 'hard', title: '🔴 Hard (Complex Sentences)', class: 'diff-hard' }
     ];
 
     levels.forEach(lvl => {
@@ -1174,22 +957,20 @@
       sampleTexts.filter(s => s.level === lvl.key).forEach(sample => {
         const card = document.createElement('div');
         card.className = 'sample-card';
-
         card.innerHTML = `
           <div class="sample-header">
             <span>${sample.title}</span>
             <div class="sample-actions">
-              <button class="sample-btn-action" onclick="toggleSampleTranslation('${sample.id}')">👁️ Show Translation</button>
-              <button class="sample-btn-action" style="background-color: var(--primary) !important;" onclick="loadSampleText('${sample.id}')">▶️ Practice This</button>
+              <button class="sample-btn-action" onclick="toggleSampleTranslation('${sample.id}')">👁️ Translation</button>
+              <button class="sample-btn-action" style="background-color: var(--primary) !important;" onclick="loadSampleText('${sample.id}')">▶️ Practice</button>
             </div>
           </div>
           <div class="sample-text-content">
-            <div><strong>Hanzi:</strong> ${sample.hanzi}</div>
-            <div style="font-size: 0.85rem; color: #9ca3af; margin-top: 4px;"><strong>Pinyin:</strong> ${sample.pinyin}</div>
+            <div><strong>Pinyin:</strong> ${sample.pinyin}</div>
+            <div style="font-size: 0.85rem; color: #9ca3af; margin-top: 4px;"><strong>Hanzi:</strong> ${sample.hanzi}</div>
           </div>
           <div class="sample-translation" id="trans_${sample.id}">${sample.english}</div>
         `;
-
         list.appendChild(card);
       });
 
@@ -1221,9 +1002,7 @@
   }
 
   function resetScore() {
-    correctScore = 0;
-    wrongScore = 0;
-    updateScoreUI();
+    correctScore = 0; wrongScore = 0; updateScoreUI();
   }
 
   function getWordSRS(wordId) {
@@ -1247,20 +1026,18 @@
         item.repetition += 1;
         learnedWords.add(wordId);
       } else {
-        item.repetition = 0;
-        item.interval = 1;
+        item.repetition = 0; item.interval = 1;
       }
 
       item.easeFactor = item.easeFactor + (0.1 - (5 - grade) * (0.08 + (5 - grade) * 0.02));
       if (item.easeFactor < 1.3) item.easeFactor = 1.3;
-
       item.dueDate = Date.now() + (item.interval * 24 * 60 * 60 * 1000);
 
       srsData[wordId] = item;
       localStorage.setItem('hsk_srs_data', JSON.stringify(srsData));
       updateParagraphHighlighting();
     } catch (e) {
-      console.error("Storage error:", e);
+      console.error(e);
     }
   }
 
@@ -1276,69 +1053,24 @@
 
   function selectNextWord() {
     const now = Date.now();
-    const dueWords = activeVocab.filter(word => {
-      const srs = getWordSRS(word.id);
-      return srs.dueDate <= now;
-    });
-
-    let selected;
-    if (dueWords.length > 0) {
-      selected = dueWords[Math.floor(Math.random() * dueWords.length)];
-    } else {
-      selected = activeVocab[Math.floor(Math.random() * activeVocab.length)];
-    }
+    const dueWords = activeVocab.filter(word => getWordSRS(word.id).dueDate <= now);
+    let selected = dueWords.length > 0 
+      ? dueWords[Math.floor(Math.random() * dueWords.length)]
+      : activeVocab[Math.floor(Math.random() * activeVocab.length)];
 
     currentVocabIndex = activeVocab.findIndex(w => w.id === selected.id);
     return selected;
   }
 
   function stopTimer() {
-    if (timerInterval) {
-      clearInterval(timerInterval);
-      timerInterval = null;
-    }
-  }
-
-  function startTimer() {
-    stopTimer();
-    const timerBar = document.getElementById('timerBar');
-    timerBar.style.width = '100%';
-
-    const startTime = Date.now();
-    timerInterval = setInterval(() => {
-      const elapsedTime = Date.now() - startTime;
-      const remainingPercent = Math.max(0, 100 - (elapsedTime / RAPID_TIME_LIMIT) * 100);
-      timerBar.style.width = `${remainingPercent}%`;
-
-      if (elapsedTime >= RAPID_TIME_LIMIT) {
-        stopTimer();
-        handleTimeout();
-      }
-    }, 50);
-  }
-
-  function handleTimeout() {
-    wrongScore++;
-    updateScoreUI();
-    updateWordSRS(currentWord.id, 1);
-    const buttons = document.querySelectorAll('#optionsGrid button');
-    buttons.forEach(btn => {
-      btn.disabled = true;
-      if (btn.innerText.includes(currentWord.hanzi) || btn.innerText === currentWord.pinyin) {
-        btn.classList.add('correct');
-      }
-    });
-
-    setTimeout(() => loadQuestion(), 600);
+    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
   }
 
   function navigateVocab(direction) {
     stopTimer();
     if (!activeVocab || activeVocab.length === 0) return;
-
     currentVocabIndex = (currentVocabIndex + direction + activeVocab.length) % activeVocab.length;
     currentWord = activeVocab[currentVocabIndex];
-
     renderQuestionDisplay();
   }
 
@@ -1370,10 +1102,6 @@
     generateOptions();
     updateParagraphHighlighting();
     playAudio();
-
-    if (rapidMode) {
-      startTimer();
-    }
   }
 
   function updateParagraphHighlighting() {
@@ -1387,42 +1115,19 @@
 
     box.style.display = 'block';
 
-    const sortedVocab = [...activeVocab].sort((a, b) => {
-      const lenA = Math.max(a.hanzi.length, a.pinyin.length);
-      const lenB = Math.max(b.hanzi.length, b.pinyin.length);
-      return lenB - lenA;
-    });
-
+    const sortedVocab = [...activeVocab].sort((a, b) => b.hanzi.length - a.hanzi.length);
     let rendered = currentParagraphText;
     const tokens = [];
 
     sortedVocab.forEach((word, index) => {
-      const normWordPinyin = normalizePinyin(word.pinyin);
-      const containsHanzi = rendered.includes(word.hanzi);
-      const containsPinyin = normalizePinyin(rendered).includes(normWordPinyin);
-
-      if (containsHanzi || containsPinyin) {
+      if (rendered.includes(word.hanzi)) {
         const token = `___VOCAB_TOKEN_${index}___`;
-        
-        if (containsHanzi) {
-          rendered = rendered.split(word.hanzi).join(token);
-          tokens.push({ token, word, origLabel: word.hanzi });
-        } else {
-          const wordsInInput = rendered.split(/(\s+|[,.!?，。！？])/);
-          for (let i = 0; i < wordsInInput.length; i++) {
-            if (normalizePinyin(wordsInInput[i]) === normWordPinyin) {
-              const origPinyinMatch = wordsInInput[i];
-              wordsInInput[i] = token;
-              tokens.push({ token, word, origLabel: origPinyinMatch });
-              break;
-            }
-          }
-          rendered = wordsInInput.join('');
-        }
+        rendered = rendered.split(word.hanzi).join(token);
+        tokens.push({ token, word });
       }
     });
 
-    tokens.forEach(({ token, word, origLabel }) => {
+    tokens.forEach(({ token, word }) => {
       const isCurrent = currentWord && currentWord.id === word.id;
       const isLearned = learnedWords.has(word.id) || getWordSRS(word.id).repetition > 0;
       
@@ -1431,14 +1136,11 @@
       else if (isLearned) className += "hl-learned";
       else className += "hl-unlearned";
 
-      let labelToDisplay = word.hanzi;
-      if (paragraphDisplayMode === 'pinyin') {
-        labelToDisplay = word.pinyin;
-      } else if (paragraphDisplayMode === 'english') {
-        labelToDisplay = word.english.split('/')[0].trim();
-      }
+      let labelToDisplay = word.pinyin; // Pinyin default in paragraph tracker
+      if (paragraphDisplayMode === 'hanzi') labelToDisplay = word.hanzi;
+      else if (paragraphDisplayMode === 'english') labelToDisplay = word.english.split('/')[0].trim();
 
-      const spanHtml = `<span class="${className}" onclick="jumpToWord('${word.id}')" title="Click to practice: ${word.hanzi} | ${word.pinyin} (${word.english})">${labelToDisplay}</span>`;
+      const spanHtml = `<span class="${className}" onclick="jumpToWord('${word.id}')">${labelToDisplay}</span>`;
       rendered = rendered.split(token).join(spanHtml);
     });
 
@@ -1455,21 +1157,10 @@
     const sortedDistractors = activeVocab
       .filter(w => w.id !== currentWord.id)
       .map(w => ({ word: w, srs: getWordSRS(w.id) }))
-      .sort((a, b) => {
-        const diffA = Math.abs(a.srs.repetition - currentSRS.repetition);
-        const diffB = Math.abs(b.srs.repetition - currentSRS.repetition);
-        return diffA - diffB;
-      });
+      .sort((a, b) => Math.abs(a.srs.repetition - currentSRS.repetition) - Math.abs(b.srs.repetition - currentSRS.repetition));
 
     for (let i = 0; i < sortedDistractors.length && options.length < 4; i++) {
       options.push(sortedDistractors[i].word);
-    }
-
-    while (options.length < 4 && options.length < activeVocab.length) {
-      const rand = activeVocab[Math.floor(Math.random() * activeVocab.length)];
-      if (!options.some(o => o.id === rand.id)) {
-        options.push(rand);
-      }
     }
 
     options.sort(() => Math.random() - 0.5);
@@ -1493,9 +1184,9 @@
       updateScoreUI();
       updateParagraphHighlighting();
       
-      if (rapidMode || !selfGradeMode) {
+      if (!selfGradeMode) {
         updateWordSRS(currentWord.id, 4);
-        setTimeout(() => loadQuestion(), rapidMode ? 300 : 600);
+        setTimeout(() => loadQuestion(), 600);
       } else {
         document.getElementById('confidencePanel').style.display = 'flex';
       }
@@ -1504,9 +1195,7 @@
       btnElement.classList.add('wrong');
       updateWordSRS(currentWord.id, 1);
       updateScoreUI();
-      if (rapidMode || !selfGradeMode) {
-        setTimeout(() => loadQuestion(), 600);
-      }
+      if (!selfGradeMode) setTimeout(() => loadQuestion(), 600);
     }
   }
 
@@ -1517,14 +1206,14 @@
 
   function cycleParagraphDisplayMode() {
     const btn = document.getElementById('displayModeBtn');
-    if (paragraphDisplayMode === 'hanzi') {
-      paragraphDisplayMode = 'pinyin';
+    if (paragraphDisplayMode === 'pinyin') {
+      paragraphDisplayMode = 'hanzi';
       btn.classList.add('active-mode');
-    } else if (paragraphDisplayMode === 'pinyin') {
+    } else if (paragraphDisplayMode === 'hanzi') {
       paragraphDisplayMode = 'english';
       btn.classList.add('active-mode');
     } else {
-      paragraphDisplayMode = 'hanzi';
+      paragraphDisplayMode = 'pinyin';
       btn.classList.remove('active-mode');
     }
     updateParagraphHighlighting();
@@ -1532,63 +1221,27 @@
 
   function toggleParagraphProgress() {
     showParagraphProgress = !showParagraphProgress;
-    const btn = document.getElementById('paragraphToggleBtn');
-    if (showParagraphProgress) {
-      btn.classList.remove('inactive-mode');
-    } else {
-      btn.classList.add('inactive-mode');
-    }
     updateParagraphHighlighting();
   }
 
   function toggleContext() {
     showContext = !showContext;
-    const btn = document.getElementById('contextBtn');
-    const contextDisplay = document.getElementById('contextDisplay');
-    
-    if (showContext) {
-      btn.classList.remove('inactive-mode');
-      contextDisplay.style.display = 'block';
-    } else {
-      btn.classList.add('inactive-mode');
-      contextDisplay.style.display = 'none';
-    }
+    document.getElementById('contextDisplay').style.display = showContext ? 'block' : 'none';
   }
 
   function toggleSelfGrade() {
     selfGradeMode = !selfGradeMode;
-    const btn = document.getElementById('selfGradeBtn');
-    if (selfGradeMode) {
-      btn.classList.remove('inactive-mode');
-    } else {
-      btn.classList.add('inactive-mode');
-      document.getElementById('confidencePanel').style.display = 'none';
-    }
   }
 
   function toggleMode() {
     reverseMode = !reverseMode;
-    document.getElementById('modeBtn').innerText = reverseMode 
-      ? "Eng/Hanzi ➔ Pinyin" 
-      : "Pinyin ➔ Eng/Hanzi";
+    document.getElementById('modeBtn').innerText = reverseMode ? "Eng/Hanzi ➔ Pinyin" : "Pinyin ➔ Eng/Hanzi";
     renderQuestionDisplay();
   }
 
   function toggleRapidMode() {
     rapidMode = !rapidMode;
-    const rapidBtn = document.getElementById('rapidBtn');
-    const timerContainer = document.getElementById('timerContainer');
-
-    if (rapidMode) {
-      rapidBtn.classList.remove('inactive-mode');
-      rapidBtn.classList.add('active-mode');
-      timerContainer.style.display = 'block';
-    } else {
-      rapidBtn.classList.remove('active-mode');
-      rapidBtn.classList.add('inactive-mode');
-      timerContainer.style.display = 'none';
-      stopTimer();
-    }
+    document.getElementById('timerContainer').style.display = rapidMode ? 'block' : 'none';
     renderQuestionDisplay();
   }
 
@@ -1599,105 +1252,48 @@
       const utterance = new SpeechSynthesisUtterance(currentWord.hanzi);
       utterance.lang = 'zh-CN';
       window.speechSynthesis.speak(utterance);
-    } catch (e) {
-      console.warn("Speech Synthesis blocked or unsupported:", e);
-    }
+    } catch (e) {}
   }
 
   function parseCustomText() {
     const text = document.getElementById('customTextInput').value;
     if (!text.trim()) return;
 
-    const matched = defaultVocabulary.filter(item => {
-      const matchHanzi = text.includes(item.hanzi);
-      const matchPinyin = normalizePinyin(text).includes(normalizePinyin(item.pinyin));
-      return matchHanzi || matchPinyin;
-    });
+    const matched = defaultVocabulary.filter(item => text.includes(item.hanzi) || normalizePinyin(text).includes(normalizePinyin(item.pinyin)));
 
     if (matched.length > 0) {
       activeVocab = matched;
       currentVocabIndex = 0;
       currentParagraphText = text;
-      saveTextHistory(text);
       loadQuestion();
     } else {
-      alert("No matching HSK 1 vocabulary found in the provided text or Pinyin.");
-    }
-  }
-
-  function saveTextHistory(text) {
-    try {
-      let history = JSON.parse(localStorage.getItem('hsk_history') || '[]');
-      history.unshift({ text, date: new Date().toLocaleTimeString() });
-      if (history.length > 10) history.pop();
-      localStorage.setItem('hsk_history', JSON.stringify(history));
-      renderHistory();
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  function renderHistory() {
-    try {
-      const historyList = document.getElementById('historyList');
-      const history = JSON.parse(localStorage.getItem('hsk_history') || '[]');
-      historyList.innerHTML = '';
-
-      history.forEach((item) => {
-        const li = document.createElement('li');
-        li.className = 'history-item';
-        li.innerText = `[${item.date}] ${item.text.substring(0, 30)}...`;
-        li.onclick = () => {
-          document.getElementById('customTextInput').value = item.text;
-          parseCustomText();
-        };
-        historyList.appendChild(li);
-      });
-    } catch (e) {
-      console.error(e);
+      alert("No matching HSK 1 vocabulary found.");
     }
   }
 
   function exportData() {
-    try {
-      const data = {
-        srs: localStorage.getItem('hsk_srs_data'),
-        history: localStorage.getItem('hsk_history')
-      };
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `hsk_quiz_backup_${new Date().toISOString().slice(0,10)}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
-    } catch (e) {
-      alert("Export failed.");
-    }
+    const data = { srs: localStorage.getItem('hsk_srs_data'), history: localStorage.getItem('hsk_history') };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `hsk_quiz_backup.json`; a.click();
+    URL.revokeObjectURL(url);
   }
 
   function importData(event) {
     const file = event.target.files[0];
     if (!file) return;
-
     const reader = new FileReader();
     reader.onload = function(e) {
-      try {
-        const data = JSON.parse(e.target.result);
-        if (data.srs) localStorage.setItem('hsk_srs_data', data.srs);
-        if (data.history) localStorage.setItem('hsk_history', data.history);
-        alert('Progress imported successfully! Reloading...');
-        location.reload();
-      } catch (err) {
-        alert('Invalid JSON file format.');
-      }
+      const data = JSON.parse(e.target.result);
+      if (data.srs) localStorage.setItem('hsk_srs_data', data.srs);
+      location.reload();
     };
     reader.readAsText(file);
   }
 
   document.addEventListener('DOMContentLoaded', () => {
     renderSampleTexts();
-    renderHistory();
     loadQuestion();
   });
 </script>
