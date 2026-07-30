@@ -372,7 +372,7 @@
 
       <div class="prompt-wrapper">
         <div class="prompt-box" id="promptDisplay">...</div>
-        <button onclick="playAudio()" class="audio-inline-btn" id="audioBtn">🔊 Listen</button>
+        <button onclick="playAudio()" class="audio-inline-btn" id="audioBtn">🔊 Replay Audio</button>
       </div>
 
       <div class="options-grid" id="optionsGrid"></div>
@@ -516,9 +516,8 @@
   let reverseMode = false;
   let audioOnlyMode = false;
   
-  // STORY MODE TRACKING
   let activeSampleObj = null;
-  let paragraphDisplayMode = 'hanzi'; // Modes: 'hanzi', 'pinyin', 'english'
+  let paragraphDisplayMode = 'hanzi';
 
   const MASTER_THRESHOLD = 3;
 
@@ -569,6 +568,9 @@
 
     currentVocabIndex = activeVocab.findIndex(w => w.id === currentWord.id);
     renderQuestionDisplay();
+    
+    // AUTO-PLAY AUDIO IMMEDIATELY WHEN CARD LOADS
+    playAudio();
   }
 
   function renderQuestionDisplay() {
@@ -577,7 +579,6 @@
     
     if (audioOnlyMode) {
       promptDisplay.innerHTML = "🎧 <br/><span style='font-size: 1rem; color: #9ca3af;'>Listen carefully...</span>";
-      playAudio();
     } else {
       if (!reverseMode) {
         promptDisplay.innerHTML = mastered 
@@ -630,6 +631,7 @@
     currentVocabIndex = (currentVocabIndex + direction + activeVocab.length) % activeVocab.length;
     currentWord = activeVocab[currentVocabIndex];
     renderQuestionDisplay();
+    playAudio();
   }
 
   function renderSampleTexts() {
@@ -716,7 +718,6 @@
     }
   }
 
-  // CLEAN 3-WAY TOGGLE LOGIC FOR STORY TEXT
   function cycleParagraphDisplayMode() {
     const btn = document.getElementById('displayModeBtn');
     if (paragraphDisplayMode === 'hanzi') {
@@ -778,6 +779,7 @@
       currentVocabIndex = targetIdx;
       currentWord = activeVocab[currentVocabIndex];
       renderQuestionDisplay();
+      playAudio();
     }
   }
 
