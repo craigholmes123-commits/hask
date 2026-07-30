@@ -14,6 +14,7 @@
       --primary-hover: #2563eb;
       --success: #10b981;
       --error: #ef4444;
+      --warning: #f59e0b;
       --border: #374151;
     }
 
@@ -68,7 +69,6 @@
       margin-top: 0;
     }
 
-    /* Score Counter UI */
     .score-tracker {
       display: flex;
       justify-content: space-around;
@@ -107,7 +107,6 @@
       color: var(--text) !important;
     }
 
-    /* Top Toolbar for Global Settings */
     .controls-top {
       display: flex;
       gap: 12px;
@@ -129,7 +128,6 @@
       background-color: #1e3a8a;
     }
 
-    /* Prompt Word + Inline Audio Layout */
     .prompt-wrapper {
       display: flex;
       align-items: center;
@@ -139,11 +137,23 @@
     }
 
     .prompt-box {
-      font-size: 2.5rem;
+      font-size: 2.2rem;
       font-weight: bold;
       text-align: center;
       color: #ffffff;
       margin: 0;
+    }
+
+    .context-sentence {
+      font-size: 1.15rem;
+      color: #60a5fa;
+      background-color: #18181b;
+      border-left: 4px solid var(--primary);
+      padding: 10px 14px;
+      margin: 12px 0 16px 0;
+      border-radius: 4px;
+      text-align: center;
+      font-weight: 500;
     }
 
     .audio-inline-btn {
@@ -159,10 +169,10 @@
     }
 
     .sub-prompt {
-      font-size: 1.1rem;
+      font-size: 1rem;
       color: var(--subtext);
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
 
     .options-grid {
@@ -171,6 +181,25 @@
       gap: 12px;
       margin-bottom: 10px;
     }
+
+    /* Self-Grading Button Area */
+    .confidence-panel {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .confidence-buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .btn-again { background-color: #ef4444 !important; }
+    .btn-hard { background-color: #f59e0b !important; }
+    .btn-good { background-color: #3b82f6 !important; }
+    .btn-easy { background-color: #10b981 !important; }
 
     button {
       background-color: var(--primary);
@@ -201,7 +230,6 @@
       background-color: var(--error) !important;
     }
 
-    /* Bottom Toolbar for Card Navigation */
     .controls-bottom {
       display: flex;
       gap: 12px;
@@ -309,10 +337,24 @@
       <div class="prompt-box" id="promptDisplay">...</div>
       <button onclick="playAudio()" class="audio-inline-btn" id="audioBtn" title="Listen">🔊 Listen</button>
     </div>
+    
+    <!-- Context Clue Sentence -->
+    <div class="context-sentence" id="contextDisplay">...</div>
     <div class="sub-prompt" id="subPromptDisplay">Loading vocabulary...</div>
 
     <!-- Answer Grid -->
     <div class="options-grid" id="optionsGrid"></div>
+
+    <!-- Anki-style Self-Grading Confidence Panel -->
+    <div class="confidence-panel" id="confidencePanel">
+      <div style="text-align: center; font-size: 0.85rem; color: var(--subtext);">Rate your recall difficulty:</div>
+      <div class="confidence-buttons">
+        <button onclick="submitConfidence(1)" class="btn-again">Again (1)</button>
+        <button onclick="submitConfidence(2)" class="btn-hard">Hard (2)</button>
+        <button onclick="submitConfidence(4)" class="btn-good">Good (4)</button>
+        <button onclick="submitConfidence(5)" class="btn-easy">Easy (5)</button>
+      </div>
+    </div>
 
     <!-- Footer Navigation Controls -->
     <div class="controls-bottom">
@@ -344,133 +386,133 @@
 
 <script>
   const defaultVocabulary = [
-    { id: "爱", hanzi: "爱", pinyin: "ài", english: "to love / affection" },
-    { id: "八", hanzi: "八", pinyin: "bā", english: "eight" },
-    { id: "爸爸", hanzi: "爸爸", pinyin: "bàba", english: "dad / father" },
-    { id: "杯子", hanzi: "杯子", pinyin: "bēizi", english: "cup / glass" },
-    { id: "北京", hanzi: "北京", pinyin: "Běijīng", english: "Beijing" },
-    { id: "本", hanzi: "本", pinyin: "běn", english: "measure word for books" },
-    { id: "不客气", hanzi: "不客气", pinyin: "bú kèqi", english: "you're welcome" },
-    { id: "不", hanzi: "不", pinyin: "bù", english: "not / no" },
-    { id: "菜", hanzi: "菜", pinyin: "cài", english: "dish / vegetable" },
-    { id: "茶", hanzi: "茶", pinyin: "chá", english: "tea" },
-    { id: "吃", hanzi: "吃", pinyin: "chī", english: "to eat" },
-    { id: "出租车", hanzi: "出租车", pinyin: "chūzūchē", english: "taxi" },
-    { id: "打电话", hanzi: "打电话", pinyin: "dǎ diànhuà", english: "to make a phone call" },
-    { id: "大", hanzi: "大", pinyin: "dà", english: "big / large" },
-    { id: "的", hanzi: "的", pinyin: "de", english: "possessive particle" },
-    { id: "电脑", hanzi: "电脑", pinyin: "diànnǎo", english: "computer" },
-    { id: "电视", hanzi: "电视", pinyin: "diànshì", english: "television" },
-    { id: "电影", hanzi: "电影", pinyin: "diànyǐng", english: "movie / film" },
-    { id: "东西", hanzi: "东西", pinyin: "dōngxi", english: "thing / stuff" },
-    { id: "都", hanzi: "都", pinyin: "dōu", english: "all / both" },
-    { id: "读", hanzi: "读", pinyin: "dú", english: "to read" },
-    { id: "对不起", hanzi: "对不起", pinyin: "duìbuqǐ", english: "sorry" },
-    { id: "多", hanzi: "多", pinyin: "duō", english: "many / much" },
-    { id: "多少", hanzi: "多少", pinyin: "duōshao", english: "how many / how much" },
-    { id: "儿子", hanzi: "儿子", pinyin: "érzi", english: "son" },
-    { id: "二", hanzi: "二", pinyin: "èr", english: "two" },
-    { id: "饭店", hanzi: "饭店", pinyin: "fàndiàn", english: "restaurant / hotel" },
-    { id: "飞机", hanzi: "飞机", pinyin: "fēijī", english: "airplane" },
-    { id: "高兴", hanzi: "高兴", pinyin: "gāoxìng", english: "happy / glad" },
-    { id: "工作", hanzi: "工作", pinyin: "gōngzuò", english: "job / to work" },
-    { id: "汉语", hanzi: "汉语", pinyin: "Hànyǔ", english: "Chinese language" },
-    { id: "好", hanzi: "好", pinyin: "hǎo", english: "good / well" },
-    { id: "喝", hanzi: "喝", pinyin: "hē", english: "to drink" },
-    { id: "和", hanzi: "和", pinyin: "hé", english: "and" },
-    { id: "很", hanzi: "很", pinyin: "hěn", english: "very" },
-    { id: "回", hanzi: "回", pinyin: "huí", english: "to return" },
-    { id: "会", hanzi: "会", pinyin: "huì", english: "can / know how to" },
-    { id: "家", hanzi: "家", pinyin: "jiā", english: "home / family" },
-    { id: "叫", hanzi: "叫", pinyin: "jiào", english: "to be called" },
-    { id: "今天", hanzi: "今天", pinyin: "jīntiān", english: "today" },
-    { id: "九", hanzi: "九", pinyin: "jiǔ", english: "nine" },
-    { id: "开", hanzi: "开", pinyin: "kāi", english: "to open / to drive" },
-    { id: "看", hanzi: "看", pinyin: "kàn", english: "to look / to watch / to read" },
-    { id: "看见", hanzi: "看见", pinyin: "kànjiàn", english: "to see" },
-    { id: "块", hanzi: "块", pinyin: "kuài", english: "piece / yuan" },
-    { id: "来", hanzi: "来", pinyin: "lái", english: "to come" },
-    { id: "老师", hanzi: "老师", pinyin: "lǎoshī", english: "teacher" },
-    { id: "冷", hanzi: "冷", pinyin: "lěng", english: "cold" },
-    { id: "里", hanzi: "里", pinyin: "lǐ", english: "inside" },
-    { id: "六", hanzi: "六", pinyin: "liù", english: "six" },
-    { id: "妈妈", hanzi: "妈妈", pinyin: "māma", english: "mom / mother" },
-    { id: "吗", hanzi: "吗", pinyin: "ma", english: "question particle" },
-    { id: "买", hanzi: "买", pinyin: "mǎi", english: "to buy" },
-    { id: "猫", hanzi: "猫", pinyin: "māo", english: "cat" },
-    { id: "没关系", hanzi: "没关系", pinyin: "méi guānxi", english: "it doesn't matter" },
-    { id: "米饭", hanzi: "米饭", pinyin: "mǐfàn", english: "cooked rice" },
-    { id: "明天", hanzi: "明天", pinyin: "míngtiān", english: "tomorrow" },
-    { id: "名字", hanzi: "名字", pinyin: "míngzi", english: "name" },
-    { id: "哪", hanzi: "哪", pinyin: "nǎ", english: "which" },
-    { id: "那", hanzi: "那", pinyin: "nà", english: "that" },
-    { id: "你", hanzi: "你", pinyin: "nǐ", english: "you" },
-    { id: "年", hanzi: "年", pinyin: "nián", english: "year" },
-    { id: "女儿", hanzi: "女儿", pinyin: "nǚ'ér", english: "daughter" },
-    { id: "朋友", hanzi: "朋友", pinyin: "péngyou", english: "friend" },
-    { id: "漂亮", hanzi: "漂亮", pinyin: "piàoliang", english: "pretty / beautiful" },
-    { id: "苹果", hanzi: "苹果", pinyin: "píngguǒ", english: "apple" },
-    { id: "七", hanzi: "七", pinyin: "qī", english: "seven" },
-    { id: "钱", hanzi: "钱", pinyin: "qián", english: "money" },
-    { id: "请", hanzi: "请", pinyin: "qǐng", english: "please / to invite" },
-    { id: "去", hanzi: "去", pinyin: "qù", english: "to go" },
-    { id: "热", hanzi: "热", pinyin: "rè", english: "hot" },
-    { id: "人", hanzi: "人", pinyin: "rén", english: "person / people" },
-    { id: "认识", hanzi: "认识", pinyin: "rènshi", english: "to know / to recognize" },
-    { id: "三", hanzi: "三", pinyin: "sān", english: "three" },
-    { id: "商店", hanzi: "商店", pinyin: "shāngdiàn", english: "shop / store" },
-    { id: "上", hanzi: "上", pinyin: "shàng", english: "above / up" },
-    { id: "谁", hanzi: "谁", pinyin: "shéi", english: "who / whom" },
-    { id: "什么", hanzi: "什么", pinyin: "shénme", english: "what" },
-    { id: "十", hanzi: "十", pinyin: "shí", english: "ten" },
-    { id: "是", hanzi: "是", pinyin: "shì", english: "to be" },
-    { id: "书", hanzi: "书", pinyin: "shū", english: "book" },
-    { id: "水", hanzi: "水", pinyin: "shuǐ", english: "water" },
-    { id: "水果", hanzi: "水果", pinyin: "shuǐguǒ", english: "fruit" },
-    { id: "睡觉", hanzi: "睡觉", pinyin: "shuìjiào", english: "to sleep" },
-    { id: "四", hanzi: "四", pinyin: "sì", english: "four" },
-    { id: "岁", hanzi: "岁", pinyin: "suì", english: "years old" },
-    { id: "他", hanzi: "他", pinyin: "tā", english: "he / him" },
-    { id: "她", hanzi: "她", pinyin: "tā", english: "she / her" },
-    { id: "太", hanzi: "太", pinyin: "tài", english: "too / excessively" },
-    { id: "天气", hanzi: "天气", pinyin: "tiānqì", english: "weather" },
-    { id: "听", hanzi: "听", pinyin: "tīng", english: "to listen" },
-    { id: "同学", hanzi: "同学", pinyin: "tóngxué", english: "classmate" },
-    { id: "我", hanzi: "我", pinyin: "wǒ", english: "I / me" },
-    { id: "我们", hanzi: "我们", pinyin: "wǒmen", english: "we / us" },
-    { id: "五", hanzi: "五", pinyin: "wǔ", english: "five" },
-    { id: "喜欢", hanzi: "喜欢", pinyin: "xǐhuan", english: "to like" },
-    { id: "下", hanzi: "下", pinyin: "xià", english: "below / down" },
-    { id: "下午", hanzi: "下午", pinyin: "xiàwǔ", english: "afternoon" },
-    { id: "下雨", hanzi: "下雨", pinyin: "xiàyǔ", english: "to rain" },
-    { id: "现在", hanzi: "现在", pinyin: "xiànzài", english: "now" },
-    { id: "想", hanzi: "想", pinyin: "xiǎng", english: "to think / to want" },
-    { id: "小", hanzi: "小", pinyin: "xiǎo", english: "small / little" },
-    { id: "写", hanzi: "写", pinyin: "xiě", english: "to write" },
-    { id: "谢谢", hanzi: "谢谢", pinyin: "xièxie", english: "thanks" },
-    { id: "星期", hanzi: "星期", pinyin: "xīngqī", english: "week" },
-    { id: "学生", hanzi: "学生", pinyin: "xuésheng", english: "student" },
-    { id: "学习", hanzi: "学习", pinyin: "xuéxí", english: "to study / to learn" },
-    { id: "学校", hanzi: "学校", pinyin: "xuéxiào", english: "school" },
-    { id: "一", hanzi: "一", pinyin: "yī", english: "one" },
-    { id: "衣服", hanzi: "衣服", pinyin: "yīfu", english: "clothes" },
-    { id: "医生", hanzi: "医生", pinyin: "yīshēng", english: "doctor" },
-    { id: "医院", hanzi: "医院", pinyin: "yīyuàn", english: "hospital" },
-    { id: "椅子", hanzi: "椅子", pinyin: "yǐzi", english: "chair" },
-    { id: "有", hanzi: "有", pinyin: "yǒu", english: "to have" },
-    { id: "月", hanzi: "月", pinyin: "yuè", english: "month / moon" },
-    { id: "再见", hanzi: "再见", pinyin: "zàijiàn", english: "goodbye" },
-    { id: "在", hanzi: "在", pinyin: "zài", english: "at / in / located" },
-    { id: "怎么", hanzi: "怎么", pinyin: "zěnme", english: "how" },
-    { id: "这", hanzi: "这", pinyin: "zhè", english: "this" },
-    { id: "中国", hanzi: "中国", pinyin: "Zhōngguó", english: "China" },
-    { id: "中午", hanzi: "中午", pinyin: "zhōngwǔ", english: "noon" },
-    { id: "住", hanzi: "住", pinyin: "zhù", english: "to live / to stay" },
-    { id: "桌子", hanzi: "桌子", pinyin: "zhuōzi", english: "table / desk" },
-    { id: "字", hanzi: "字", pinyin: "zì", english: "character / word" },
-    { id: "昨天", hanzi: "昨天", pinyin: "zuótiān", english: "yesterday" },
-    { id: "做", hanzi: "做", pinyin: "zuò", english: "to do / to make" },
-    { id: "坐", hanzi: "坐", pinyin: "zuò", english: "to sit" }
+    { id: "爱", hanzi: "爱", pinyin: "ài", english: "to love / affection", sentence: "妈妈很 ___ 我。(Māma hěn ___ wǒ.)" },
+    { id: "八", hanzi: "八", pinyin: "bā", english: "eight", sentence: "我有 ___ 个苹果。(Wǒ yǒu ___ gè píngguǒ.)" },
+    { id: "爸爸", hanzi: "爸爸", pinyin: "bàba", english: "dad / father", sentence: "我的 ___ 是医生。(Wǒ de ___ shì yīshēng.)" },
+    { id: "杯子", hanzi: "杯子", pinyin: "bēizi", english: "cup / glass", sentence: "桌子上有一个 ___。(Zhuōzi shàng yǒu yí gè ___.)" },
+    { id: "北京", hanzi: "北京", pinyin: "Běijīng", english: "Beijing", sentence: "我想去 ___。(Wǒ xiǎng qù ___.)" },
+    { id: "本", hanzi: "本", pinyin: "běn", english: "measure word for books", sentence: "我买了一 ___ 书。(Wǒ mǎi le yì ___ shū.)" },
+    { id: "不客气", hanzi: "不客气", pinyin: "bú kèqi", english: "you're welcome", sentence: "谢谢你！— ___。(Xièxie nǐ! — ___.)" },
+    { id: "不", hanzi: "不", pinyin: "bù", english: "not / no", sentence: "我 ___ 吃菜。(Wǒ ___ chī cài.)" },
+    { id: "菜", hanzi: "菜", pinyin: "cài", english: "dish / vegetable", sentence: "今天有很热的 ___。(Jīntiān yǒu hěn rè de ___.)" },
+    { id: "茶", hanzi: "茶", pinyin: "chá", english: "tea", sentence: "我想喝热 ___。(Wǒ xiǎng hē rè ___.)" },
+    { id: "吃", hanzi: "吃", pinyin: "chī", english: "to eat", sentence: "你想 ___ 米饭吗？(Nǐ xiǎng ___ mǐfàn ma?)" },
+    { id: "出租车", hanzi: "出租车", pinyin: "chūzūchē", english: "taxi", sentence: "我们坐 ___ 去商店。(Wǒmen zuò ___ qù shāngdiàn.)" },
+    { id: "打电话", hanzi: "打电话", pinyin: "dǎ diànhuà", english: "to make a phone call", sentence: "他在给朋友 ___。(Tā zài gěi péngyou ___.)" },
+    { id: "大", hanzi: "大", pinyin: "dà", english: "big / large", sentence: "这个苹果很 ___。(Zhè gè píngguǒ hěn ___.)" },
+    { id: "的", hanzi: "的", pinyin: "de", english: "possessive particle", sentence: "这是我 ___ 书。(Zhè shì wǒ ___ shū.)" },
+    { id: "电脑", hanzi: "电脑", pinyin: "diànnǎo", english: "computer", sentence: "我喜欢在 ___ 上工作。(Wǒ xǐhuan zài ___ shàng gōngzuò.)" },
+    { id: "电视", hanzi: "电视", pinyin: "diànshì", english: "television", sentence: "我喜欢看 ___。(Wǒ xǐhuan kàn ___.)" },
+    { id: "电影", hanzi: "电影", pinyin: "diànyǐng", english: "movie / film", sentence: "今天下午看 ___。(Jīntiān xiàwǔ kàn ___.)" },
+    { id: "东西", hanzi: "东西", pinyin: "dōngxi", english: "thing / stuff", sentence: "去商店买 ___。(Qù shāngdiàn mǎi ___.)" },
+    { id: "都", hanzi: "都", pinyin: "dōu", english: "all / both", sentence: "我们 ___ 喜欢汉语。(Wǒmen ___ xǐhuan Hànyǔ.)" },
+    { id: "读", hanzi: "读", pinyin: "dú", english: "to read", sentence: "你在 ___ 书吗？(Nǐ zài ___ shū ma?)" },
+    { id: "对不起", hanzi: "对不起", pinyin: "duìbuqǐ", english: "sorry", sentence: "___，没关系。(____, méi guānxi.)" },
+    { id: "多", hanzi: "多", pinyin: "duō", english: "many / much", sentence: "商店里有很 ___ 人。(Shāngdiàn lǐ yǒu hěn ___ rén.)" },
+    { id: "多少", hanzi: "多少", pinyin: "duōshao", english: "how many / how much", sentence: "这个 ___ 钱？(Zhè gè ___ qián?)" },
+    { id: "儿子", hanzi: "儿子", pinyin: "érzi", english: "son", sentence: "他的 ___ 是学生。(Tā de ___ shì xuésheng.)" },
+    { id: "二", hanzi: "二", pinyin: "èr", english: "two", sentence: "一、___、三。(Yī, ___, sān.)" },
+    { id: "饭店", hanzi: "饭店", pinyin: "fàndiàn", english: "restaurant / hotel", sentence: "我去 ___ 吃米饭。(Wǒ qù ___ chī mǐfàn.)" },
+    { id: "飞机", hanzi: "飞机", pinyin: "fēijī", english: "airplane", sentence: "他坐 ___ 去北京。(Tā zuò ___ qù Běijīng.)" },
+    { id: "高兴", hanzi: "高兴", pinyin: "gāoxìng", english: "happy / glad", sentence: "认识你我很高兴。(Rènshi nǐ wǒ hěn ___.)" },
+    { id: "工作", hanzi: "工作", pinyin: "gōngzuò", english: "job / to work", sentence: "你喜欢你的 ___ 吗？(Nǐ xǐhuan nǐ de ___ ma?)" },
+    { id: "汉语", hanzi: "汉语", pinyin: "Hànyǔ", english: "Chinese language", sentence: "我们学习 ___。(Wǒmen xuéxí ___.)" },
+    { id: "好", hanzi: "好", pinyin: "hǎo", english: "good / well", sentence: "今天天气很 ___。(Jīntiān tiānqì hěn ___.)" },
+    { id: "喝", hanzi: "喝", pinyin: "hē", english: "to drink", sentence: "你想 ___ 水吗？(Nǐ xiǎng ___ shuǐ ma?)" },
+    { id: "和", hanzi: "和", pinyin: "hé", english: "and", sentence: "我 ___ 他是同学。(Wǒ ___ tā shì tóngxué.)" },
+    { id: "很", hanzi: "很", pinyin: "hěn", english: "very", sentence: "天气 ___ 热。(Tiānqì ___ rè.)" },
+    { id: "回", hanzi: "回", pinyin: "huí", english: "to return", sentence: "我三点 ___ 家。(Wǒ sān diǎn ___ jiā.)" },
+    { id: "会", hanzi: "会", pinyin: "huì", english: "can / know how to", sentence: "我 ___ 说汉语。(Wǒ ___ shuō Hànyǔ.)" },
+    { id: "家", hanzi: "家", pinyin: "jiā", english: "home / family", sentence: "我回 ___ 睡觉。(Wǒ huí ___ shuìjiào.)" },
+    { id: "叫", hanzi: "叫", pinyin: "jiào", english: "to be called", sentence: "你 ___ 什么名字？(Nǐ ___ shénme míngzi?)" },
+    { id: "今天", hanzi: "今天", pinyin: "jīntiān", english: "today", sentence: "___ 天气冷。(____ tiānqì lěng.)" },
+    { id: "九", hanzi: "九", pinyin: "jiǔ", english: "nine", sentence: "商店里有 ___ 个人。(Shāngdiàn lǐ yǒu ___ gè rén.)" },
+    { id: "开", hanzi: "开", pinyin: "kāi", english: "to open / to drive", sentence: "他会 ___ 出租车。(Tā huì ___ chūzūchē.)" },
+    { id: "看", hanzi: "看", pinyin: "kàn", english: "to look / to watch / to read", sentence: "我想 ___ 书。(Wǒ xiǎng ___ shū.)" },
+    { id: "看见", hanzi: "看见", pinyin: "kànjiàn", english: "to see", sentence: "我 ___ 老师了。(Wǒ ___ lǎoshī le.)" },
+    { id: "块", hanzi: "块", pinyin: "kuài", english: "piece / yuan", sentence: "十 ___ 钱。(Shí ___ qián.)" },
+    { id: "来", hanzi: "来", pinyin: "lái", english: "to come", sentence: "今天医生 ___ 我家。(Jīntiān yīshēng ___ wǒ jiā.)" },
+    { id: "老师", hanzi: "老师", pinyin: "lǎoshī", english: "teacher", sentence: "她是我们的 ___。(Tā shì wǒmen de ___.)" },
+    { id: "冷", hanzi: "冷", pinyin: "lěng", english: "cold", sentence: "今天天气不 ___。(Jīntiān tiānqì bù ___.)" },
+    { id: "里", hanzi: "里", pinyin: "lǐ", english: "inside", sentence: "学校 ___ 有很多学生。(Xuéxiào ___ yǒu hěn duō xuésheng.)" },
+    { id: "六", hanzi: "六", pinyin: "liù", english: "six", sentence: "下个星期 ___。(Xià gè xīngqī ___.)" },
+    { id: "妈妈", hanzi: "妈妈", pinyin: "māma", english: "mom / mother", sentence: "我的 ___ 喜欢喝茶。(Wǒ de ___ xǐhuan hē chá.)" },
+    { id: "吗", hanzi: "吗", pinyin: "ma", english: "question particle", sentence: "你是医生 ___？(Nǐ shì yīshēng ___?)" },
+    { id: "买", hanzi: "买", pinyin: "mǎi", english: "to buy", sentence: "我去商店 ___ 东西。(Wǒ qù shāngdiàn ___ dōngxi.)" },
+    { id: "猫", hanzi: "猫", pinyin: "māo", english: "cat", sentence: "我家有一只 ___。(Wǒ jiā yǒu yì zhī ___.)" },
+    { id: "没关系", hanzi: "没关系", pinyin: "méi guānxi", english: "it doesn't matter", sentence: "对不起！— ___。(Duìbuqǐ! — ___.)" },
+    { id: "米饭", hanzi: "米饭", pinyin: "mǐfàn", english: "cooked rice", sentence: "我想吃 ___。(Wǒ xiǎng chī ___.)" },
+    { id: "明天", hanzi: "明天", pinyin: "míngtiān", english: "tomorrow", sentence: "___ 我去学校。(____ wǒ qù xuéxiào.)" },
+    { id: "名字", hanzi: "名字", pinyin: "míngzi", english: "name", sentence: "你的 ___ 是什么？(Nǐ de ___ shì shénme?)" },
+    { id: "哪", hanzi: "哪", pinyin: "nǎ", english: "which", sentence: "你是 ___ 国人？(Nǐ shì ___ guó rén?)" },
+    { id: "那", hanzi: "那", pinyin: "nà", english: "that", sentence: "___ 是我的电脑。(___ shì wǒ de diànnǎo.)" },
+    { id: "你", hanzi: "你", pinyin: "nǐ", english: "you", sentence: "___ 好！( ___ hǎo!)" },
+    { id: "年", hanzi: "年", pinyin: "nián", english: "year", sentence: "我不去 ___。(Wǒ bù qù ___.)" },
+    { id: "女儿", hanzi: "女儿", pinyin: "nǚ'ér", english: "daughter", sentence: "她是我 ___。(Tā shì wǒ ___.)" },
+    { id: "朋友", hanzi: "朋友", pinyin: "péngyou", english: "friend", sentence: "他想喝水，他是我的 ___。(Tā xiǎng hē shuǐ, tā shì wǒ de ___.)" },
+    { id: "漂亮", hanzi: "漂亮", pinyin: "piàoliang", english: "pretty / beautiful", sentence: "这里的衣服很 ___。(Zhèlǐ de yīfu hěn ___.)" },
+    { id: "苹果", hanzi: "苹果", pinyin: "píngguǒ", english: "apple", sentence: "她给我买 ___。(Tā gěi wǒ mǎi ___.)" },
+    { id: "七", hanzi: "七", pinyin: "qī", english: "seven", sentence: "今天 ___ 号。(Jīntiān ___ hào.)" },
+    { id: "钱", hanzi: "钱", pinyin: "qián", english: "money", sentence: "我没有很多 ___。(Wǒ méiyǒu hěn duō ___.)" },
+    { id: "请", hanzi: "请", pinyin: "qǐng", english: "please / to invite", sentence: "___ 喝水。(___ hē shuǐ.)" },
+    { id: "去", hanzi: "去", pinyin: "qù", english: "to go", sentence: "我想 ___ 饭店。(Wǒ xiǎng ___ fàndiàn.)" },
+    { id: "热", hanzi: "热", pinyin: "rè", english: "hot", sentence: "我想喝 ___ 茶。(Wǒ xiǎng hē ___ chá.)" },
+    { id: "人", hanzi: "人", pinyin: "rén", english: "person / people", sentence: "他是中国 ___。(Tā shì Zhōngguó ___.)" },
+    { id: "认识", hanzi: "认识", pinyin: "rènshi", english: "to know / to recognize", sentence: "很高兴 ___ 你。(Hěn gāoxìng ___ nǐ.)" },
+    { id: "三", hanzi: "三", pinyin: "sān", english: "three", sentence: "下午 ___ 点去商店。(Xiàwǔ ___ diǎn qù shāngdiàn.)" },
+    { id: "商店", hanzi: "商店", pinyin: "shāngdiàn", english: "shop / store", sentence: "我们去 ___ 买东西。(Wǒmen qù ___ mǎi dōngxi.)" },
+    { id: "上", hanzi: "上", pinyin: "shàng", english: "above / up", sentence: "桌子 ___ 有书。(Zhuōzi ___ yǒu shū.)" },
+    { id: "谁", hanzi: "谁", pinyin: "shéi", english: "who / whom", sentence: "他是 ___？(Tā shì ___?)" },
+    { id: "什么", hanzi: "什么", pinyin: "shénme", english: "what", sentence: "你喜欢买 ___？(Nǐ xǐhuan mǎi ___?)" },
+    { id: "十", hanzi: "十", pinyin: "shí", english: "ten", sentence: "我要买 ___ 个。(Wǒ yào mǎi ___ gè.)" },
+    { id: "是", hanzi: "是", pinyin: "shì", english: "to be", sentence: "这 ___ 我的书。(Zhè ___ wǒ de shū.)" },
+    { id: "书", hanzi: "书", pinyin: "shū", english: "book", sentence: "我看 ___。(Wǒ kàn ___.)" },
+    { id: "水", hanzi: "水", pinyin: "shuǐ", english: "water", sentence: "他想喝 ___。(Tā xiǎng hē ___.)" },
+    { id: "水果", hanzi: "水果", pinyin: "shuǐguǒ", english: "fruit", sentence: "去商店买 ___。(Qù shāngdiàn mǎi ___.)" },
+    { id: "睡觉", hanzi: "睡觉", pinyin: "shuìjiào", english: "to sleep", sentence: "我现在去 ___。(Wǒ xiànzài qù ___.)" },
+    { id: "四", hanzi: "四", pinyin: "sì", english: "four", sentence: "今天星期 ___。(Jīntiān xīngqī ___.)" },
+    { id: "岁", hanzi: "岁", pinyin: "suì", english: "years old", sentence: "他的女儿十 ___。(Tā de nǚ'ér shí ___.)" },
+    { id: "他", hanzi: "他", pinyin: "tā", english: "he / him", sentence: "___ 想喝水。(___ xiǎng hē shuǐ.)" },
+    { id: "她", hanzi: "她", pinyin: "tā", english: "she / her", sentence: "___ 是我老师。(___ shì wǒ lǎoshī.)" },
+    { id: "太", hanzi: "太", pinyin: "tài", english: "too / excessively", sentence: "天气 ___ 热了。(Tiānqì ___ rè le.)" },
+    { id: "天气", hanzi: "天气", pinyin: "tiānqì", english: "weather", sentence: "今天 ___ 不冷。(Jīntiān ___ bù lěng.)" },
+    { id: "听", hanzi: "听", pinyin: "tīng", english: "to listen", sentence: "你 ___ 老师说话。(Nǐ ___ lǎoshī shuōhuà.)" },
+    { id: "同学", hanzi: "同学", pinyin: "tóngxué", english: "classmate", sentence: "我和他是 ___。(Wǒ hé tā shì ___.)" },
+    { id: "我", hanzi: "我", pinyin: "wǒ", english: "I / me", sentence: "___ 想去饭店。(___ xiǎng qù fàndiàn.)" },
+    { id: "我们", hanzi: "我们", pinyin: "wǒmen", english: "we / us", sentence: "___ 下午去商店。(___ xiàwǔ qù shāngdiàn.)" },
+    { id: "五", hanzi: "五", pinyin: "wǔ", english: "five", sentence: "我有 ___ 块钱。(Wǒ yǒu ___ kuài qián.)" },
+    { id: "喜欢", hanzi: "喜欢", pinyin: "xǐhuan", english: "to like", sentence: "你 ___ 买什么？(Nǐ ___ mǎi shénme?)" },
+    { id: "下", hanzi: "下", pinyin: "xià", english: "below / down", sentence: "桌子 ___ 有猫。(Zhuōzi ___ yǒu māo.)" },
+    { id: "下午", hanzi: "下午", pinyin: "xiàwǔ", english: "afternoon", sentence: "我们 ___ 三点去。(Wǒmen ___ sān diǎn qù.)" },
+    { id: "下雨", hanzi: "下雨", pinyin: "xiàyǔ", english: "to rain", sentence: "昨天 ___ 了。(Zuótiān ___ le.)" },
+    { id: "现在", hanzi: "现在", pinyin: "xiànzài", english: "now", sentence: "我 ___ 去睡觉。(Wǒ ___ qù shuìjiào.)" },
+    { id: "想", hanzi: "想", pinyin: "xiǎng", english: "to think / to want", sentence: "我 ___ 去饭店。(Wǒ ___ qù fàndiàn.)" },
+    { id: "小", hanzi: "小", pinyin: "xiǎo", english: "small / little", sentence: "那只猫很 ___。(Nà zhī māo hěn ___.)" },
+    { id: "写", hanzi: "写", pinyin: "xiě", english: "to write", sentence: "我们在 ___ 字。(Wǒmen zài ___ zì.)" },
+    { id: "谢谢", hanzi: "谢谢", pinyin: "xièxie", english: "thanks", sentence: "___ 你！( ___ nǐ!)" },
+    { id: "星期", hanzi: "星期", pinyin: "xīngqī", english: "week", sentence: "今天 ___ 三。(Jīntiān ___ sān.)" },
+    { id: "学生", hanzi: "学生", pinyin: "xuésheng", english: "student", sentence: "他是我的 ___。(Tā shì wǒ de ___.)" },
+    { id: "学习", hanzi: "学习", pinyin: "xuéxí", english: "to study / to learn", sentence: "我们要 ___ 汉语。(Wǒmen yào ___ Hànyǔ.)" },
+    { id: "学校", hanzi: "学校", pinyin: "xuéxiào", english: "school", sentence: "老师在 ___ 教书。(Lǎoshī zài ___ jiāoshū.)" },
+    { id: "一", hanzi: "一", pinyin: "yī", english: "one", sentence: "这是 ___ 个苹果。(Zhè shì ___ gè píngguǒ.)" },
+    { id: "衣服", hanzi: "衣服", pinyin: "yīfu", english: "clothes", sentence: "我想买新 ___。(Wǒ xiǎng mǎi xīn ___.)" },
+    { id: "医生", hanzi: "医生", pinyin: "yīshēng", english: "doctor", sentence: "我是 ___。(Wǒ shì ___.)" },
+    { id: "医院", hanzi: "医院", pinyin: "yīyuàn", english: "hospital", sentence: "医生在 ___。(Yīshēng zài ___.)" },
+    { id: "椅子", hanzi: "椅子", pinyin: "yǐzi", english: "chair", sentence: "请坐 ___。(Qǐng zuò ___.)" },
+    { id: "有", hanzi: "有", pinyin: "yǒu", english: "to have", sentence: "商店 ___ 苹果。(Shāngdiàn ___ píngguǒ.)" },
+    { id: "月", hanzi: "月", pinyin: "yuè", english: "month / moon", sentence: "三 ___ 四号。(Sān ___ sì hào.)" },
+    { id: "再见", hanzi: "再见", pinyin: "zàijiàn", english: "goodbye", sentence: "老师，___！(Lǎoshī, ___!)" },
+    { id: "在", hanzi: "在", pinyin: "zài", english: "at / in / located", sentence: "我 ___ 学校看书。(Wǒ ___ xuéxiào kàn shū.)" },
+    { id: "怎么", hanzi: "怎么", pinyin: "zěnme", english: "how", sentence: "这个字 ___ 读？(Zhè gè zì ___ dú?)" },
+    { id: "这", hanzi: "这", pinyin: "zhè", english: "this", sentence: "___ 是我的杯子。(___ shì wǒ de bēizi.)" },
+    { id: "中国", hanzi: "中国", pinyin: "Zhōngguó", english: "China", sentence: "我喜欢 ___。(Wǒ xǐhuan ___.)" },
+    { id: "中午", hanzi: "中午", pinyin: "zhōngwǔ", english: "noon", sentence: "今天 ___ 吃米饭。(Jīntiān ___ chī mǐfàn.)" },
+    { id: "住", hanzi: "住", pinyin: "zhù", english: "to live / to stay", sentence: "我 ___ 在北京。(Wǒ ___ zài Běijīng.)" },
+    { id: "桌子", hanzi: "桌子", pinyin: "zhuōzi", english: "table / desk", sentence: "书在 ___ 上。(Shū zài ___ shàng.)" },
+    { id: "字", hanzi: "字", pinyin: "zì", english: "character / word", sentence: "我会写 ___。(Wǒ huì xiě ___.)" },
+    { id: "昨天", hanzi: "昨天", pinyin: "zuótiān", english: "yesterday", sentence: "___ 我没去学校。(____ wǒ méi qù xuéxiào.)" },
+    { id: "做", hanzi: "做", pinyin: "zuò", english: "to do / to make", sentence: "你在 ___ 什么？(Nǐ zài ___ shénme?)" },
+    { id: "坐", hanzi: "坐", pinyin: "zuò", english: "to sit", sentence: "我们 ___ 出租车。(Wǒmen ___ chūzūchē.)" }
   ];
 
   let activeVocab = [...defaultVocabulary];
@@ -482,7 +524,6 @@
   let timerInterval = null;
   const RAPID_TIME_LIMIT = 3000;
 
-  // Score Tracking State
   let correctScore = 0;
   let wrongScore = 0;
 
@@ -616,16 +657,25 @@
   function renderQuestionDisplay() {
     const promptDisplay = document.getElementById('promptDisplay');
     const subPromptDisplay = document.getElementById('subPromptDisplay');
+    const contextDisplay = document.getElementById('contextDisplay');
+
+    // Hide the self-grading panel until user guesses
+    document.getElementById('confidencePanel').style.display = 'none';
 
     if (!reverseMode) {
-      promptDisplay.innerText = currentWord.pinyin;
-      subPromptDisplay.innerText = "Select the matching Hanzi & Meaning";
+      promptDisplay.innerText = `${currentWord.pinyin} (${currentWord.hanzi})`;
+      subPromptDisplay.innerText = "Select the matching Meaning";
     } else {
-      promptDisplay.innerText = `${currentWord.hanzi} (${currentWord.english})`;
+      promptDisplay.innerText = `${currentWord.hanzi} - ${currentWord.english}`;
       subPromptDisplay.innerText = "Select the matching Pinyin";
     }
 
+    contextDisplay.innerText = currentWord.sentence || "...";
+
     generateOptions();
+
+    // Auto-play audio clip when card loads
+    playAudio();
 
     if (rapidMode) {
       startTimer();
@@ -663,7 +713,7 @@
 
     options.forEach(opt => {
       const btn = document.createElement('button');
-      btn.innerText = !reverseMode ? `${opt.hanzi} - ${opt.english}` : opt.pinyin;
+      btn.innerText = !reverseMode ? opt.english : `${opt.pinyin} (${opt.hanzi})`;
       btn.onclick = () => checkAnswer(opt, btn);
       grid.appendChild(btn);
     });
@@ -676,21 +726,29 @@
     if (isCorrect) {
       correctScore++;
       btnElement.classList.add('correct');
-      updateWordSRS(currentWord.id, 4);
-      playAudio();
       updateScoreUI();
-      setTimeout(() => {
-        loadQuestion();
-      }, rapidMode ? 300 : 600);
+      
+      if (rapidMode) {
+        updateWordSRS(currentWord.id, 4);
+        setTimeout(() => loadQuestion(), 300);
+      } else {
+        // Show confidence rating buttons for detailed SRS grading
+        document.getElementById('confidencePanel').style.display = 'flex';
+      }
     } else {
       wrongScore++;
       btnElement.classList.add('wrong');
       updateWordSRS(currentWord.id, 1);
       updateScoreUI();
-      setTimeout(() => {
-        if (rapidMode) loadQuestion();
-      }, 600);
+      if (rapidMode) {
+        setTimeout(() => loadQuestion(), 600);
+      }
     }
+  }
+
+  function submitConfidence(grade) {
+    updateWordSRS(currentWord.id, grade);
+    loadQuestion();
   }
 
   function toggleMode() {
