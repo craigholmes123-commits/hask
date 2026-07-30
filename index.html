@@ -107,7 +107,6 @@
       color: var(--text) !important;
     }
 
-    /* Compact Top Toolbar with Emoji Icons */
     .controls-top {
       display: flex;
       gap: 8px;
@@ -147,7 +146,6 @@
       opacity: 0.4;
     }
 
-    /* Paragraph Progress UI */
     .paragraph-card {
       background-color: #18181b;
       border: 1px solid var(--border);
@@ -336,7 +334,7 @@
 
     textarea {
       width: 100%;
-      height: 100px;
+      height: 90px;
       margin-top: 10px;
       background-color: var(--bg);
       color: var(--text);
@@ -345,6 +343,64 @@
       padding: 8px;
       box-sizing: border-box;
       font-family: inherit;
+    }
+
+    .sample-texts-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .sample-card {
+      background-color: #18181b;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .sample-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.95rem;
+      font-weight: bold;
+      color: var(--text);
+    }
+
+    .sample-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .sample-btn-action {
+      font-size: 0.8rem !important;
+      padding: 6px 10px !important;
+      width: auto !important;
+      background-color: var(--border) !important;
+    }
+
+    .sample-btn-action:hover {
+      background-color: #4b5563 !important;
+    }
+
+    .sample-text-content {
+      font-size: 0.95rem;
+      color: var(--subtext);
+      line-height: 1.5;
+    }
+
+    .sample-translation {
+      display: none;
+      font-size: 0.9rem;
+      color: #60a5fa;
+      background-color: #121212;
+      padding: 8px 10px;
+      border-radius: 4px;
+      border-left: 3px solid var(--primary);
     }
 
     .history-list {
@@ -446,14 +502,17 @@
     </div>
   </div>
 
-  <details>
-    <summary>Custom Text Parser & Data Sync Settings</summary>
+  <details open>
+    <summary>Custom Text Parser & Pre-made Sample Stories</summary>
     
     <h3>Parse Custom Text (Pinyin or Hanzi)</h3>
     <textarea id="customTextInput" placeholder="Paste Chinese text or Pinyin here (e.g. 'Jīntiān zhōngwǔ wǒ xiǎng qù fàndiàn...')..."></textarea>
     <button onclick="parseCustomText()" style="margin-top: 8px;">Filter & Practice Custom Words</button>
 
-    <h3>Text History</h3>
+    <h3 style="margin-top: 20px;">Pre-made Sample Stories</h3>
+    <div class="sample-texts-list" id="sampleTextsContainer"></div>
+
+    <h3 style="margin-top: 20px;">Text History</h3>
     <ul class="history-list" id="historyList"></ul>
 
     <div class="sync-section">
@@ -472,6 +531,37 @@
     return p.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z]/g, "");
   }
 
+  const sampleTexts = [
+    {
+      id: "sample1",
+      title: "1. Restaurant & Shopping",
+      hanzi: "今天中午我和朋友去饭店吃米饭，喝热茶。下午三点我们坐出租车去商店买东西。我很高兴！",
+      pinyin: "Jīntiān zhōngwǔ wǒ hé péngyou qù fàndiàn chī mǐfàn, hē rè chá. Xiàwǔ sān diǎn wǒmen zuò chūzūchē qù shāngdiàn mǎi dōngxi. Wǒ hěn gāoxìng!",
+      english: "Today at noon, my friend and I went to a restaurant to eat rice and drink hot tea. At 3 PM, we took a taxi to the store to buy things. I am very happy!"
+    },
+    {
+      id: "sample2",
+      title: "2. Meeting Classmate & Weather",
+      hanzi: "今天天气不冷，我和同学在学校看见了张老师。我们都很高兴，请老师喝茶。",
+      pinyin: "Jīntiān tiānqì bù lěng, wǒ hé tóngxué zài xuéxiào kànjiàn le Zhāng lǎoshī. Wǒmen dōu hěn gāoxìng, qǐng lǎoshī hē chá.",
+      english: "The weather today is not cold. My classmate and I saw Teacher Zhang at school. We were all very happy and invited the teacher to drink tea."
+    },
+    {
+      id: "sample3",
+      title: "3. Family & Movies",
+      hanzi: "妈妈在家里做菜，我和爸爸在看电视。今天下午我们要去医院看朋友，晚上看电影。",
+      pinyin: "Māma zài jiālǐ zuò cài, wǒ hé bàba zài kàn diànshì. Jīntiān xiàwǔ wǒmen yào qù yīyuàn kàn péngyou, wǎnshang kàn diànyǐng.",
+      english: "Mom is cooking at home, while dad and I are watching TV. This afternoon we are going to the hospital to see a friend, and tonight we will watch a movie."
+    },
+    {
+      id: "sample4",
+      title: "4. Buying Fruit",
+      hanzi: "现在四点，我和女儿去商店买苹果和水果。这个苹果太大了，一个苹果五块钱。",
+      pinyin: "Xiànzài sì diǎn, wǒ hé nǚ'ér qù shāngdiàn mǎi píngguǒ hé shuǐguǒ. Zhè gè píngguǒ tài dà le, yí gè píngguǒ wǔ kuài qián.",
+      english: "It is 4 o'clock now. My daughter and I are going to the store to buy apples and fruit. This apple is too big; one apple costs 5 yuan."
+    }
+  ];
+
   const defaultVocabulary = [
     { id: "爱", hanzi: "爱", pinyin: "ài", english: "to love / affection", sentence: "妈妈很 ___ 我。(Māma hěn ___ wǒ.)" },
     { id: "八", hanzi: "八", pinyin: "bā", english: "eight", sentence: "我有 ___ 个苹果。(Wǒ yǒu ___ gè píngguǒ.)" },
@@ -488,6 +578,7 @@
     { id: "打电话", hanzi: "打电话", pinyin: "dǎ diànhuà", english: "to make a phone call", sentence: "他在给朋友 ___。(Tā zài gěi péngyou ___.)" },
     { id: "大", hanzi: "大", pinyin: "dà", english: "big / large", sentence: "这个苹果很 ___。(Zhè gè píngguǒ hěn ___.)" },
     { id: "的", hanzi: "的", pinyin: "de", english: "possessive particle", sentence: "这是我 ___ 书。(Zhè shì wǒ ___ shū.)" },
+    { id: "点", hanzi: "点", pinyin: "diǎn", english: "o'clock / point", sentence: "现在三 ___。(Xiànzài sān ___.)" },
     { id: "电脑", hanzi: "电脑", pinyin: "diànnǎo", english: "computer", sentence: "我喜欢在 ___ 上工作。(Wǒ xǐhuan zài ___ shàng gōngzuò.)" },
     { id: "电视", hanzi: "电视", pinyin: "diànshì", english: "television", sentence: "我喜欢看 ___。(Wǒ xǐhuan kàn ___.)" },
     { id: "电影", hanzi: "电影", pinyin: "diànyǐng", english: "movie / film", sentence: "今天下午看 ___。(Jīntiān xiàwǔ kàn ___.)" },
@@ -607,7 +698,6 @@
   let currentVocabIndex = 0;
   let reverseMode = false;
   
-  // Toggles
   let showContext = true;
   let selfGradeMode = true;
   let showParagraphProgress = true;
@@ -621,6 +711,51 @@
 
   let correctScore = 0;
   let wrongScore = 0;
+
+  function renderSampleTexts() {
+    const container = document.getElementById('sampleTextsContainer');
+    container.innerHTML = '';
+
+    sampleTexts.forEach(sample => {
+      const card = document.createElement('div');
+      card.className = 'sample-card';
+
+      card.innerHTML = `
+        <div class="sample-header">
+          <span>${sample.title}</span>
+          <div class="sample-actions">
+            <button class="sample-btn-action" onclick="toggleSampleTranslation('${sample.id}')">👁️ Show Translation</button>
+            <button class="sample-btn-action" style="background-color: var(--primary) !important;" onclick="loadSampleText('${sample.id}')">▶️ Practice This</button>
+          </div>
+        </div>
+        <div class="sample-text-content">
+          <div><strong>Hanzi:</strong> ${sample.hanzi}</div>
+          <div style="font-size: 0.85rem; color: #9ca3af; margin-top: 4px;"><strong>Pinyin:</strong> ${sample.pinyin}</div>
+        </div>
+        <div class="sample-translation" id="trans_${sample.id}">${sample.english}</div>
+      `;
+
+      container.appendChild(card);
+    });
+  }
+
+  function toggleSampleTranslation(id) {
+    const el = document.getElementById(`trans_${id}`);
+    if (el.style.display === 'block') {
+      el.style.display = 'none';
+    } else {
+      el.style.display = 'block';
+    }
+  }
+
+  function loadSampleText(id) {
+    const sample = sampleTexts.find(s => s.id === id);
+    if (sample) {
+      document.getElementById('customTextInput').value = sample.hanzi;
+      parseCustomText();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
 
   function updateScoreUI() {
     document.getElementById('correctCount').innerText = correctScore;
@@ -1022,7 +1157,6 @@
       currentVocabIndex = 0;
       currentParagraphText = text;
       saveTextHistory(text);
-      alert(`Parsed! Loaded ${matched.length} HSK 1 words from input.`);
       loadQuestion();
     } else {
       alert("No matching HSK 1 vocabulary found in the provided text or Pinyin.");
@@ -1100,6 +1234,7 @@
   }
 
   document.addEventListener('DOMContentLoaded', () => {
+    renderSampleTexts();
     renderHistory();
     loadQuestion();
   });
