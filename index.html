@@ -1,557 +1,171 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>HSK 1 Pinyin Quiz & Practice Tool</title>
-  <style>
-    :root {
-      --bg-color: #f4f6f8;
-      --card-bg: #ffffff;
-      --primary: #2b6cb0;
-      --primary-hover: #2c5282;
-      --success: #38a169;
-      --error: #e53e3e;
-      --text: #2d3748;
-    }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text);
-      margin: 0;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .container {
-      width: 100%;
-      max-width: 600px;
-    }
-
-    .card {
-      background: var(--card-bg);
-      border-radius: 12px;
-      padding: 24px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-      margin-bottom: 20px;
-    }
-
-    h1, h2, h3, h4 {
-      margin-top: 0;
-      text-align: center;
-    }
-
-    .prompt-box {
-      font-size: 2.5rem;
-      font-weight: bold;
-      text-align: center;
-      margin: 20px 0;
-      min-height: 60px;
-    }
-
-    .sub-prompt {
-      font-size: 1.2rem;
-      color: #718096;
-      text-align: center;
-      margin-bottom: 15px;
-    }
-
-    .options-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-
-    button {
-      background-color: var(--primary);
-      color: white;
-      border: none;
-      padding: 12px 16px;
-      font-size: 1rem;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background-color 0.2s;
-      width: 100%;
-    }
-
-    button:hover {
-      background-color: var(--primary-hover);
-    }
-
-    button.correct {
-      background-color: var(--success) !important;
-    }
-
-    button.wrong {
-      background-color: var(--error) !important;
-    }
-
-    .controls {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 15px;
-    }
-
-    details {
-      background: var(--card-bg);
-      border-radius: 8px;
-      padding: 12px 16px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    }
-
-    summary {
-      font-weight: bold;
-      cursor: pointer;
-      padding: 4px 0;
-    }
-
-    textarea {
-      width: 100%;
-      height: 100px;
-      margin-top: 10px;
-      border: 1px solid #cbd5e0;
-      border-radius: 6px;
-      padding: 8px;
-      box-sizing: border-box;
-      font-family: inherit;
-    }
-
-    .history-list {
-      list-style-type: none;
-      padding: 0;
-      margin-top: 10px;
-      max-height: 150px;
-      overflow-y: auto;
-    }
-
-    .history-item {
-      padding: 8px;
-      border-bottom: 1px solid #edf2f7;
-      cursor: pointer;
-      font-size: 0.9rem;
-    }
-
-    .history-item:hover {
-      background-color: #f7fafc;
-    }
-
-    .sync-section {
-      margin-top: 15px;
-      border-top: 1px solid #e2e8f0;
-      padding-top: 15px;
-    }
-
-    .sync-btn-group {
-      display: flex;
-      gap: 10px;
-      margin-top: 10px;
-    }
-  </style>
-</head>
-<body>
-
-<div class="container">
-  <h1>HSK 1 Vocabulary Practice</h1>
-
-  <!-- Quiz Interface Card -->
-  <div class="card">
-    <div class="controls">
-      <button onclick="toggleMode()" id="modeBtn">Mode: Pinyin ➔ English/Hanzi</button>
-      <button onclick="playAudio()" id="audioBtn">🔊 Listen</button>
-    </div>
-
-    <div class="prompt-box" id="promptDisplay">---</div>
-    <div class="sub-prompt" id="subPromptDisplay"></div>
-
-    <div class="options-grid" id="optionsGrid"></div>
-  </div>
-
-  <!-- Collapsible Section: Custom Input, Text History & Data Sync -->
-  <details>
-    <summary>Custom Text Parser & Data Sync Settings</summary>
-    
-    <h3>Parse Custom Text</h3>
-    <textarea id="customTextInput" placeholder="Paste Chinese text here to extract HSK 1 vocabulary..."></textarea>
-    <button onclick="parseCustomText()" style="margin-top: 8px;">Filter & Practice Custom Words</button>
-
-    <h3>Text History</h3>
-    <ul class="history-list" id="historyList"></ul>
-
-    <!-- Data Sync Section -->
-    <div class="sync-section">
-      <h4>Sync Data Between Devices</h4>
-      <div class="sync-btn-group">
-        <button type="button" onclick="exportData()">Export Progress (JSON)</button>
-        <button type="button" onclick="document.getElementById('importFile').click()">Import Progress (JSON)</button>
-      </div>
-      <input type="file" id="importFile" style="display: none;" onchange="importData(event)" accept=".json" />
-    </div>
-  </details>
-</div>
-
-<script>
-  // Sample HSK 3.0 Level 1 Dictionary Baseline
-  const defaultVocabulary = [
-    { id: "爱", hanzi: "爱", pinyin: "ài", english: "to love / affection" },
-    { id: "八", hanzi: "八", pinyin: "bā", english: "eight" },
-    { id: "爸爸", hanzi: "爸爸", pinyin: "bàba", english: "dad / father" },
-    { id: "杯子", hanzi: "杯子", pinyin: "bēizi", english: "cup / glass" },
-    { id: "北京", hanzi: "北京", pinyin: "Běijīng", english: "Beijing" },
-    { id: "本", hanzi: "本", pinyin: "běn", english: "volume / measure word for books" },
-    { id: "不客气", hanzi: "不客气", pinyin: "bú kèqi", english: "you're welcome" },
-    { id: "不", hanzi: "不", pinyin: "bù", english: "not / no" },
-    { id: "菜", hanzi: "菜", pinyin: "cài", english: "dish / vegetable" },
-    { id: "茶", hanzi: "茶", pinyin: "chá", english: "tea" },
-    { id: "吃", hanzi: "吃", pinyin: "chī", english: "to eat" },
-    { id: "出租车", hanzi: "出租车", pinyin: "chūzūchē", english: "taxi" },
-    { id: "打电话", hanzi: "打电话", pinyin: "dǎ diànhuà", english: "to make a phone call" },
-    { id: "大", hanzi: "大", pinyin: "dà", english: "big / large" },
-    { id: "的", hanzi: "的", pinyin: "de", english: "possessive particle" },
-    { id: "点", hanzi: "点", pinyin: "diǎn", english: "o'clock / dot" },
-    { id: "电脑", hanzi: "电脑", pinyin: "diànnǎo", english: "computer" },
-    { id: "电视", hanzi: "电视", pinyin: "diànshì", english: "television" },
-    { id: "电影", hanzi: "电影", pinyin: "diànyǐng", english: "movie / film" },
-    { id: "东西", hanzi: "东西", pinyin: "dōngxi", english: "thing / stuff" },
-    { id: "都", hanzi: "都", pinyin: "dōu", english: "all / both" },
-    { id: "读", hanzi: "读", pinyin: "dú", english: "to read" },
-    { id: "对不起", hanzi: "对不起", pinyin: "duìbuqǐ", english: "sorry" },
-    { id: "多", hanzi: "多", pinyin: "duō", english: "many / much" },
-    { id: "多少", hanzi: "多少", pinyin: "duōshao", english: "how many / how much" },
-    { id: "儿子", hanzi: "儿子", pinyin: "érzi", english: "son" },
-    { id: "二", hanzi: "二", pinyin: "èr", english: "two" },
-    { id: "饭店", hanzi: "饭店", pinyin: "fàndiàn", english: "restaurant / hotel" },
-    { id: "飞机", hanzi: "飞机", pinyin: "fēijī", english: "airplane" },
-    { id: "分钟", hanzi: "分钟", pinyin: "fēnzhōng", english: "minute" },
-    { id: "高兴", hanzi: "高兴", pinyin: "gāoxìng", english: "happy / glad" },
-    { id: "个", hanzi: "个", pinyin: "gè", english: "general measure word" },
-    { id: "工作", hanzi: "工作", pinyin: "gōngzuò", english: "job / to work" },
-    { id: "汉语", hanzi: "汉语", pinyin: "Hànyǔ", english: "Chinese language" },
-    { id: "好", hanzi: "好", pinyin: "hǎo", english: "good / well" },
-    { id: "喝", hanzi: "喝", pinyin: "hē", english: "to drink" },
-    { id: "和", hanzi: "和", pinyin: "hé", english: "and" },
-    { id: "很", hanzi: "很", pinyin: "hěn", english: "very" },
-    { id: "后面", hanzi: "后面", pinyin: "hòumiàn", english: "behind / back" },
-    { id: "回", hanzi: "回", pinyin: "huí", english: "to return" },
-    { id: "会", hanzi: "会", pinyin: "huì", english: "can / know how to" },
-    { id: "几", hanzi: "几", pinyin: "jǐ", english: "how many / several" },
-    { id: "家", hanzi: "家", pinyin: "jiā", english: "home / family" },
-    { id: "叫", hanzi: "叫", pinyin: "jiào", english: "to be called" },
-    { id: "今天", hanzi: "今天", pinyin: "jīntiān", english: "today" },
-    { id: "九", hanzi: "九", pinyin: "jiǔ", english: "nine" },
-    { id: "开", hanzi: "开", pinyin: "kāi", english: "to open / to drive" },
-    { id: "看", hanzi: "看", pinyin: "kàn", english: "to look / to watch / to read" },
-    { id: "看见", hanzi: "看见", pinyin: "kànjiàn", english: "to see" },
-    { id: "块", hanzi: "块", pinyin: "kuài", english: "piece / yuan (currency)" },
-    { id: "来", hanzi: "来", pinyin: "lái", english: "to come" },
-    { id: "老师", hanzi: "老师", pinyin: "lǎoshī", english: "teacher" },
-    { id: "了", hanzi: "了", pinyin: "le", english: "modal particle" },
-    { id: "冷", hanzi: "冷", pinyin: "lěng", english: "cold" },
-    { id: "里", hanzi: "里", pinyin: "lǐ", english: "inside" },
-    { id: "零", hanzi: "零", pinyin: "líng", english: "zero" },
-    { id: "六", hanzi: "六", pinyin: "liù", english: "six" },
-    { id: "妈妈", hanzi: "妈妈", pinyin: "māma", english: "mom / mother" },
-    { id: "吗", hanzi: "吗", pinyin: "ma", english: "question particle" },
-    { id: "买", hanzi: "买", pinyin: "mǎi", english: "to buy" },
-    { id: "猫", hanzi: "猫", pinyin: "māo", english: "cat" },
-    { id: "没", hanzi: "没", pinyin: "méi", english: "not have" },
-    { id: "没关系", hanzi: "没关系", pinyin: "méi guānxi", english: "it doesn't matter" },
-    { id: "米饭", hanzi: "米饭", pinyin: "mǐfàn", english: "cooked rice" },
-    { id: "明天", hanzi: "明天", pinyin: "míngtiān", english: "tomorrow" },
-    { id: "名字", hanzi: "名字", pinyin: "míngzi", english: "name" },
-    { id: "哪", hanzi: "哪", pinyin: "nǎ", english: "which" },
-    { id: "哪儿", hanzi: "哪儿", pinyin: "nǎr", english: "where" },
-    { id: "那", hanzi: "那", pinyin: "nà", english: "that" },
-    { id: "呢", hanzi: "呢", pinyin: "ne", english: "question particle" },
-    { id: "能", hanzi: "能", pinyin: "néng", english: "can / be able to" },
-    { id: "你", hanzi: "你", pinyin: "nǐ", english: "you" },
-    { id: "年", hanzi: "年", pinyin: "nián", english: "year" },
-    { id: "女儿", hanzi: "女儿", pinyin: "nǚ'ér", english: "daughter" },
-    { id: "朋友", hanzi: "朋友", pinyin: "péngyou", english: "friend" },
-    { id: "漂亮", hanzi: "漂亮", pinyin: "piàoliang", english: "pretty / beautiful" },
-    { id: "苹果", hanzi: "苹果", pinyin: "píngguǒ", english: "apple" },
-    { id: "七", hanzi: "七", pinyin: "qī", english: "seven" },
-    { id: "钱", hanzi: "钱", pinyin: "qián", english: "money" },
-    { id: "前面", hanzi: "前面", pinyin: "qiánmiàn", english: "in front" },
-    { id: "请", hanzi: "请", pinyin: "qǐng", english: "please / to invite" },
-    { id: "去", hanzi: "去", pinyin: "qù", english: "to go" },
-    { id: "热", hanzi: "热", pinyin: "rè", english: "hot" },
-    { id: "人", hanzi: "人", pinyin: "rén", english: "person / people" },
-    { id: "认识", hanzi: "认识", pinyin: "rènshi", english: "to know / to recognize" },
-    { id: "三", hanzi: "三", pinyin: "sān", english: "three" },
-    { id: "商店", hanzi: "商店", pinyin: "shāngdiàn", english: "shop / store" },
-    { id: "上", hanzi: "上", pinyin: "shàng", english: "above / up" },
-    { id: "上午", hanzi: "上午", pinyin: "shàngwǔ", english: "morning" },
-    { id: "少", hanzi: "少", pinyin: "shǎo", english: "few / little" },
-    { id: "谁", hanzi: "谁", pinyin: "shéi", english: "who / whom" },
-    { id: "什么", hanzi: "什么", pinyin: "shénme", english: "what" },
-    { id: "十", hanzi: "十", pinyin: "shí", english: "ten" },
-    { id: "时候", hanzi: "时候", pinyin: "shíhou", english: "time / moment" },
-    { id: "是", hanzi: "是", pinyin: "shì", english: "to be" },
-    { id: "书", hanzi: "书", pinyin: "shū", english: "book" },
-    { id: "水", hanzi: "水", pinyin: "shuǐ", english: "water" },
-    { id: "水果", hanzi: "水果", pinyin: "shuǐguǒ", english: "fruit" },
-    { id: "睡觉", hanzi: "睡觉", pinyin: "shuìjiào", english: "to sleep" },
-    { id: "说话", hanzi: "说话", pinyin: "shuōhuà", english: "to speak / to talk" },
-    { id: "四", hanzi: "四", pinyin: "sì", english: "four" },
-    { id: "岁", hanzi: "岁", pinyin: "suì", english: "years old" },
-    { id: "他", hanzi: "他", pinyin: "tā", english: "he / him" },
-    { id: "她", hanzi: "她", pinyin: "tā", english: "she / her" },
-    { id: "太", hanzi: "太", pinyin: "tài", english: "too / excessively" },
-    { id: "天气", hanzi: "天气", pinyin: "tiānqì", english: "weather" },
-    { id: "听", hanzi: "听", pinyin: "tīng", english: "to listen" },
-    { id: "同学", hanzi: "同学", pinyin: "tóngxué", english: "classmate" },
-    { id: "喂", hanzi: "喂", pinyin: "wèi", english: "hello (on phone)" },
-    { id: "我", hanzi: "我", pinyin: "wǒ", english: "I / me" },
-    { id: "我们", hanzi: "我们", pinyin: "wǒmen", english: "we / us" },
-    { id: "五", hanzi: "五", pinyin: "wǔ", english: "five" },
-    { id: "喜欢", hanzi: "喜欢", pinyin: "xǐhuan", english: "to like" },
-    { id: "下", hanzi: "下", pinyin: "xià", english: "below / down" },
-    { id: "下午", hanzi: "下午", pinyin: "xiàwǔ", english: "afternoon" },
-    { id: "下雨", hanzi: "下雨", pinyin: "xiàyǔ", english: "to rain" },
-    { id: "先生", hanzi: "先生", pinyin: "xiānsheng", english: "Mr. / sir" },
-    { id: "现在", hanzi: "现在", pinyin: "xiànzài", english: "now" },
-    { id: "想", hanzi: "想", pinyin: "xiǎng", english: "to think / to want" },
-    { id: "小", hanzi: "小", pinyin: "xiǎo", english: "small / little" },
-    { id: "小姐", hanzi: "小姐", pinyin: "xiǎojiě", english: "Miss / young lady" },
-    { id: "些", hanzi: "些", pinyin: "xiē", english: "some / a few" },
-    { id: "写", hanzi: "写", pinyin: "xiě", english: "to write" },
-    { id: "谢谢", hanzi: "谢谢", pinyin: "xièxie", english: "thanks" },
-    { id: "星期", hanzi: "星期", pinyin: "xīngqī", english: "week" },
-    { id: "学生", hanzi: "学生", pinyin: "xuésheng", english: "student" },
-    { id: "学习", hanzi: "学习", pinyin: "xuéxí", english: "to study / to learn" },
-    { id: "学校", hanzi: "学校", pinyin: "xuéxiào", english: "school" },
-    { id: "一", hanzi: "一", pinyin: "yī", english: "one" },
-    { id: "衣服", hanzi: "衣服", pinyin: "yīfu", english: "clothes" },
-    { id: "医生", hanzi: "医生", pinyin: "yīshēng", english: "doctor" },
-    { id: "医院", hanzi: "医院", pinyin: "yīyuàn", english: "hospital" },
-    { id: "椅子", hanzi: "椅子", pinyin: "yǐzi", english: "chair" },
-    { id: "有", hanzi: "有", pinyin: "yǒu", english: "to have" },
-    { id: "月", hanzi: "月", pinyin: "yuè", english: "month / moon" },
-    { id: "再见", hanzi: "再见", pinyin: "zàijiàn", english: "goodbye" },
-    { id: "在", hanzi: "在", pinyin: "zài", english: "at / in / located" },
-    { id: "怎么", hanzi: "怎么", pinyin: "zěnme", english: "how" },
-    { id: "怎么样", hanzi: "怎么样", pinyin: "zěnmeyàng", english: "how about it" },
-    { id: "这", hanzi: "这", pinyin: "zhè", english: "this" },
-    { id: "中国", hanzi: "中国", pinyin: "Zhōngguó", english: "China" },
-    { id: "中午", hanzi: "中午", pinyin: "zhōngwǔ", english: "noon" },
-    { id: "住", hanzi: "住", pinyin: "zhù", english: "to live / to stay" },
-    { id: "桌子", hanzi: "桌子", pinyin: "zhuōzi", english: "table / desk" },
-    { id: "字", hanzi: "字", pinyin: "zì", english: "character / word" },
-    { id: "昨天", hanzi: "昨天", pinyin: "zuótiān", english: "yesterday" },
-    { id: "做", hanzi: "做", pinyin: "zuò", english: "to do / to make" },
-    { id: "坐", hanzi: "坐", pinyin: "zuò", english: "to sit" }
-  ];
-
-  let activeVocab = [...defaultVocabulary];
-  let currentWord = null;
-  let reverseMode = false; // false: Pinyin -> Hanzi/English, true: English/Hanzi -> Pinyin
-
-  // --- SM-2 SRS Algorithm Helpers ---
-  function getWordSRS(wordId) {
-    const srsData = JSON.parse(localStorage.getItem('hsk_srs_data') || '{}');
-    return srsData[wordId] || {
-      interval: 1,
-      repetition: 0,
-      easeFactor: 2.5,
-      dueDate: Date.now()
-    };
+<style>
+  :root {
+    --bg-color: #121212;
+    --card-bg: #1e1e1e;
+    --primary: #3b82f6;
+    --primary-hover: #2563eb;
+    --success: #10b981;
+    --error: #ef4444;
+    --text: #e5e7eb;
+    --subtext: #9ca3af;
+    --border: #374151;
   }
 
-  function updateWordSRS(wordId, grade) {
-    const srsData = JSON.parse(localStorage.getItem('hsk_srs_data') || '{}');
-    let item = getWordSRS(wordId);
-
-    if (grade >= 3) {
-      if (item.repetition === 0) item.interval = 1;
-      else if (item.repetition === 1) item.interval = 6;
-      else item.interval = Math.round(item.interval * item.easeFactor);
-      item.repetition += 1;
-    } else {
-      item.repetition = 0;
-      item.interval = 1;
-    }
-
-    item.easeFactor = item.easeFactor + (0.1 - (5 - grade) * (0.08 + (5 - grade) * 0.02));
-    if (item.easeFactor < 1.3) item.easeFactor = 1.3;
-
-    item.dueDate = Date.now() + (item.interval * 24 * 60 * 60 * 1000);
-
-    srsData[wordId] = item;
-    localStorage.setItem('hsk_srs_data', JSON.stringify(srsData));
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text);
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
-  function selectNextWord() {
-    const now = Date.now();
-    const dueWords = activeVocab.filter(word => {
-      const srs = getWordSRS(word.id);
-      return srs.dueDate <= now;
-    });
-
-    if (dueWords.length > 0) {
-      return dueWords[Math.floor(Math.random() * dueWords.length)];
-    }
-    return activeVocab[Math.floor(Math.random() * activeVocab.length)];
+  .container {
+    width: 100%;
+    max-width: 600px;
   }
 
-  // --- Quiz Render & Logic ---
-  function loadQuestion() {
-    if (activeVocab.length === 0) return;
-    currentWord = selectNextWord();
-
-    const promptDisplay = document.getElementById('promptDisplay');
-    const subPromptDisplay = document.getElementById('subPromptDisplay');
-
-    if (!reverseMode) {
-      promptDisplay.innerText = currentWord.pinyin;
-      subPromptDisplay.innerText = "Select the matching Hanzi & Meaning";
-    } else {
-      promptDisplay.innerText = `${currentWord.hanzi} (${currentWord.english})`;
-      subPromptDisplay.innerText = "Select the matching Pinyin";
-    }
-
-    playAudio();
-    generateOptions();
+  .card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    margin-bottom: 20px;
+    border: 1px solid var(--border);
   }
 
-  function generateOptions() {
-    const grid = document.getElementById('optionsGrid');
-    grid.innerHTML = '';
-
-    const options = [currentWord];
-    while (options.length < 4 && options.length < activeVocab.length) {
-      const rand = activeVocab[Math.floor(Math.random() * activeVocab.length)];
-      if (!options.some(o => o.id === rand.id)) {
-        options.push(rand);
-      }
-    }
-
-    options.sort(() => Math.random() - 0.5);
-
-    options.forEach(opt => {
-      const btn = document.createElement('button');
-      btn.innerText = !reverseMode ? `${opt.hanzi} - ${opt.english}` : opt.pinyin;
-      btn.onclick = () => checkAnswer(opt, btn);
-      grid.appendChild(btn);
-    });
+  h1, h2, h3, h4 {
+    margin-top: 0;
+    text-align: center;
+    color: var(--text);
   }
 
-  function checkAnswer(selected, btnElement) {
-    const isCorrect = selected.id === currentWord.id;
-
-    if (isCorrect) {
-      btnElement.classList.add('correct');
-      updateWordSRS(currentWord.id, 4); // Grade 4: Good
-      setTimeout(() => {
-        loadQuestion();
-      }, 600);
-    } else {
-      btnElement.classList.add('wrong');
-      updateWordSRS(currentWord.id, 1); // Grade 1: Incorrect
-    }
+  .prompt-box {
+    font-size: 2.5rem;
+    font-weight: bold;
+    text-align: center;
+    margin: 20px 0;
+    min-height: 60px;
+    color: #ffffff;
   }
 
-  function toggleMode() {
-    reverseMode = !reverseMode;
-    document.getElementById('modeBtn').innerText = reverseMode 
-      ? "Mode: English/Hanzi ➔ Pinyin" 
-      : "Mode: Pinyin ➔ English/Hanzi";
-    loadQuestion();
+  .sub-prompt {
+    font-size: 1.1rem;
+    color: var(--subtext);
+    text-align: center;
+    margin-bottom: 15px;
   }
 
-  function playAudio() {
-    if (!currentWord || !('speechSynthesis' in window)) return;
-    const utterance = new SpeechSynthesisUtterance(currentWord.hanzi);
-    utterance.lang = 'zh-CN';
-    window.speechSynthesis.speak(utterance);
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
   }
 
-  // --- Custom Text Parser & History ---
-  function parseCustomText() {
-    const text = document.getElementById('customTextInput').value;
-    if (!text.trim()) return;
-
-    const matched = defaultVocabulary.filter(item => text.includes(item.hanzi));
-
-    if (matched.length > 0) {
-      activeVocab = matched;
-      saveTextHistory(text);
-      alert(`Parsed! Loaded ${matched.length} HSK 1 words for practice.`);
-      loadQuestion();
-    } else {
-      alert("No HSK 1 vocabulary found in the provided text.");
-    }
+  button {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    padding: 14px 16px;
+    font-size: 1rem;
+    font-weight: 500;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    width: 100%;
   }
 
-  function saveTextHistory(text) {
-    let history = JSON.parse(localStorage.getItem('hsk_history') || '[]');
-    history.unshift({ text, date: new Date().toLocaleTimeString() });
-    if (history.length > 10) history.pop();
-    localStorage.setItem('hsk_history', JSON.stringify(history));
-    renderHistory();
+  button:hover {
+    background-color: var(--primary-hover);
   }
 
-  function renderHistory() {
-    const historyList = document.getElementById('historyList');
-    const history = JSON.parse(localStorage.getItem('hsk_history') || '[]');
-    historyList.innerHTML = '';
-
-    history.forEach((item, index) => {
-      const li = document.createElement('li');
-      li.className = 'history-item';
-      li.innerText = `[${item.date}] ${item.text.substring(0, 30)}...`;
-      li.onclick = () => {
-        document.getElementById('customTextInput').value = item.text;
-        parseCustomText();
-      };
-      historyList.appendChild(li);
-    });
+  button:active {
+    transform: scale(0.98);
   }
 
-  // --- Data Sync Export/Import ---
-  function exportData() {
-    const data = {
-      srs: localStorage.getItem('hsk_srs_data'),
-      history: localStorage.getItem('hsk_history')
-    };
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `hsk_quiz_backup_${new Date().toISOString().slice(0,10)}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+  button.correct {
+    background-color: var(--success) !important;
   }
 
-  function importData(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      try {
-        const data = JSON.parse(e.target.result);
-        if (data.srs) localStorage.setItem('hsk_srs_data', data.srs);
-        if (data.history) localStorage.setItem('hsk_history', data.history);
-        alert('Progress imported successfully! Reloading...');
-        location.reload();
-      } catch (err) {
-        alert('Invalid JSON file format.');
-      }
-    };
-    reader.readAsText(file);
+  button.wrong {
+    background-color: var(--error) !important;
   }
 
-  // Init
-  window.onload = () => {
-    renderHistory();
-    loadQuestion();
-  };
-</script>
+  .controls {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
 
-</body>
-</html>
+  .controls button {
+    background-color: #2d3748;
+  }
+
+  .controls button:hover {
+    background-color: #4a5568;
+  }
+
+  details {
+    background: var(--card-bg);
+    border-radius: 8px;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+  }
+
+  summary {
+    font-weight: bold;
+    cursor: pointer;
+    padding: 4px 0;
+    color: var(--text);
+  }
+
+  textarea {
+    width: 100%;
+    height: 100px;
+    margin-top: 10px;
+    background-color: #121212;
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px;
+    box-sizing: border-box;
+    font-family: inherit;
+  }
+
+  .history-list {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 10px;
+    max-height: 150px;
+    overflow-y: auto;
+  }
+
+  .history-item {
+    padding: 8px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: var(--subtext);
+  }
+
+  .history-item:hover {
+    background-color: #2d3748;
+    color: var(--text);
+  }
+
+  .sync-section {
+    margin-top: 15px;
+    border-top: 1px solid var(--border);
+    padding-top: 15px;
+  }
+
+  .sync-btn-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+  }
+</style>
