@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>HSK 1 Practice Tool</title>
+  <title>HSK 1 Vocabulary Practice Tool</title>
   <style>
     :root {
       --bg: #121212;
@@ -345,11 +345,27 @@
       font-family: inherit;
     }
 
+    .difficulty-group {
+      margin-top: 15px;
+    }
+
+    .difficulty-title {
+      font-size: 0.9rem;
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+
+    .diff-easy { background-color: rgba(16, 185, 129, 0.2); color: var(--success); }
+    .diff-medium { background-color: rgba(245, 158, 11, 0.2); color: var(--warning); }
+    .diff-hard { background-color: rgba(239, 68, 68, 0.2); color: var(--error); }
+
     .sample-texts-list {
       display: flex;
       flex-direction: column;
       gap: 12px;
-      margin-top: 10px;
     }
 
     .sample-card {
@@ -503,14 +519,14 @@
   </div>
 
   <details open>
-    <summary>Custom Text Parser & Pre-made Sample Stories</summary>
+    <summary>Custom Text Parser & Tiered Practice Stories</summary>
     
     <h3>Parse Custom Text (Pinyin or Hanzi)</h3>
     <textarea id="customTextInput" placeholder="Paste Chinese text or Pinyin here (e.g. 'Jīntiān zhōngwǔ wǒ xiǎng qù fàndiàn...')..."></textarea>
     <button onclick="parseCustomText()" style="margin-top: 8px;">Filter & Practice Custom Words</button>
 
-    <h3 style="margin-top: 20px;">Pre-made Sample Stories</h3>
-    <div class="sample-texts-list" id="sampleTextsContainer"></div>
+    <h3 style="margin-top: 20px;">Leveled Sample Stories</h3>
+    <div id="sampleTextsContainer"></div>
 
     <h3 style="margin-top: 20px;">Text History</h3>
     <ul class="history-list" id="historyList"></ul>
@@ -532,33 +548,82 @@
   }
 
   const sampleTexts = [
+    // --- EASY ---
     {
-      id: "sample1",
-      title: "1. Restaurant & Shopping",
+      id: "easy1",
+      level: "easy",
+      title: "1. Basic Greeting & Intro",
+      hanzi: "你好！我是学生，他是老师。我很喜欢学习汉语。",
+      pinyin: "Nǐ hǎo! Wǒ shì xuésheng, tā shì lǎoshī. Wǒ hěn xǐhuan xuéxí Hànyǔ.",
+      english: "Hello! I am a student, and he is a teacher. I really like studying Chinese."
+    },
+    {
+      id: "easy2",
+      level: "easy",
+      title: "2. Family & Age",
+      hanzi: "我爸爸妈妈都在家里。我有一个女儿，她九岁了。",
+      pinyin: "Wǒ bàba māma dōu zài jiālǐ. Wǒ yǒu yí gè nǚ'ér, tā jiǔ suì le.",
+      english: "My dad and mom are both at home. I have a daughter, she is nine years old."
+    },
+    {
+      id: "easy3",
+      level: "easy",
+      title: "3. Simple Weather & Tea",
+      hanzi: "今天天气很热。我想喝冷水，不喝热茶。",
+      pinyin: "Jīntiān tiānqì hěn rè. Wǒ xiǎng hē lěng shuǐ, bù hē rè chá.",
+      english: "The weather today is very hot. I want to drink cold water, not hot tea."
+    },
+
+    // --- MEDIUM ---
+    {
+      id: "med1",
+      level: "medium",
+      title: "1. Lunch & Taxi to Shop",
       hanzi: "今天中午我和朋友去饭店吃米饭，喝热茶。下午三点我们坐出租车去商店买东西。我很高兴！",
       pinyin: "Jīntiān zhōngwǔ wǒ hé péngyou qù fàndiàn chī mǐfàn, hē rè chá. Xiàwǔ sān diǎn wǒmen zuò chūzūchē qù shāngdiàn mǎi dōngxi. Wǒ hěn gāoxìng!",
       english: "Today at noon, my friend and I went to a restaurant to eat rice and drink hot tea. At 3 PM, we took a taxi to the store to buy things. I am very happy!"
     },
     {
-      id: "sample2",
-      title: "2. Meeting Classmate & Weather",
+      id: "med2",
+      level: "medium",
+      title: "2. School & Meeting Teacher",
       hanzi: "今天天气不冷，我和同学在学校看见了张老师。我们都很高兴，请老师喝茶。",
       pinyin: "Jīntiān tiānqì bù lěng, wǒ hé tóngxué zài xuéxiào kànjiàn le Zhāng lǎoshī. Wǒmen dōu hěn gāoxìng, qǐng lǎoshī hē chá.",
       english: "The weather today is not cold. My classmate and I saw Teacher Zhang at school. We were all very happy and invited the teacher to drink tea."
     },
     {
-      id: "sample3",
-      title: "3. Family & Movies",
+      id: "med3",
+      level: "medium",
+      title: "3. Hospital Visit & Movie",
       hanzi: "妈妈在家里做菜，我和爸爸在看电视。今天下午我们要去医院看朋友，晚上看电影。",
       pinyin: "Māma zài jiālǐ zuò cài, wǒ hé bàba zài kàn diànshì. Jīntiān xiàwǔ wǒmen yào qù yīyuàn kàn péngyou, wǎnshang kàn diànyǐng.",
       english: "Mom is cooking at home, while dad and I are watching TV. This afternoon we are going to the hospital to see a friend, and tonight we will watch a movie."
     },
+
+    // --- HARD ---
     {
-      id: "sample4",
-      title: "4. Buying Fruit",
-      hanzi: "现在四点，我和女儿去商店买苹果和水果。这个苹果太大了，一个苹果五块钱。",
-      pinyin: "Xiànzài sì diǎn, wǒ hé nǚ'ér qù shāngdiàn mǎi píngguǒ hé shuǐguǒ. Zhè gè píngguǒ tài dà le, yí gè píngguǒ wǔ kuài qián.",
-      english: "It is 4 o'clock now. My daughter and I are going to the store to buy apples and fruit. This apple is too big; one apple costs 5 yuan."
+      id: "hard1",
+      level: "hard",
+      title: "1. Shopping Prices & Books",
+      hanzi: "现在四点半，我和女儿去商店买苹果和水果。这个苹果太大了，一个五块钱。我买了一本书，三块钱。",
+      pinyin: "Xiànzài sì diǎn bàn, wǒ hé nǚ'ér qù shāngdiàn mǎi píngguǒ hé shuǐguǒ. Zhè gè píngguǒ tài dà le, yí gè wǔ kuài qián. Wǒ mǎi le yì běn shū, sān kuài qián.",
+      english: "It is 4:30 now. My daughter and I went to the store to buy apples and fruit. This apple is too big, one costs 5 yuan. I bought a book for 3 yuan."
+    },
+    {
+      id: "hard2",
+      level: "hard",
+      title: "2. Work, Travel & Flights",
+      hanzi: "我儿子是医生，在医院工作。他明天下午坐飞机去北京。北京的天气很冷，他要买多一点衣服。",
+      pinyin: "Wǒ érzi shì yīshēng, zài yīyuàn gōngzuò. Tā míngtiān xiàwǔ zuò fēijī qù Běijīng. Běijīng de tiānqì hěn lěng, tā yào mǎi duō yìdiǎn yīfu.",
+      english: "My son is a doctor working in a hospital. He will take a plane to Beijing tomorrow afternoon. The weather in Beijing is very cold, so he needs to buy some more clothes."
+    },
+    {
+      id: "hard3",
+      level: "hard",
+      title: "3. Weekend Routine & Calls",
+      hanzi: "昨天下雨了，我没去学校。我和老朋友打电话说汉语，他说我写的字很漂亮。明天星期六，我们要在饭店吃菜。",
+      pinyin: "Zuótiān xiàyǔ le, wǒ méi qù xuéxiào. Wǒ hé lǎo péngyou dǎ diànhuà shuō Hànyǔ, tā shuō wǒ xiě de zì hěn piàoliang. Míngtiān xīngqīliù, wǒmen yào zài fàndiàn chī cài.",
+      english: "It rained yesterday, so I didn't go to school. I made a phone call to an old friend in Chinese; he said the characters I write are very pretty. Tomorrow is Saturday, and we will eat dishes at a restaurant."
     }
   ];
 
@@ -701,7 +766,6 @@
   let showContext = true;
   let selfGradeMode = true;
   let showParagraphProgress = true;
-  // Modes for active text display: 'hanzi', 'pinyin', 'english'
   let paragraphDisplayMode = 'hanzi'; 
   let currentParagraphText = "";
   let learnedWords = new Set();
@@ -717,26 +781,48 @@
     const container = document.getElementById('sampleTextsContainer');
     container.innerHTML = '';
 
-    sampleTexts.forEach(sample => {
-      const card = document.createElement('div');
-      card.className = 'sample-card';
+    const levels = [
+      { key: 'easy', title: '🟢 Easy (Basic Phrases)', class: 'diff-easy' },
+      { key: 'medium', title: '🟡 Medium (Daily Routines)', class: 'diff-medium' },
+      { key: 'hard', title: '🔴 Hard (Complex Sentences & Prices)', class: 'diff-hard' }
+    ];
 
-      card.innerHTML = `
-        <div class="sample-header">
-          <span>${sample.title}</span>
-          <div class="sample-actions">
-            <button class="sample-btn-action" onclick="toggleSampleTranslation('${sample.id}')">👁️ Show Translation</button>
-            <button class="sample-btn-action" style="background-color: var(--primary) !important;" onclick="loadSampleText('${sample.id}')">▶️ Practice This</button>
+    levels.forEach(lvl => {
+      const group = document.createElement('div');
+      group.className = 'difficulty-group';
+
+      const label = document.createElement('div');
+      label.className = `difficulty-title ${lvl.class}`;
+      label.innerText = lvl.title;
+      group.appendChild(label);
+
+      const list = document.createElement('div');
+      list.className = 'sample-texts-list';
+
+      sampleTexts.filter(s => s.level === lvl.key).forEach(sample => {
+        const card = document.createElement('div');
+        card.className = 'sample-card';
+
+        card.innerHTML = `
+          <div class="sample-header">
+            <span>${sample.title}</span>
+            <div class="sample-actions">
+              <button class="sample-btn-action" onclick="toggleSampleTranslation('${sample.id}')">👁️ Show Translation</button>
+              <button class="sample-btn-action" style="background-color: var(--primary) !important;" onclick="loadSampleText('${sample.id}')">▶️ Practice This</button>
+            </div>
           </div>
-        </div>
-        <div class="sample-text-content">
-          <div><strong>Hanzi:</strong> ${sample.hanzi}</div>
-          <div style="font-size: 0.85rem; color: #9ca3af; margin-top: 4px;"><strong>Pinyin:</strong> ${sample.pinyin}</div>
-        </div>
-        <div class="sample-translation" id="trans_${sample.id}">${sample.english}</div>
-      `;
+          <div class="sample-text-content">
+            <div><strong>Hanzi:</strong> ${sample.hanzi}</div>
+            <div style="font-size: 0.85rem; color: #9ca3af; margin-top: 4px;"><strong>Pinyin:</strong> ${sample.pinyin}</div>
+          </div>
+          <div class="sample-translation" id="trans_${sample.id}">${sample.english}</div>
+        `;
 
-      container.appendChild(card);
+        list.appendChild(card);
+      });
+
+      group.appendChild(list);
+      container.appendChild(group);
     });
   }
 
