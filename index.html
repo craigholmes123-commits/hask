@@ -45,7 +45,6 @@
       overflow: hidden;
     }
 
-    /* Timer Bar UI */
     .timer-container {
       width: 100%;
       height: 6px;
@@ -133,7 +132,7 @@
       background-color: var(--border);
       color: var(--text);
       flex: 1;
-      min-width: 120px;
+      min-width: 100px;
     }
 
     .controls button:hover {
@@ -216,6 +215,8 @@
     </div>
 
     <div class="controls">
+      <button onclick="navigateVocab(-1)" id="prevBtn">⬅️ Prev</button>
+      <button onclick="navigateVocab(1)" id="nextBtn">Next ➡️</button>
       <button onclick="toggleMode()" id="modeBtn">Mode: Pinyin ➔ English/Hanzi</button>
       <button onclick="toggleRapidMode()" id="rapidBtn">⚡ Rapid: OFF</button>
       <button onclick="playAudio()" id="audioBtn">🔊 Listen</button>
@@ -381,6 +382,7 @@
 
   let activeVocab = [...defaultVocabulary];
   let currentWord = null;
+  let currentVocabIndex = 0;
   let reverseMode = false;
   
   let rapidMode = false;
@@ -430,10 +432,15 @@
       return srs.dueDate <= now;
     });
 
+    let selected;
     if (dueWords.length > 0) {
-      return dueWords[Math.floor(Math.random() * dueWords.length)];
+      selected = dueWords[Math.floor(Math.random() * dueWords.length)];
+    } else {
+      selected = activeVocab[Math.floor(Math.random() * activeVocab.length)];
     }
-    return activeVocab[Math.floor(Math.random() * activeVocab.length)];
+
+    currentVocabIndex = activeVocab.findIndex(w => w.id === selected.id);
+    return selected;
   }
 
   function stopTimer() {
@@ -476,11 +483,24 @@
     }, 600);
   }
 
+  function navigateVocab(direction) {
+    stopTimer();
+    if (!activeVocab || activeVocab.length === 0) return;
+
+    currentVocabIndex = (currentVocabIndex + direction + activeVocab.length) % activeVocab.length;
+    currentWord = activeVocab[currentVocabIndex];
+
+    renderQuestionDisplay();
+  }
+
   function loadQuestion() {
     stopTimer();
     if (!activeVocab || activeVocab.length === 0) return;
     currentWord = selectNextWord();
+    renderQuestionDisplay();
+  }
 
+  function renderQuestionDisplay() {
     const promptDisplay = document.getElementById('promptDisplay');
     const subPromptDisplay = document.getElementById('subPromptDisplay');
 
@@ -499,7 +519,6 @@
     }
   }
 
-  // --- SMART DISTRACTOR SELECTION ---
   function generateOptions() {
     const grid = document.getElementById('optionsGrid');
     grid.innerHTML = '';
@@ -507,7 +526,6 @@
     const currentSRS = getWordSRS(currentWord.id);
     const options = [currentWord];
 
-    // Pick distractors with similar SRS mastery/repetition level to avoid easy elimination
     const sortedDistractors = activeVocab
       .filter(w => w.id !== currentWord.id)
       .map(w => ({ word: w, srs: getWordSRS(w.id) }))
@@ -563,7 +581,7 @@
     document.getElementById('modeBtn').innerText = reverseMode 
       ? "Mode: English/Hanzi ➔ Pinyin" 
       : "Mode: Pinyin ➔ English/Hanzi";
-    loadQuestion();
+    renderQuestionDisplay();
   }
 
   function toggleRapidMode() {
@@ -581,7 +599,7 @@
       timerContainer.style.display = 'none';
       stopTimer();
     }
-    loadQuestion();
+    renderQuestionDisplay();
   }
 
   function playAudio() {
@@ -604,6 +622,7 @@
 
     if (matched.length > 0) {
       activeVocab = matched;
+      currentVocabIndex = 0;
       saveTextHistory(text);
       alert(`Parsed! Loaded ${matched.length} HSK 1 words for practice.`);
       loadQuestion();
