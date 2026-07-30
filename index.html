@@ -68,27 +68,69 @@
       margin-top: 0;
     }
 
+    /* Top Toolbar for Global Settings */
+    .controls-top {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .controls-top button {
+      flex: 1;
+      background-color: var(--border);
+      color: var(--text);
+    }
+
+    .controls-top button:hover {
+      background-color: #4b5563;
+    }
+
+    .controls-top button.active-mode {
+      border: 1px solid var(--primary);
+      background-color: #1e3a8a;
+    }
+
+    /* Prompt Word + Inline Audio Layout */
+    .prompt-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin: 10px 0 5px 0;
+    }
+
     .prompt-box {
       font-size: 2.5rem;
       font-weight: bold;
       text-align: center;
-      margin: 20px 0;
-      min-height: 60px;
       color: #ffffff;
+      margin: 0;
+    }
+
+    .audio-inline-btn {
+      width: auto !important;
+      padding: 8px 12px !important;
+      background-color: var(--border) !important;
+      font-size: 0.9rem !important;
+      border-radius: 6px;
+    }
+
+    .audio-inline-btn:hover {
+      background-color: #4b5563 !important;
     }
 
     .sub-prompt {
       font-size: 1.1rem;
       color: var(--subtext);
       text-align: center;
-      margin-bottom: 15px;
+      margin-bottom: 20px;
     }
 
     .options-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
     }
 
     button {
@@ -120,28 +162,23 @@
       background-color: var(--error) !important;
     }
 
-    .controls {
+    /* Bottom Toolbar for Card Navigation */
+    .controls-bottom {
       display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 15px;
+      gap: 12px;
+      margin-top: 15px;
+      border-top: 1px solid var(--border);
+      padding-top: 15px;
     }
 
-    .controls button {
-      background-color: var(--border);
-      color: var(--text);
+    .controls-bottom button {
       flex: 1;
-      min-width: 100px;
+      background-color: #2a2d32;
+      color: var(--text);
     }
 
-    .controls button:hover {
-      background-color: #4b5563;
-    }
-
-    .controls button.active-mode {
-      border: 1px solid var(--primary);
-      background-color: #1e3a8a;
+    .controls-bottom button:hover {
+      background-color: #3b3e45;
     }
 
     details {
@@ -214,18 +251,27 @@
       <div class="timer-bar" id="timerBar"></div>
     </div>
 
-    <div class="controls">
-      <button onclick="navigateVocab(-1)" id="prevBtn">⬅️ Prev</button>
-      <button onclick="navigateVocab(1)" id="nextBtn">Next ➡️</button>
+    <!-- Mode Controls -->
+    <div class="controls-top">
       <button onclick="toggleMode()" id="modeBtn">Mode: Pinyin ➔ English/Hanzi</button>
       <button onclick="toggleRapidMode()" id="rapidBtn">⚡ Rapid: OFF</button>
-      <button onclick="playAudio()" id="audioBtn">🔊 Listen</button>
     </div>
 
-    <div class="prompt-box" id="promptDisplay">...</div>
+    <!-- Word Prompt Area + Inline Audio -->
+    <div class="prompt-wrapper">
+      <div class="prompt-box" id="promptDisplay">...</div>
+      <button onclick="playAudio()" class="audio-inline-btn" id="audioBtn" title="Listen">🔊 Listen</button>
+    </div>
     <div class="sub-prompt" id="subPromptDisplay">Loading vocabulary...</div>
 
+    <!-- Answer Grid -->
     <div class="options-grid" id="optionsGrid"></div>
+
+    <!-- Footer Navigation Controls -->
+    <div class="controls-bottom">
+      <button onclick="navigateVocab(-1)" id="prevBtn">⬅️ Prev</button>
+      <button onclick="navigateVocab(1)" id="nextBtn">Next ➡️</button>
+    </div>
   </div>
 
   <details>
