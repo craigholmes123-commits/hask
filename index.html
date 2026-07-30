@@ -462,7 +462,7 @@
       <button onclick="toggleContext()" id="contextBtn" class="icon-btn" title="Toggle Sentence Context (📖)">📖</button>
       <button onclick="toggleSelfGrade()" id="selfGradeBtn" class="icon-btn" title="Toggle Self-Grade (⭐)">⭐</button>
       <button onclick="toggleParagraphProgress()" id="paragraphToggleBtn" class="icon-btn" title="Toggle Text Progress (📜)">📜</button>
-      <button onclick="togglePinyinParagraph()" id="pinyinDisplayBtn" class="icon-btn" title="Toggle Hanzi/Pinyin Display in Text (🔤)">🔤</button>
+      <button onclick="cycleParagraphDisplayMode()" id="displayModeBtn" class="icon-btn" title="Display Mode: Hanzi / Pinyin / English (🔤)">🔤</button>
     </div>
 
     <!-- Active Paragraph Display with Highlighted Words -->
@@ -701,7 +701,8 @@
   let showContext = true;
   let selfGradeMode = true;
   let showParagraphProgress = true;
-  let displayPinyinInParagraph = false;
+  // Modes for active text display: 'hanzi', 'pinyin', 'english'
+  let paragraphDisplayMode = 'hanzi'; 
   let currentParagraphText = "";
   let learnedWords = new Set();
 
@@ -978,9 +979,14 @@
       else if (isLearned) className += "hl-learned";
       else className += "hl-unlearned";
 
-      const labelToDisplay = displayPinyinInParagraph ? word.pinyin : origLabel;
+      let labelToDisplay = word.hanzi;
+      if (paragraphDisplayMode === 'pinyin') {
+        labelToDisplay = word.pinyin;
+      } else if (paragraphDisplayMode === 'english') {
+        labelToDisplay = word.english.split('/')[0].trim();
+      }
 
-      const spanHtml = `<span class="${className}" onclick="jumpToWord('${word.id}')" title="Click to practice: ${word.pinyin} (${word.english})">${labelToDisplay}</span>`;
+      const spanHtml = `<span class="${className}" onclick="jumpToWord('${word.id}')" title="Click to practice: ${word.hanzi} | ${word.pinyin} (${word.english})">${labelToDisplay}</span>`;
       rendered = rendered.split(token).join(spanHtml);
     });
 
@@ -1057,12 +1063,16 @@
     loadQuestion();
   }
 
-  function togglePinyinParagraph() {
-    displayPinyinInParagraph = !displayPinyinInParagraph;
-    const btn = document.getElementById('pinyinDisplayBtn');
-    if (displayPinyinInParagraph) {
+  function cycleParagraphDisplayMode() {
+    const btn = document.getElementById('displayModeBtn');
+    if (paragraphDisplayMode === 'hanzi') {
+      paragraphDisplayMode = 'pinyin';
+      btn.classList.add('active-mode');
+    } else if (paragraphDisplayMode === 'pinyin') {
+      paragraphDisplayMode = 'english';
       btn.classList.add('active-mode');
     } else {
+      paragraphDisplayMode = 'hanzi';
       btn.classList.remove('active-mode');
     }
     updateParagraphHighlighting();
