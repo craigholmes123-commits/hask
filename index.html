@@ -482,7 +482,6 @@
     { id: "hard6", level: "hard", title: "6. Learning Progress & Books", hanzi: "我学会了很多汉语字，读书也越来越快。我的老师是从北京来的，她教我们怎么写漂亮的字。", pinyin: "Wǒ xuéhuì le hěn duō Hànyǔ zì, dú shū yě yuè lái yuè kuài. Wǒ de lǎoshī shì cóng Běijīng lái de, tā jiāo wǒmen zěnme xiě piàoliang de zì.", english: "I have learned many Chinese characters and read books faster and faster. My teacher comes from Beijing, and she teaches us how to write pretty characters." }
   ];
 
-  // EXPANDED MASTER VOCABULARY DECK
   const masterVocabulary = [
     { id: "1", hanzi: "你好", pinyin: "nǐ hǎo", english: "hello" },
     { id: "2", hanzi: "英语", pinyin: "Yīngyǔ", english: "English language" },
@@ -614,7 +613,6 @@
     
     let options = [currentWord];
     
-    // FIXED: PULL WRONG ANSWERS FROM ENTIRE MASTER DICTIONARY SO YOU ALWAYS GET 4 OPTIONS
     while(options.length < 4 && options.length < masterVocabulary.length) {
       let rand = masterVocabulary[Math.floor(Math.random() * masterVocabulary.length)];
       if(!options.some(opt => opt.id === rand.id)) {
@@ -781,7 +779,10 @@
     sortedVocab.forEach((word) => {
       let targetToReplace = (paragraphDisplayMode === 'pinyin') ? word.pinyin : word.hanzi;
       
-      if (rendered.includes(targetToReplace)) {
+      const escapedTarget = escapeRegExp(targetToReplace);
+      const regex = new RegExp("(?<![a-zA-Z\u4e00-\u9fa5])" + escapedTarget + "(?![a-zA-Z\u4e00-\u9fa5])(?![^<]*>|[^<>]*</)", "gi");
+
+      if (regex.test(rendered)) {
         const isCurrent = currentWord && currentWord.id === word.id;
         const mastered = isMastered(word.id);
 
@@ -790,9 +791,9 @@
         else if (mastered) className += "hl-learned";
         else className += "hl-unlearned";
 
-        const spanHtml = `<span class="${className}" onclick="jumpOrAddWord('${word.id}')">${targetToReplace}</span>`;
-        const regex = new RegExp(escapeRegExp(targetToReplace) + "(?![^<]*>|[^<>]*</)", "g");
-        rendered = rendered.replace(regex, spanHtml);
+        rendered = rendered.replace(regex, (match) => {
+          return `<span class="${className}" onclick="jumpOrAddWord('${word.id}')">${match}</span>`;
+        });
       }
     });
 
