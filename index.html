@@ -1,442 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Survival & HSK Chinese Study Tool</title>
-  <style>
-    :root {
-      --bg: #121212;
-      --card: #1e1e1e;
-      --text: #e5e7eb;
-      --subtext: #9ca3af;
-      --primary: #3b82f6;
-      --primary-hover: #2563eb;
-      --success: #10b981;
-      --error: #ef4444;
-      --warning: #f59e0b;
-      --border: #374151;
-      --mastered: #8b5cf6;
-    }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
-      margin: 0;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-    }
-
-    .container {
-      width: 100%;
-      max-width: 650px;
-    }
-
-    .tab-nav {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-      width: 100%;
-    }
-
-    .tab-btn {
-      flex: 1;
-      background-color: #18181b;
-      color: var(--subtext);
-      border: 1px solid var(--border);
-      padding: 12px 16px;
-      font-size: 1rem;
-      font-weight: bold;
-      border-radius: 8px;
-      cursor: pointer;
-      text-align: center;
-      transition: all 0.2s ease;
-    }
-
-    .tab-btn:hover { background-color: #27272a; color: var(--text); }
-    .tab-btn.active-tab { background-color: var(--primary); color: #ffffff; border-color: var(--primary); }
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-
-    .card {
-      background-color: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 24px;
-      margin-bottom: 20px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-      position: relative;
-      overflow: hidden;
-    }
-
-    h1, h2, h3, h4 { color: var(--text); text-align: center; margin-top: 0; }
-
-    .controls-top {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 15px;
-      align-items: center;
-    }
-
-    .icon-btn {
-      padding: 8px 12px !important;
-      font-size: 0.9rem !important;
-      font-weight: bold;
-      background-color: var(--border);
-      color: var(--text);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      border-radius: 6px;
-      border: 1px solid var(--border);
-      cursor: pointer;
-      width: auto !important;
-    }
-
-    .icon-btn:hover { background-color: #4b5563; }
-    .icon-btn.active-mode { border: 1px solid var(--primary); background-color: #1e3a8a; }
-    
-    .btn-text { font-size: 0.85rem; padding: 8px 12px; background-color: var(--border); color: white; border: none; border-radius: 6px; cursor: pointer; flex: 1;}
-    .btn-text:hover { background-color: #4b5563; }
-    .btn-text.active-mode { border: 1px solid var(--primary); background-color: #1e3a8a; }
-
-    .paragraph-card {
-      background-color: #18181b;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 12px 16px;
-      margin-bottom: 15px;
-    }
-
-    .paragraph-title { 
-      font-size: 0.85rem; 
-      color: var(--subtext); 
-      font-weight: bold; 
-      margin-bottom: 8px; 
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .paragraph-body { font-size: 1.15rem; line-height: 1.8; color: var(--text); word-break: break-word; }
-
-    .hl-word {
-      padding: 3px 6px;
-      border-radius: 4px;
-      margin: 2px 2px;
-      transition: all 0.2s ease;
-      cursor: pointer;
-      display: inline-block;
-    }
-
-    .hl-word:hover { transform: scale(1.05); filter: brightness(1.2); }
-    .hl-current { background-color: rgba(59, 130, 246, 0.3); border: 1.5px solid var(--primary); color: #93c5fd; font-weight: bold; }
-    .hl-learned { background-color: rgba(16, 185, 129, 0.2); border: 1px solid var(--success); color: #6ee7b7; }
-    .hl-unlearned { background-color: rgba(255, 255, 255, 0.05); border: 1px dashed var(--border); }
-
-    .prompt-wrapper {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      margin: 15px 0 15px 0;
-      min-height: 80px;
-    }
-
-    .prompt-box {
-      font-size: 2.2rem;
-      font-weight: bold;
-      text-align: center;
-      color: #ffffff;
-      margin: 0;
-    }
-
-    .audio-inline-btn {
-      width: auto !important;
-      padding: 8px 16px !important;
-      background-color: var(--primary) !important;
-      font-size: 0.95rem !important;
-      border-radius: 6px;
-      border: none;
-      color: white;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    .options-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 15px;
-    }
-
-    button {
-      background-color: var(--border);
-      color: #ffffff;
-      border: none;
-      padding: 14px 16px;
-      font-size: 1rem;
-      font-weight: bold;
-      border-radius: 6px;
-      cursor: pointer;
-      width: 100%;
-      transition: all 0.15s ease;
-    }
-
-    button:hover { background-color: #4b5563; }
-    button.correct { background-color: var(--success) !important; }
-    button.wrong { background-color: var(--error) !important; }
-
-    .mastered-badge {
-      font-size: 0.75rem;
-      background-color: var(--mastered);
-      color: white;
-      padding: 2px 6px;
-      border-radius: 4px;
-      vertical-align: middle;
-      margin-left: 8px;
-    }
-
-    details {
-      background-color: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 12px 16px;
-      margin-top: 10px;
-    }
-
-    summary { font-weight: bold; cursor: pointer; color: var(--text); }
-
-    textarea {
-      width: 100%;
-      height: 90px;
-      margin-top: 10px;
-      background-color: var(--bg);
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 8px;
-      box-sizing: border-box;
-      font-family: inherit;
-    }
-
-    .difficulty-group { margin-top: 15px; }
-    .difficulty-title {
-      font-size: 0.9rem;
-      font-weight: bold;
-      padding: 4px 8px;
-      border-radius: 4px;
-      display: inline-block;
-      margin-bottom: 8px;
-    }
-
-    .diff-easy { background-color: rgba(16, 185, 129, 0.2); color: var(--success); }
-    .diff-medium { background-color: rgba(245, 158, 11, 0.2); color: var(--warning); }
-    .diff-hard { background-color: rgba(239, 68, 68, 0.2); color: var(--error); }
-
-    .sample-texts-list { display: flex; flex-direction: column; gap: 12px; }
-
-    .sample-card {
-      background-color: #18181b;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .sample-header { display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem; font-weight: bold; }
-    .sample-actions { display: flex; gap: 8px; }
-    .sample-btn-action { font-size: 0.8rem !important; padding: 6px 10px !important; width: auto !important; background-color: var(--border) !important; }
-    .sample-text-content { font-size: 0.95rem; color: var(--subtext); line-height: 1.5; }
-    .sample-translation {
-      display: none;
-      font-size: 0.9rem;
-      color: #60a5fa;
-      background-color: #121212;
-      padding: 8px 10px;
-      border-radius: 4px;
-      border-left: 3px solid var(--primary);
-    }
-
-    .history-list { list-style-type: none; padding: 0; margin-top: 10px; max-height: 150px; overflow-y: auto; }
-    .history-item { padding: 8px; border-bottom: 1px solid var(--border); cursor: pointer; font-size: 0.9rem; color: var(--subtext); }
-    .history-item:hover { background-color: var(--border); color: var(--text); }
-
-    .sync-section { margin-top: 15px; border-top: 1px solid var(--border); padding-top: 15px; }
-    .sync-btn-group { display: flex; gap: 10px; margin-top: 10px; }
-
-    /* Builder Specific */
-    .builder-grammar-hint {
-      background-color: #18181b;
-      border-left: 4px solid var(--warning);
-      padding: 10px;
-      font-size: 0.85rem;
-      color: var(--warning);
-      border-radius: 4px;
-      margin-bottom: 15px;
-      text-align: center;
-    }
-
-    .builder-target-english {
-      font-size: 1.2rem;
-      font-weight: bold;
-      color: #ffffff;
-      text-align: center;
-      margin-bottom: 15px;
-      padding: 10px;
-      background-color: #18181b;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-    }
-
-    .builder-workspace {
-      min-height: 70px;
-      background-color: #121212;
-      border: 2px dashed var(--border);
-      border-radius: 8px;
-      padding: 10px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .builder-tile-bank {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-      margin-bottom: 20px;
-    }
-
-    .tile-btn {
-      background-color: #27272a;
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 10px 14px;
-      border-radius: 8px;
-      cursor: pointer;
-      width: auto !important;
-      display: inline-flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 2px;
-    }
-
-    .tile-btn:hover { border-color: var(--primary); }
-    .tile-pinyin-main { font-size: 1.1rem; font-weight: bold; color: #60a5fa; }
-    .tile-hanzi-sub { font-size: 1rem; color: #e5e7eb; }
-    .faded-pinyin { color: #4b5563; font-style: italic; font-size: 0.8rem; text-decoration: line-through; }
-    
-    .builder-feedback { text-align: center; font-weight: bold; min-height: 24px; margin-bottom: 15px; }
-
-    .controls-bottom { display: flex; gap: 12px; margin-top: 15px; border-top: 1px solid var(--border); padding-top: 15px; }
-    .debug-tags { font-size: 0.75rem; color: var(--subtext); text-align: center; margin-top: 10px; }
-  </style>
-</head>
-<body>
-
-<div class="container">
-  <h1>Survival & HSK Chinese Study Tool</h1>
-
-  <div class="tab-nav">
-    <button class="tab-btn active-tab" onclick="switchTab('flashcardTab')">🎴 Flashcards & Texts</button>
-    <button class="tab-btn" onclick="switchTab('builderTab')">🧱 Sentence Builder</button>
-  </div>
-
-  <!-- TAB 1: FLASHCARDS & TEXTS -->
-  <div id="flashcardTab" class="tab-content active">
-    <div class="card">
-      <div class="controls-top">
-        <button onclick="toggleAudioOnly()" id="audioOnlyBtn" class="btn-text">🎧 Blind Mode</button>
-        <button onclick="toggleMode()" id="modeBtn" class="btn-text">Pinyin/Hanzi ➔ English</button>
-      </div>
-
-      <!-- Active Text Tracker -->
-      <div class="paragraph-card" id="paragraphBox" style="display:none;">
-        <div class="paragraph-title">
-          <span>📜 Active Story Progress:</span>
-          <button onclick="cycleParagraphDisplayMode()" id="displayModeBtn" class="icon-btn">顯示: 漢 Hanzi</button>
-        </div>
-        <div class="paragraph-body" id="paragraphDisplay"></div>
-      </div>
-
-      <div class="prompt-wrapper">
-        <div class="prompt-box" id="promptDisplay">...</div>
-        <button onclick="playAudio()" class="audio-inline-btn" id="audioBtn">🔊 Replay Audio</button>
-      </div>
-
-      <div class="options-grid" id="optionsGrid"></div>
-
-      <div class="controls-bottom">
-        <button onclick="navigateVocab(-1)">⬅️ Prev</button>
-        <button onclick="navigateVocab(1)" style="background-color: var(--primary);">Next ➡️</button>
-      </div>
-    </div>
-
-    <!-- Custom Text Parser & Sample Stories Section -->
-    <details open>
-      <summary>Custom Text Parser & Tiered Practice Stories</summary>
-      
-      <h3>Parse Custom Text (Pinyin or Hanzi)</h3>
-      <textarea id="customTextInput" placeholder="Paste Chinese text or Pinyin here (e.g. 'Jīntiān zhōngwǔ wǒ xiǎng qù fàndiàn...')..."></textarea>
-      <button onclick="parseCustomText()" style="margin-top: 8px;">Filter & Practice Custom Words</button>
-
-      <h3 style="margin-top: 20px;">Leveled Sample Stories</h3>
-      <div id="sampleTextsContainer"></div>
-
-      <h3 style="margin-top: 20px;">Text History</h3>
-      <ul class="history-list" id="historyList"></ul>
-
-      <div class="sync-section">
-        <h4>Sync Data Between Devices</h4>
-        <div class="sync-btn-group">
-          <button type="button" onclick="exportData()">Export Progress (JSON)</button>
-          <button type="button" onclick="document.getElementById('importFile').click()">Import Progress (JSON)</button>
-        </div>
-        <input type="file" id="importFile" style="display: none;" onchange="importData(event)" accept=".json" />
-      </div>
-    </details>
-  </div>
-
-  <!-- TAB 2: SENTENCE BUILDER -->
-  <div id="builderTab" class="tab-content">
-    <div class="card">
-      <h2>Active Sentence Builder</h2>
-      <div style="text-align: center; font-size: 0.85rem; color: var(--subtext); margin-bottom: 15px;">
-        🗣️ Assemble the sentence. Words mastered in Flashcards will have Pinyin hidden!
-      </div>
-
-      <div class="builder-grammar-hint" id="builderGrammarHint">Pattern...</div>
-      <div class="builder-target-english" id="builderTargetEnglish">"..."</div>
-
-      <div class="builder-workspace" id="builderWorkspace">
-        <span style="color: var(--subtext); font-size: 0.9rem;" id="workspacePlaceholder">Click tiles below...</span>
-      </div>
-
-      <div class="builder-feedback" id="builderFeedback"></div>
-      <div class="builder-tile-bank" id="builderTileBank"></div>
-
-      <div class="controls-bottom">
-        <button onclick="clearBuilderWorkspace()" style="background-color: #374151;">🔄 Clear</button>
-        <button onclick="checkBuilderAnswer()" style="background-color: var(--success);">✅ Check</button>
-        <button onclick="loadNextBuilderPuzzle()" style="background-color: var(--primary);">Next ➡️</button>
-      </div>
-      <div class="debug-tags" id="debugTagsDisplay"></div>
-    </div>
-  </div>
-
-</div>
-
 <script>
   function normalizePinyin(p) {
     return p.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z]/g, "");
@@ -466,14 +27,12 @@
     { id: "easy4", level: "easy", title: "4. Cat & Table", hanzi: "桌子上有一只猫。它很小，很漂亮。", pinyin: "Zhuōzi shàng yǒu yì zhī māo. Tā hěn xiǎo, hěn piàoliang.", english: "There is a cat on the table. It is very small and very pretty." },
     { id: "easy5", level: "easy", title: "5. Seeing Friends", hanzi: "今天是我生日。我和三个朋友去吃米饭。", pinyin: "Jīntiān shì wǒ shēngrì. Wǒ hé sān gè péngyou qù chī mǐfàn.", english: "Today is my birthday. My three friends and I are going to eat rice." },
     { id: "easy6", level: "easy", title: "6. Sleep & Home", hanzi: "现在十点了。我很想去睡觉，回家里。", pinyin: "Xiànzài shí diǎn le. Wǒ hěn xiǎng qù shuìjiào, huí jiālǐ.", english: "It is 10 o'clock now. I really want to go to sleep and go back home." },
-
     { id: "med1", level: "medium", title: "1. Lunch & Taxi to Shop", hanzi: "今天中午我和朋友去饭店吃米饭，喝热茶。下午三点我们坐出租车去商店买东西。我很高兴！", pinyin: "Jīntiān zhōngwǔ wǒ hé péngyou qù fàndiàn chī mǐfàn, hē rè chá. Xiàwǔ sān diǎn wǒmen zuò chūzūchē qù shāngdiàn mǎi dōngxi. Wǒ hěn gāoxìng!", english: "Today at noon, my friend and I went to a restaurant to eat rice and drink hot tea. At 3 PM, we took a taxi to the store to buy things. I am very happy!" },
     { id: "med2", level: "medium", title: "2. School & Meeting Teacher", hanzi: "今天天气不冷，我和同学在学校看见了老师。我们都很高兴，请老师喝茶。", pinyin: "Jīntiān tiānqì bù lěng, wǒ hé tóngxué zài xuéxiào kànjiàn le lǎoshī. Wǒmen dōu hěn gāoxìng, qǐng lǎoshī hē chá.", english: "The weather today is not cold. My classmate and I saw the teacher at school. We were all very happy and invited the teacher to drink tea." },
     { id: "med3", level: "medium", title: "3. Hospital Visit & Movie", hanzi: "妈妈在家里做菜，我和爸爸在看电视。今天下午我们要去医院看朋友，晚上看电影。", pinyin: "Māma zài jiālǐ zuò cài, wǒ hé bàba zài kàn diànshì. Jīntiān xiàwǔ wǒmen yào qù yīyuàn kàn péngyou, wǎnshang kàn diànyǐng.", english: "Mom is cooking at home, while dad and I are watching TV. This afternoon we are going to the hospital to see a friend, and tonight we will watch a movie." },
     { id: "med4", level: "medium", title: "4. Calling Classmates", hanzi: "昨天我没去学校。我和同学打电话说汉语，他说今天老师教了很多字。", pinyin: "Zuótiān wǒ méi qù xuéxiào. Wǒ hé tóngxué dǎ diànhuà shuō Hànyǔ, tā shuō jīntiān lǎoshī jiāo le hěn duō zì.", english: "I didn't go to school yesterday. I called my classmate to speak Chinese; he said the teacher taught a lot of characters today." },
     { id: "med5", level: "medium", title: "5. Working on Computer", hanzi: "我在电脑上工作。儿子在桌子上面看书，女儿在听音乐。", pinyin: "Wǒ zài diànnǎo shàng gōngzuò. Érzi zài zhuōzi shàngmiàn kàn shū, nǚ'ér zài tīng yīnyuè.", english: "I am working on the computer. My son is reading a book at the table, and my daughter is listening to music." },
     { id: "med6", level: "medium", title: "6. Cold Weather & Clothes", hanzi: "北京的天气很冷，下雨了。我们要去商店买新的衣服和杯子。", pinyin: "Běijīng de tiānqì hěn lěng, xiàyǔ le. Wǒmen yào qù shāngdiàn mǎi xīn de yīfu hé bēizi.", english: "The weather in Beijing is very cold and it rained. We need to go to the store to buy new clothes and cups." },
-
     { id: "hard1", level: "hard", title: "1. Shopping Prices & Books", hanzi: "现在四点半，我和女儿去商店买苹果和水果。这个苹果太大了，一个五块钱。我买了一本书，三块钱。", pinyin: "Xiànzài sì diǎn bàn, wǒ hé nǚ'ér qù shāngdiàn mǎi píngguǒ hé shuǐguǒ. Zhè gè píngguǒ tài dà le, yí gè wǔ kuài qián. Wǒ mǎi le yì běn shū, sān kuài qián.", english: "It is 4:30 now. My daughter and I went to the store to buy apples and fruit. This apple is too big, one costs 5 yuan. I bought a book for 3 yuan." },
     { id: "hard2", level: "hard", title: "2. Work, Travel & Flights", hanzi: "我儿子是医生，在医院工作。他明天下午坐飞机去北京。北京的天气很冷，他要买衣服。", pinyin: "Wǒ érzi shì yīshēng, zài yīyuàn gōngzuò. Tā míngtiān xiàwǔ zuò fēijī qù Běijīng. Běijīng de tiānqì hěn lěng, tā yào mǎi yīfu.", english: "My son is a doctor working in a hospital. He will take a plane to Beijing tomorrow afternoon. The weather in Beijing is very cold, so he needs to buy clothes." },
     { id: "hard3", level: "hard", title: "3. Weekend Routine & Calls", hanzi: "昨天下雨了，我没去学校。我和老朋友打电话说汉语，他说我写的字很漂亮。明天星期六，我们要在饭店吃菜。", pinyin: "Zuótiān xiàyǔ le, wǒ méi qù xuéxiào. Wǒ hé lǎo péngyou dǎ diànhuà shuō Hànyǔ, tā shuō wǒ xiě de zì hěn piàoliang. Míngtiān xīngqīliù, wǒmen yào zài fàndiàn chī cài.", english: "It rained yesterday, so I didn't go to school. I made a phone call to an old friend in Chinese; he said the characters I write are very pretty. Tomorrow is Saturday, and we will eat dishes at a restaurant." },
@@ -482,7 +41,7 @@
     { id: "hard6", level: "hard", title: "6. Learning Progress & Books", hanzi: "我学会了很多汉语字，读书也越来越快。我的老师是从北京来的，她教我们怎么写漂亮的字。", pinyin: "Wǒ xuéhuì le hěn duō Hànyǔ zì, dú shū yě yuè lái yuè kuài. Wǒ de lǎoshī shì cóng Běijīng lái de, tā jiāo wǒmen zěnme xiě piàoliang de zì.", english: "I have learned many Chinese characters and read books faster and faster. My teacher comes from Beijing, and she teaches us how to write pretty characters." }
   ];
 
-  const masterVocabulary = [
+  let masterVocabulary = [
     { id: "1", hanzi: "你好", pinyin: "nǐ hǎo", english: "hello" },
     { id: "2", hanzi: "英语", pinyin: "Yīngyǔ", english: "English language" },
     { id: "3", hanzi: "老师", pinyin: "lǎoshī", english: "teacher" },
@@ -528,7 +87,8 @@
     { id: "43", hanzi: "九岁", pinyin: "jiǔ suì", english: "nine years old" },
     { id: "44", hanzi: "天气", pinyin: "tiānqì", english: "weather" },
     { id: "45", hanzi: "热", pinyin: "rè", english: "hot" },
-    { id: "46", hanzi: "喝", pinyin: "hē", english: "to drink" }
+    { id: "46", hanzi: "喝", pinyin: "hē", english: "to drink" },
+    { id: "47", hanzi: "不", pinyin: "bù", english: "not / no" }
   ];
 
   let activeVocab = [...masterVocabulary];
@@ -541,6 +101,29 @@
   let paragraphDisplayMode = 'hanzi';
 
   const MASTER_THRESHOLD = 3;
+
+  function autoExtractTextVocabulary(hanziText, pinyinText) {
+    let cleanHanzi = hanziText.replace(/[^\u4e00-\u9fa5]/g, '');
+    let pinyinTokens = pinyinText.replace(/[^\w\s\u0300-\u036f']/g, '').split(/\s+/).filter(Boolean);
+
+    let charIndex = 0;
+    pinyinTokens.forEach((pToken, idx) => {
+      let hChar = cleanHanzi[idx] || cleanHanzi[charIndex];
+      charIndex++;
+      if (!hChar) return;
+
+      let existsInMaster = masterVocabulary.some(w => w.hanzi === hChar || normalizePinyin(w.pinyin) === normalizePinyin(pToken));
+      if (!existsInMaster) {
+        let newEntry = {
+          id: "dyn_" + Date.now() + "_" + Math.random().toString(36).substr(2, 4),
+          hanzi: hChar,
+          pinyin: pToken.toLowerCase(),
+          english: `[${pToken}] ${hChar}`
+        };
+        masterVocabulary.push(newEntry);
+      }
+    });
+  }
 
   function getWordSRS(wordId) {
     const data = JSON.parse(localStorage.getItem('survival_srs') || '{}');
@@ -726,6 +309,8 @@
       activeSampleObj = { hanzi: text, pinyin: text, english: text };
     }
 
+    autoExtractTextVocabulary(activeSampleObj.hanzi, activeSampleObj.pinyin);
+
     const matched = masterVocabulary.filter(item => {
       return text.includes(item.hanzi) || normalizePinyin(text).includes(normalizePinyin(item.pinyin));
     });
@@ -735,8 +320,6 @@
       currentVocabIndex = 0;
       saveTextHistory(text);
       loadQuestion();
-    } else {
-      alert("No matching vocabulary found in the provided text.");
     }
   }
 
@@ -922,7 +505,7 @@
         { id: "18", hanzi: "在", pinyin: "zài" },
         { id: "11", hanzi: "酒吧", pinyin: "jiǔbā" },
         { id: "15", hanzi: "想", pinyin: "xiǎng" },
-        { id: "x3", hanzi: "喝", pinyin: "hē" },
+        { id: "46", hanzi: "喝", pinyin: "hē" },
         { id: "21", hanzi: "冰", pinyin: "bīng" },
         { id: "12", hanzi: "啤酒", pinyin: "píjiǔ" }
       ],
@@ -1078,6 +661,3 @@
     loadQuestion();
   });
 </script>
-
-</body>
-</html>
