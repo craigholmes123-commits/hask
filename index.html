@@ -1,3 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Survival & HSK Chinese Study Tool</title>
+  <style>
+    :root {
+      --bg: #121212;
+      --card: #1e1e1e;
+      --text: #e5e7eb;
+      --subtext: #9ca3af;
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --success: #10b981;
+      --error: #ef4444;
+      --warning: #f59e0b;
+      --border: #374151;
+      --mastered: #8b5cf6;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 650px;
+    }
+
+    .tab-nav {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      width: 100%;
+    }
+
+    .tab-btn {
+      flex: 1;
+      background-color: #18181b;
+      color: var(--subtext);
+      border: 1px solid var(--border);
+      padding: 12px 16px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn:hover { background-color: #27272a; color: var(--text); }
+    .tab-btn.active-tab { background-color: var(--primary); color: #ffffff; border-color: var(--primary); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .card {
+      background-color: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      position: relative;
+      overflow: hidden;
+    }
+
+    h1, h2, h3, h4 { color: var(--text); text-align: center; margin-top: 0; }
+
+    .controls-top {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 15px;
+      align-items: center;
+    }
+
+    .icon-btn {
+      padding: 8px 12px !important;
+      font-size: 0.9rem !important;
+      font-weight: bold;
+      background-color: var(--border);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      width: auto !important;
+    }
+
+    .icon-btn:hover { background-color: #4b5563; }
+    .icon-btn.active-mode { border: 1px solid var(--primary); background-color: #1e3a8a; }
+    
+    .btn-text { font-size: 0.85rem; padding: 8px 12px; background-color: var(--border); color: white; border: none; border-radius: 6px; cursor: pointer; flex: 1;}
+    .btn-text:hover { background-color: #4b5563; }
+    .btn-text.active-mode { border: 1px solid var(--primary); background-color: #1e3a8a; }
+
+    .paragraph-card {
+      background-color: #18181b;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 15px;
+    }
+
+    .paragraph-title { 
+      font-size: 0.85rem; 
+      color: var(--subtext); 
+      font-weight: bold; 
+      margin-bottom: 8px; 
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .paragraph-body { font-size: 1.15rem; line-height: 1.8; color: var(--text); word-break: break-word; }
+
+    .hl-word {
+      padding: 3px 6px;
+      border-radius: 4px;
+      margin: 2px 2px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      display: inline-block;
+    }
+
+    .hl-word:hover { transform: scale(1.05); filter: brightness(1.2); }
+    .hl-current { background-color: rgba(59, 130, 246, 0.3); border: 1.5px solid var(--primary); color: #93c5fd; font-weight: bold; }
+    .hl-learned { background-color: rgba(16, 185, 129, 0.2); border: 1px solid var(--success); color: #6ee7b7; }
+    .hl-unlearned { background-color: rgba(255, 255, 255, 0.05); border: 1px dashed var(--border); }
+
+    .prompt-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin: 15px 0 15px 0;
+      min-height: 80px;
+    }
+
+    .prompt-box {
+      font-size: 2.2rem;
+      font-weight: bold;
+      text-align: center;
+      color: #ffffff;
+      margin: 0;
+    }
+
+    .audio-inline-btn {
+      width: auto !important;
+      padding: 8px 16px !important;
+      background-color: var(--primary) !important;
+      font-size: 0.95rem !important;
+      border-radius: 6px;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 15px;
+    }
+
+    button {
+      background-color: var(--border);
+      color: #ffffff;
+      border: none;
+      padding: 14px 16px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+      transition: all 0.15s ease;
+    }
+
+    button:hover { background-color: #4b5563; }
+    button.correct { background-color: var(--success) !important; }
+    button.wrong { background-color: var(--error) !important; }
+
+    .mastered-badge {
+      font-size: 0.75rem;
+      background-color: var(--mastered);
+      color: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+      vertical-align: middle;
+      margin-left: 8px;
+    }
+
+    details {
+      background-color: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-top: 10px;
+    }
+
+    summary { font-weight: bold; cursor: pointer; color: var(--text); }
+
+    textarea {
+      width: 100%;
+      height: 90px;
+      margin-top: 10px;
+      background-color: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px;
+      box-sizing: border-box;
+      font-family: inherit;
+    }
+
+    .difficulty-group { margin-top: 15px; }
+    .difficulty-title {
+      font-size: 0.9rem;
+      font-weight: bold;
+      padding: 4px 8px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+
+    .diff-easy { background-color: rgba(16, 185, 129, 0.2); color: var(--success); }
+    .diff-medium { background-color: rgba(245, 158, 11, 0.2); color: var(--warning); }
+    .diff-hard { background-color: rgba(239, 68, 68, 0.2); color: var(--error); }
+
+    .sample-texts-list { display: flex; flex-direction: column; gap: 12px; }
+
+    .sample-card {
+      background-color: #18181b;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .sample-header { display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem; font-weight: bold; }
+    .sample-actions { display: flex; gap: 8px; }
+    .sample-btn-action { font-size: 0.8rem !important; padding: 6px 10px !important; width: auto !important; background-color: var(--border) !important; }
+    .sample-text-content { font-size: 0.95rem; color: var(--subtext); line-height: 1.5; }
+    .sample-translation {
+      display: none;
+      font-size: 0.9rem;
+      color: #60a5fa;
+      background-color: #121212;
+      padding: 8px 10px;
+      border-radius: 4px;
+      border-left: 3px solid var(--primary);
+    }
+
+    .history-list { list-style-type: none; padding: 0; margin-top: 10px; max-height: 150px; overflow-y: auto; }
+    .history-item { padding: 8px; border-bottom: 1px solid var(--border); cursor: pointer; font-size: 0.9rem; color: var(--subtext); }
+    .history-item:hover { background-color: var(--border); color: var(--text); }
+
+    .sync-section { margin-top: 15px; border-top: 1px solid var(--border); padding-top: 15px; }
+    .sync-btn-group { display: flex; gap: 10px; margin-top: 10px; }
+
+    /* Builder Specific */
+    .builder-grammar-hint {
+      background-color: #18181b;
+      border-left: 4px solid var(--warning);
+      padding: 10px;
+      font-size: 0.85rem;
+      color: var(--warning);
+      border-radius: 4px;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    .builder-target-english {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #ffffff;
+      text-align: center;
+      margin-bottom: 15px;
+      padding: 10px;
+      background-color: #18181b;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .builder-workspace {
+      min-height: 70px;
+      background-color: #121212;
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .builder-tile-bank {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .tile-btn {
+      background-color: #27272a;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      width: auto !important;
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .tile-btn:hover { border-color: var(--primary); }
+    .tile-pinyin-main { font-size: 1.1rem; font-weight: bold; color: #60a5fa; }
+    .tile-hanzi-sub { font-size: 1rem; color: #e5e7eb; }
+    .faded-pinyin { color: #4b5563; font-style: italic; font-size: 0.8rem; text-decoration: line-through; }
+    
+    .builder-feedback { text-align: center; font-weight: bold; min-height: 24px; margin-bottom: 15px; }
+
+    .controls-bottom { display: flex; gap: 12px; margin-top: 15px; border-top: 1px solid var(--border); padding-top: 15px; }
+    .debug-tags { font-size: 0.75rem; color: var(--subtext); text-align: center; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Survival & HSK Chinese Study Tool</h1>
+
+  <div class="tab-nav">
+    <button class="tab-btn active-tab" onclick="switchTab('flashcardTab')">🎴 Flashcards & Texts</button>
+    <button class="tab-btn" onclick="switchTab('builderTab')">🧱 Sentence Builder</button>
+  </div>
+
+  <!-- TAB 1: FLASHCARDS & TEXTS -->
+  <div id="flashcardTab" class="tab-content active">
+    <div class="card">
+      <div class="controls-top">
+        <button onclick="toggleAudioOnly()" id="audioOnlyBtn" class="btn-text">🎧 Blind Mode</button>
+        <button onclick="toggleMode()" id="modeBtn" class="btn-text">Pinyin/Hanzi ➔ English</button>
+      </div>
+
+      <!-- Active Text Tracker -->
+      <div class="paragraph-card" id="paragraphBox" style="display:none;">
+        <div class="paragraph-title">
+          <span>📜 Active Story Progress:</span>
+          <button onclick="cycleParagraphDisplayMode()" id="displayModeBtn" class="icon-btn">顯示: 漢 Hanzi</button>
+        </div>
+        <div class="paragraph-body" id="paragraphDisplay"></div>
+      </div>
+
+      <div class="prompt-wrapper">
+        <div class="prompt-box" id="promptDisplay">...</div>
+        <button onclick="playAudio()" class="audio-inline-btn" id="audioBtn">🔊 Replay Audio</button>
+      </div>
+
+      <div class="options-grid" id="optionsGrid"></div>
+
+      <div class="controls-bottom">
+        <button onclick="navigateVocab(-1)">⬅️ Prev</button>
+        <button onclick="navigateVocab(1)" style="background-color: var(--primary);">Next ➡️</button>
+      </div>
+    </div>
+
+    <!-- Custom Text Parser & Sample Stories Section -->
+    <details open>
+      <summary>Custom Text Parser & Tiered Practice Stories</summary>
+      
+      <h3>Parse Custom Text (Pinyin or Hanzi)</h3>
+      <textarea id="customTextInput" placeholder="Paste Chinese text or Pinyin here (e.g. 'Jīntiān zhōngwǔ wǒ xiǎng qù fàndiàn...')..."></textarea>
+      <button onclick="parseCustomText()" style="margin-top: 8px;">Filter & Practice Custom Words</button>
+
+      <h3 style="margin-top: 20px;">Leveled Sample Stories</h3>
+      <div id="sampleTextsContainer"></div>
+
+      <h3 style="margin-top: 20px;">Text History</h3>
+      <ul class="history-list" id="historyList"></ul>
+
+      <div class="sync-section">
+        <h4>Sync Data Between Devices</h4>
+        <div class="sync-btn-group">
+          <button type="button" onclick="exportData()">Export Progress (JSON)</button>
+          <button type="button" onclick="document.getElementById('importFile').click()">Import Progress (JSON)</button>
+        </div>
+        <input type="file" id="importFile" style="display: none;" onchange="importData(event)" accept=".json" />
+      </div>
+    </details>
+  </div>
+
+  <!-- TAB 2: SENTENCE BUILDER -->
+  <div id="builderTab" class="tab-content">
+    <div class="card">
+      <h2>Active Sentence Builder</h2>
+      <div style="text-align: center; font-size: 0.85rem; color: var(--subtext); margin-bottom: 15px;">
+        🗣️ Assemble the sentence. Words mastered in Flashcards will have Pinyin hidden!
+      </div>
+
+      <div class="builder-grammar-hint" id="builderGrammarHint">Pattern...</div>
+      <div class="builder-target-english" id="builderTargetEnglish">"..."</div>
+
+      <div class="builder-workspace" id="builderWorkspace">
+        <span style="color: var(--subtext); font-size: 0.9rem;" id="workspacePlaceholder">Click tiles below...</span>
+      </div>
+
+      <div class="builder-feedback" id="builderFeedback"></div>
+      <div class="builder-tile-bank" id="builderTileBank"></div>
+
+      <div class="controls-bottom">
+        <button onclick="clearBuilderWorkspace()" style="background-color: #374151;">🔄 Clear</button>
+        <button onclick="checkBuilderAnswer()" style="background-color: var(--success);">✅ Check</button>
+        <button onclick="loadNextBuilderPuzzle()" style="background-color: var(--primary);">Next ➡️</button>
+      </div>
+      <div class="debug-tags" id="debugTagsDisplay"></div>
+    </div>
+  </div>
+
+</div>
+
 <script>
   function normalizePinyin(p) {
     return p.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z]/g, "");
@@ -661,3 +1100,6 @@
     loadQuestion();
   });
 </script>
+
+</body>
+</html>
