@@ -1,0 +1,10 @@
+{
+  "name": "hask",
+  "private": true,
+  "description": "Hask: learn simplified Chinese with the official HSK 3.0 (2025) word lists",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "serve": "python3 -m http.server 8000",
+    "build-data": "python3 tools/build_data.py --cache tools/.cache --out data"
+  }
+}

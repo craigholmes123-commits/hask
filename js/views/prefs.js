@@ -1,0 +1,232 @@
+// Prefs: display, study, audio, backup, about.
+import { loadMeta } from "../data.js";
+import { esc } from "../pinyin.js";
+import { hasSpeech, mandarinVoices, onVoices, speak } from "../speech.js";
+import { exportJSON, importJSON, resetAll, setSetting, state } from "../state.js";
+import { h, icon, toast } from "../ui.js";
+
+function field(label, control, hint) {
+  const id = control.id;
+  const wrap = h("div.field");
+  wrap.append(h("label", { for: id, text: label }), control);
+  if (hint) wrap.append(h("p.hint-text", hint));
+  return wrap;
+}
+
+function select(id, options, value, onchange) {
+  const s = h("select", { id });
+  for (const [v, label] of options) s.append(h("option", { value: String(v), text: label }));
+  s.value = String(value);
+  s.addEventListener("change", () => onchange(s.value));
+  return s;
+}
+
+function toggle(id, label, checked, onchange, hint) {
+  const input = h("input", { type: "checkbox", id, role: "switch" });
+  input.checked = checked;
+  input.addEventListener("change", () => onchange(input.checked));
+  const row = h("label.toggle-row", { for: id });
+  row.append(h("span", h("b", label), hint ? h("small", hint) : null), input);
+  return row;
+}
+
+export async function renderPrefs(root) {
+  root.innerHTML = "";
+  const page = h("section.page.prefs");
+  root.append(page);
+  page.append(h("header.page-head", { html: `<p class="eyebrow">Settings</p><h1><span lang="zh-CN" class="h1-zh">设置</span> Prefs</h1>` }));
+  const s = state.settings;
+
+  // display
+  const display = h("section.card.form");
+  display.append(h("h2", "Display"));
+  display.append(
+    field(
+      "Show Chinese as",
+      select("pref-script", [["both", "汉字 + pīnyīn (both)"], ["hanzi", "汉字 characters only"], ["pinyin", "pīnyīn only"]], s.script, (v) => setSetting("script", v)),
+      "Same as the switch at the top. Answers always show both.",
+    ),
+  );
+  display.append(toggle("pref-tones", "Tone colours", s.toneColors, (v) => setSetting("toneColors", v), "Red, orange, green, blue, grey for tones 1–4 and neutral"));
+  display.append(field("Theme", select("pref-theme", [["auto", "Match my device"], ["light", "Light"], ["dark", "Dark"]], s.theme, (v) => setSetting("theme", v))));
+  page.append(display);
+
+  // study
+  const study = h("section.card.form");
+  study.append(h("h2", "Study"));
+  study.append(
+    field(
+      "New words per day",
+      select("pref-daily", [[5, "5 · gentle"], [10, "10 · steady (recommended)"], [15, "15"], [20, "20 · fast"], [30, "30 · intensive"]], s.dailyNew, (v) => setSetting("dailyNew", Number(v))),
+      "Each new word adds roughly 10 reviews over the following month.",
+    ),
+  );
+  study.append(field("Cards per session", select("pref-session", [[10, "10 · about 3 minutes"], [20, "20 · about 6 minutes"], [30, "30"], [50, "50"]], s.sessionSize, (v) => setSetting("sessionSize", Number(v)))));
+  study.append(
+    field(
+      "Question style",
+      select("pref-style", [["mixed", "Mixed (recommended)"], ["choice", "Multiple choice only"], ["flip", "Flashcards: grade yourself"]], s.answerStyle, (v) => setSetting("answerStyle", v)),
+      "Mixed rotates meaning, listening, reverse and tone questions, and uses self-graded cards for words you know well.",
+    ),
+  );
+  study.append(
+    field(
+      "Order within HSK levels",
+      select("pref-order", [["frequency", "Most common words first"], ["official", "Syllabus order (alphabetical by pinyin)"]], s.order, (v) => setSetting("order", v)),
+    ),
+  );
+  page.append(study);
+
+  // audio
+  const audio = h("section.card.form");
+  audio.append(h("h2", "Audio"));
+  audio.append(toggle("pref-autoplay", "Play words automatically", s.autoplay, (v) => setSetting("autoplay", v)));
+  const rate = h("input", { type: "range", id: "pref-rate", min: "0.5", max: "1.2", step: "0.05", value: String(s.rate) });
+  const rateOut = h("output", { for: "pref-rate", text: `${Math.round(s.rate * 100)}%` });
+  rate.addEventListener("input", () => (rateOut.textContent = `${Math.round(rate.value * 100)}%`));
+  rate.addEventListener("change", () => setSetting("rate", Number(rate.value)));
+  const rateField = h("div.field", h("label", { for: "pref-rate", text: "Speaking speed" }), h("div.range-row", rate, rateOut));
+  audio.append(rateField);
+  const voiceSel = h("select#pref-voice");
+  const voiceField = field("Voice", voiceSel, "Uses the Mandarin voices installed on this device.");
+  audio.append(voiceField);
+  const test = h("button.btn.ghost.small", { type: "button", html: `${icon("sound")} Test: 你好，欢迎！`, onclick: () => speak("你好，欢迎！") });
+  audio.append(test);
+  const noVoice = h("p.notice", {
+    hidden: true,
+    html: `${icon("info")} No Mandarin voice found. On iPhone/iPad: Settings → Accessibility → Spoken Content → Voices → Chinese (China). On Android: install Google Speech Services and the Chinese voice data. On Windows: Settings → Time & language → Speech → add Chinese (Simplified). Then reload this page.`,
+  });
+  audio.append(noVoice);
+  onVoices((voices) => {
+    voiceSel.innerHTML = "";
+    voiceSel.append(h("option", { value: "", text: "Best available" }));
+    for (const v of voices) voiceSel.append(h("option", { value: v.voiceURI, text: `${v.name} (${v.lang})` }));
+    voiceSel.value = s.voice && voices.some((v) => v.voiceURI === s.voice) ? s.voice : "";
+    noVoice.hidden = voices.length > 0;
+    if (!hasSpeech()) {
+      noVoice.hidden = false;
+      noVoice.innerHTML = `${icon("info")} This browser can't speak. Try Chrome, Edge or Safari.`;
+    }
+  });
+  voiceSel.addEventListener("change", () => setSetting("voice", voiceSel.value));
+  page.append(audio);
+
+  // data
+  const data = h("section.card.form");
+  data.append(h("h2", "Your progress"));
+  const syncNote = h("p.muted.small");
+  const st = state.sync.status;
+  syncNote.textContent =
+    st === "synced" || st === "syncing"
+      ? "Progress is saved on this device and synced to your Claude account, so it follows you to your other devices."
+      : "Progress is saved in this browser on this device. Use a backup to move it to another device.";
+  data.append(syncNote);
+  const row = h("div.row.wrap");
+  const exportBtn = h("button.btn.ghost", { type: "button", text: "Download backup" });
+  exportBtn.addEventListener("click", () => {
+    const json = exportJSON();
+    try {
+      const blob = new Blob([json], { type: "application/json" });
+      const a = h("a", { href: URL.createObjectURL(blob), download: `hask-progress-${new Date().toISOString().slice(0, 10)}.json` });
+      document.body.append(a);
+      a.click();
+      setTimeout(() => {
+        URL.revokeObjectURL(a.href);
+        a.remove();
+      }, 1000);
+    } catch {
+      /* fall through to the copy option */
+    }
+  });
+  const copyBtn = h("button.btn.ghost", { type: "button", text: "Copy backup" });
+  copyBtn.addEventListener("click", async () => {
+    const json = exportJSON();
+    try {
+      await navigator.clipboard.writeText(json);
+      toast("Backup copied. Paste it into a note or email to keep it.");
+    } catch {
+      area.value = json;
+      area.hidden = false;
+      area.select();
+      toast("Select all and copy the text below.");
+    }
+  });
+  const fileIn = h("input", { type: "file", id: "pref-import-file", accept: ".json,application/json", hidden: true });
+  const importBtn = h("button.btn.ghost", { type: "button", text: "Restore from file", onclick: () => fileIn.click() });
+  fileIn.addEventListener("change", async () => {
+    const f = fileIn.files[0];
+    if (!f) return;
+    try {
+      importJSON(await f.text());
+      toast("Progress restored and merged.");
+    } catch (e) {
+      toast(e.message || "That file couldn't be read.");
+    }
+    fileIn.value = "";
+  });
+  // inside the claude.ai viewer, pages can't start downloads; copying still works
+  if (window.claude) exportBtn.hidden = true;
+  row.append(exportBtn, copyBtn, importBtn, fileIn);
+  data.append(row);
+  const area = h("textarea#pref-backup-text", { rows: 4, placeholder: "Or paste a backup here and press Restore pasted text", hidden: true });
+  const pasteBtn = h("button.btn.link", { type: "button", text: "Paste a backup instead" });
+  const restorePaste = h("button.btn.ghost.small", { type: "button", text: "Restore pasted text", hidden: true });
+  pasteBtn.addEventListener("click", () => {
+    area.hidden = false;
+    restorePaste.hidden = false;
+    area.value = "";
+    area.focus();
+  });
+  restorePaste.addEventListener("click", () => {
+    try {
+      importJSON(area.value);
+      toast("Progress restored and merged.");
+      area.hidden = true;
+      restorePaste.hidden = true;
+    } catch (e) {
+      toast(e.message || "That text isn't a valid backup.");
+    }
+  });
+  data.append(pasteBtn, area, restorePaste);
+
+  const danger = h("div.danger");
+  const resetBtn = h("button.btn.danger-btn.small", { type: "button", text: "Reset all progress…" });
+  const confirmBox = h("div.confirm", { hidden: true });
+  confirmBox.innerHTML = `<p>This erases every word's progress, your streak and stats. Settings are kept. Download a backup first if you might want it back.</p>`;
+  const yes = h("button.btn.danger-btn.small", { type: "button", text: "Erase my progress" });
+  const no = h("button.btn.ghost.small", { type: "button", text: "Keep it" });
+  confirmBox.append(h("div.row", no, yes));
+  resetBtn.addEventListener("click", () => {
+    confirmBox.hidden = false;
+    resetBtn.hidden = true;
+    no.focus();
+  });
+  no.addEventListener("click", () => {
+    confirmBox.hidden = true;
+    resetBtn.hidden = false;
+  });
+  yes.addEventListener("click", () => {
+    resetAll();
+    toast("Progress erased.");
+    confirmBox.hidden = true;
+    resetBtn.hidden = false;
+  });
+  danger.append(resetBtn, confirmBox);
+  data.append(danger);
+  page.append(data);
+
+  // about
+  const meta = await loadMeta().catch(() => null);
+  const about = h("section.card.prose.about");
+  about.innerHTML = `
+    <h2>About the data</h2>
+    <ul class="credits">
+      <li><b>Word lists, levels, pinyin, parts of speech:</b> 《HSK考试大纲》 HSK examination syllabus, 中外语言交流合作中心 (Center for Language Education and Cooperation), published November 2025${meta ? `; ${meta.cumulative["7-9"].toLocaleString()} entries` : ""}. Not an official product.</li>
+      <li><b>English meanings:</b> <a href="https://www.mdbg.net/chinese/dictionary?page=cedict" target="_blank" rel="noopener">CC-CEDICT</a>${meta?.cedict ? ` (${esc(meta.cedict)})` : ""}, CC BY-SA 4.0, and <a href="https://github.com/bezlant/hsk-3-vocabulary" target="_blank" rel="noopener">HSKStory's curated HSK 3.0 glosses</a>, CC BY-SA 4.0.</li>
+      <li><b>Example sentences:</b> <a href="https://tatoeba.org" target="_blank" rel="noopener">Tatoeba</a> via manythings.org, CC BY 2.0 FR.</li>
+      <li><b>Character parts and origins:</b> <a href="https://github.com/skishore/makemeahanzi" target="_blank" rel="noopener">Make Me a Hanzi</a>, LGPL-3.0.</li>
+      <li><b>Word frequency (Top 100/200/300):</b> <a href="https://github.com/rspeer/wordfreq" target="_blank" rel="noopener">wordfreq</a> and <a href="https://github.com/hermitdave/FrequencyWords" target="_blank" rel="noopener">FrequencyWords</a> (OpenSubtitles 2018), CC BY-SA 4.0.</li>
+    </ul>
+    <p class="muted small">${meta ? `Data built ${esc(meta.built)}. ` : ""}Pronunciation uses your device's own text-to-speech voice.</p>`;
+  page.append(about);
+}

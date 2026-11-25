@@ -1,0 +1,17 @@
+{
+  "name": "Hask 汉语 · HSK 3.0 Chinese",
+  "short_name": "Hask",
+  "description": "Learn simplified Chinese with the official HSK 3.0 word lists, the most common words, spaced repetition and tone training.",
+  "start_url": "./#today",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f2f4f3",
+  "theme_color": "#f2f4f3",
+  "lang": "en",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}
