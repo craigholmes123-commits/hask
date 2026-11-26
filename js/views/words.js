@@ -5,9 +5,11 @@ import { status } from "../srs.js";
 import { getCard, setSetting, state } from "../state.js";
 import { h, icon, toast } from "../ui.js";
 import { openWord, wordRow } from "./common.js";
-import { deckStats, statsBar } from "./today.js";
+import { REALMS } from "../game.js";
+import { deckStats, statsBar } from "./stats.js";
 
 let lastQuery = "";
+const realmFor = (deckId) => REALMS.find((r) => r.deck === deckId);
 
 export async function renderWords(root, nav) {
   root.innerHTML = "";
@@ -15,7 +17,8 @@ export async function renderWords(root, nav) {
   root.append(page);
   page.append(
     h("header.page-head", {
-      html: `<p class="eyebrow">HSK 3.0 · 2025 syllabus</p><h1><span lang="zh-CN" class="h1-zh">词汇</span> Words</h1>`,
+      html: `<p class="eyebrow">藏经阁 · Library Pavilion</p><h1><span lang="zh-CN" class="h1-zh calli">藏经阁</span> Library</h1>
+        <p class="lede">Every scripture of the sect: the most common words, and the official HSK 3.0 word lists that carry you through the realms.</p>`,
     }),
   );
 
@@ -85,9 +88,9 @@ export async function renderWords(root, nav) {
 
   const meta = await loadMeta().catch(() => null);
   const groups = [
-    ["Most common words", "Ranked by how often they occur in conversation (film and TV subtitles) and everyday writing.", DECKS.filter((d) => d.kind === "top")],
+    ["Common scriptures · 常用经", "The most common words, ranked by how often they occur in conversation (film and TV subtitles) and everyday writing. The Top 100 is the scripture of Qi Refining.", DECKS.filter((d) => d.kind === "top")],
     [
-      "HSK 3.0 levels",
+      "Realm scriptures · HSK 3.0",
       `From the official HSK syllabus (中外语言交流合作中心, Nov 2025), used for exams since July 2026. ${meta ? meta.cumulative["6"].toLocaleString() + " words by HSK 6, " + meta.cumulative["7-9"].toLocaleString() + " by HSK 9." : ""}`,
       DECKS.filter((d) => d.kind === "hsk"),
     ],
@@ -101,8 +104,8 @@ export async function renderWords(root, nav) {
       const count = d.kind === "top" ? d.n : meta ? meta.counts[d.level] : "";
       cardEl.innerHTML = `
         <span class="deck-hz" lang="zh-CN">${esc(d.hz)}</span>
-        <span class="dc-name">${esc(d.name)} ${state.settings.deck === d.id ? '<span class="tag tag-active">Studying</span>' : ""}</span>
-        <span class="dc-sub">${count ? count.toLocaleString() + (d.kind === "hsk" && d.level !== "1" ? " new words" : " words") : ""}</span>
+        <span class="dc-name">${esc(d.name)} ${state.settings.deck === d.id ? '<span class="tag tag-active">Cultivating</span>' : ""}</span>
+        <span class="dc-sub">${realmFor(d.id) ? `<span lang="zh-CN">${esc(realmFor(d.id).zh)}</span> · ` : ""}${count ? count.toLocaleString() + (d.kind === "hsk" && d.level !== "1" ? " new words" : " words") : ""}</span>
         <span class="dc-bar"></span>`;
       grid.append(cardEl);
       deckStats(d.id)
@@ -118,9 +121,9 @@ export async function renderWords(root, nav) {
 
 const FILTERS = [
   ["all", "All"],
-  ["new", "New"],
-  ["learning", "In progress"],
-  ["known", "Known"],
+  ["new", "Unread"],
+  ["learning", "Comprehending"],
+  ["known", "Mastered"],
 ];
 
 export async function renderDeck(root, deckId, nav) {
@@ -131,9 +134,9 @@ export async function renderDeck(root, deckId, nav) {
   const meta = await loadMeta().catch(() => null);
   const cov = meta?.coverage?.[deck.id];
   page.append(
-    h("a.back", { href: "#words", html: `${icon("left")} Words` }),
+    h("a.back", { href: "#library", html: `${icon("left")} Library` }),
     h("header.page-head", {
-      html: `<p class="eyebrow">${deck.kind === "top" ? "Most common words" : "HSK 3.0 · official syllabus"}</p>
+      html: `<p class="eyebrow">${realmFor(deck.id) ? `<span lang="zh-CN">${esc(realmFor(deck.id).zh)}</span> scripture · ${esc(realmFor(deck.id).name)}` : deck.kind === "top" ? "Common scripture" : "HSK 3.0 · official syllabus"}</p>
         <h1><span lang="zh-CN" class="h1-zh">${esc(deck.hz)}</span> ${esc(deck.name)}</h1>
         <p class="lede">${esc(deck.blurb)}.${cov ? ` ${deck.kind === "top" ? "These words" : "All words up to this level"} make up about <b>${Math.round(cov)}%</b> of the words in everyday Chinese text.` : ""}</p>`,
     }),
@@ -142,16 +145,18 @@ export async function renderDeck(root, deckId, nav) {
   const setStudy = () => {
     const active = state.settings.deck === deck.id;
     studyBtn.className = `btn ${active ? "ghost" : "primary"}`;
-    studyBtn.innerHTML = active ? `${icon("check")} Studying this deck` : `Study this deck`;
+    studyBtn.innerHTML = active ? `${icon("check")} Cultivating this scripture` : `Cultivate this scripture`;
   };
   setStudy();
   studyBtn.addEventListener("click", () => {
     setSetting("deck", deck.id);
     setStudy();
     toast(`New words will now come from ${deck.name}`);
+    const r = realmFor(deck.id);
+    if (r && r !== REALMS[state.game.realm]) toast(`Note: your realm, ${REALMS[state.game.realm].name}, is comprehended through ${REALMS[state.game.realm].scripture}`);
   });
   const statBox = h("div.card.deck-progress");
-  page.append(h("div.row.wrap", studyBtn, h("a.btn.ghost", { href: "#study", text: "Start a session" })), statBox);
+  page.append(h("div.row.wrap", studyBtn, h("a.btn.ghost", { href: "#study", text: "Cultivate now" })), statBox);
 
   const controls = h("div.list-controls");
   const chips = h("div.seg", { role: "tablist", "aria-label": "Filter words" });
@@ -222,7 +227,7 @@ export async function renderDeck(root, deckId, nav) {
     }
     shown += next.length;
     moreBox.innerHTML = "";
-    if (!items.length) listBox.append(h("p.muted.pad", "No words here yet."));
+    if (!items.length) listBox.append(h("p.muted.pad", "No scriptures here yet."));
     if (shown < items.length) {
       moreBox.append(h("button.btn.ghost", { type: "button", text: `Show more (${(items.length - shown).toLocaleString()} left)`, onclick: more }));
     }

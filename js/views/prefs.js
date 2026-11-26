@@ -39,7 +39,7 @@ export async function renderPrefs(root) {
   root.innerHTML = "";
   const page = h("section.page.prefs");
   root.append(page);
-  page.append(h("header.page-head", { html: `<p class="eyebrow">Settings</p><h1><span lang="zh-CN" class="h1-zh">设置</span> Prefs</h1>` }));
+  page.append(h("header.page-head", { html: `<a class="back" href="#sect">${icon("left")} Sect</a><p class="eyebrow">宗门大殿 · Sect Hall</p><h1><span lang="zh-CN" class="h1-zh calli">大殿</span> Sect Hall</h1><p class="lede">Settings for sound, display, your study pace and your records.</p>` }));
   const s = state.settings;
 
   // audio
@@ -124,7 +124,6 @@ export async function renderPrefs(root) {
     ),
   );
   display.append(toggle("pref-tones", "Tone colours", s.toneColors, (v) => setSetting("toneColors", v), "Red, orange, green, blue, grey for tones 1–4 and neutral"));
-  display.append(field("Theme", select("pref-theme", [["auto", "Match my device"], ["light", "Light"], ["dark", "Dark"]], s.theme, (v) => setSetting("theme", v))));
   page.append(display);
 
   // study

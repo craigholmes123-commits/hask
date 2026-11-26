@@ -1,6 +1,6 @@
 // Offline support: the app shell and core data are cached on install;
 // everything else (other HSK levels, recordings, sentences, fonts) is cached the first time it loads.
-const VERSION = "hask-v2";
+const VERSION = "hask-v3";
 const SHELL = [
   "./",
   "index.html",
@@ -14,12 +14,19 @@ const SHELL = [
   "js/srs.js",
   "js/state.js",
   "js/ui.js",
+  "js/game.js",
+  "js/fx.js",
+  "js/views/cave.js",
+  "js/views/rewards.js",
+  "js/views/sect.js",
+  "js/views/stats.js",
+  "js/views/treasury.js",
+  "js/views/tribulation.js",
   "js/views/common.js",
   "js/views/guide.js",
   "js/views/practice.js",
   "js/views/prefs.js",
   "js/views/study.js",
-  "js/views/today.js",
   "js/views/words.js",
   "data/meta.json",
   "data/top.json",

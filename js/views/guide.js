@@ -43,12 +43,14 @@ export async function renderGuide(root) {
 
   page.innerHTML = `
   <header class="page-head">
-    <p class="eyebrow">Guide</p>
-    <h1><span lang="zh-CN" class="h1-zh">指南</span> Learn faster</h1>
-    <p class="lede">How the app works, the habits that speed learning up, and the sounds of Mandarin.</p>
+    <a class="back" href="#sect">${icon("left")} Sect</a>
+    <p class="eyebrow">长老训诫 · Elder's Teachings</p>
+    <h1><span lang="zh-CN" class="h1-zh calli">训诫</span> The elders teach</h1>
+    <p class="lede">How cultivation works, the habits that speed learning up, and the sounds of Mandarin.</p>
   </header>
 
   <nav class="toc" aria-label="Guide sections">
+    <a href="#guide" data-jump="g-cult">Cultivation</a>
     <a href="#guide" data-jump="g-loop">Daily loop</a>
     <a href="#guide" data-jump="g-habits">Habits</a>
     <a href="#guide" data-jump="g-tones">Tones</a>
@@ -57,6 +59,21 @@ export async function renderGuide(root) {
     <a href="#guide" data-jump="g-hsk">HSK 3.0</a>
     <a href="#guide" data-jump="g-plan">Timeline</a>
   </nav>
+
+  <section id="g-cult" class="card prose">
+    <h2><span lang="zh-CN">修炼之道</span> How cultivation works</h2>
+    <p>Your cultivation grows only through study. Nothing happens while you're away, so every bit of power is a word you know.</p>
+    <ul class="rules">
+      <li><b><span lang="zh-CN">灵气</span> Qi</b> comes from every answer: about 10 for a new word, 5–6 for a correct answer, 1 for a wrong one. Trials give Qi too.</li>
+      <li><b>Realms and layers.</b> Each realm has nine layers and is comprehended through one scripture: Qi Refining through the Top 100, Foundation Establishment through HSK 1, Golden Core through HSK 2, and on up to Mahayana through HSK 7–9.</li>
+      <li><b><span lang="zh-CN">瓶颈</span> Bottlenecks.</b> A layer needs Qi <i>and</i> comprehension: enough of the scripture's words learned. When your Qi is full but your comprehension isn't, learn new words. Qi that overflows condenses into spirit stones.</li>
+      <li><b><span lang="zh-CN">天劫</span> Heavenly Tribulation.</b> At layer nine with 80% of the scripture learned, the heavens test you: a quiz of 6–9 bolts on the realm's words. Each wrong answer costs a Dao Heart. Survive and you enter the next realm; fail and you lose 30% of your gathered Qi.</li>
+      <li><b><span lang="zh-CN">灵石</span> Spirit stones</b> come from sessions, sect missions, tribulations and overflowing Qi. Spend them in the Treasury on pills and on your Spirit-Gathering Array (+10% Qi per level).</li>
+      <li><b><span lang="zh-CN">法宝</span> Treasures and <span lang="zh-CN">道号</span> titles</b> are earned by milestones: a 7-day streak, 500 mastered words, surviving a tribulation…</li>
+      <li><b><span lang="zh-CN">灵兽</span> Spirit beast.</b> An egg appears after your first session. It grows each day you cultivate, hatches into a companion you choose, and grants a bonus that grows with it.</li>
+      <li><b><span lang="zh-CN">心魔</span> Inner Demons</b> are the words you keep getting wrong. Fight them in the Trials for extra Qi.</li>
+    </ul>
+  </section>
 
   <section id="g-loop" class="card prose">
     <h2>The daily loop</h2>
@@ -92,7 +109,7 @@ export async function renderGuide(root) {
       <li><b>一 yī</b> becomes <b>yí</b> before a 4th tone (一个 yí ge, 一下 yíxià) and <b>yì</b> before the other tones (一起 yìqǐ). It stays yī when counting: 第一, 十一.</li>
     </ul>
     <p class="muted small">Like the HSK syllabus, the app writes the 一 and 不 changes but not the 3rd-tone change.</p>
-    <p>Colours follow the tones everywhere in the app: <span class="t1">1st red</span>, <span class="t2">2nd orange</span>, <span class="t3">3rd green</span>, <span class="t4">4th blue</span>, <span class="t5">neutral grey</span>. Turn them off in Prefs if you'd rather not.</p>
+    <p>Colours follow the tones everywhere in the app: <span class="t1">1st red</span>, <span class="t2">2nd orange</span>, <span class="t3">3rd green</span>, <span class="t4">4th blue</span>, <span class="t5">neutral grey</span>. Turn them off in the Sect Hall if you'd rather not.</p>
   </section>
 
   <section id="g-pinyin" class="card prose">
@@ -119,7 +136,7 @@ export async function renderGuide(root) {
 
   <section id="g-plan" class="card prose">
     <h2>A realistic timeline</h2>
-    <p>At <b>${daily} new words a day</b> (change it in Prefs), with reviews taking about 10–15 minutes:</p>
+    <p>At <b>${daily} new words a day</b> (change it in the Sect Hall), with reviews taking about 10–15 minutes:</p>
     <div class="table-wrap"><table class="plan"><tbody>
       <tr><td>Top 100</td><td class="num">${days(100)} days</td></tr>
       <tr><td>HSK 1 · 300 words</td><td class="num">${days(300)} days</td></tr>
@@ -147,7 +164,7 @@ export async function renderGuide(root) {
     play.addEventListener("click", async () => {
       const ref = meta?.audio?.tones?.["ma" + tone.t];
       const ok = (ref && (await playRecording({ a: ref }))) || (await speak(tone.hz));
-      if (!ok) toast("Couldn't play the sound. See Prefs → Audio.");
+      if (!ok) toast("Couldn't play the sound. See Sect Hall → Audio.");
     });
     row.append(play);
     tt.append(row);

@@ -22,6 +22,27 @@ export const DEFAULT_SETTINGS = {
   level: "beginner",
 };
 
+/** Cultivation progress. Only study changes it (see game.js for the rules). */
+export function defaultGame() {
+  return {
+    realm: 0, // index into REALMS
+    stage: 1, // layer 1-9
+    qi: 0, // qi gathered towards the next layer
+    stones: 0, // spirit stones
+    arrayLv: 0, // spirit-gathering array level
+    pills: { qi: 0, heart: 0, beast: 0 }, // inventory
+    qiBoost: 0, // answers left with double qi
+    heartBonus: 0, // extra Dao Hearts for the next tribulation
+    treasures: [],
+    titles: ["mortal"],
+    title: "mortal",
+    beast: null, // {kind: null|"fox"|"crane"|"rabbit"|"qilin", growth, fed: dayKey}
+    claimed: {}, // missions claimed: {"2026-11-26": ["session"], "w2026-11-23": ["days5"]}
+    stats: { sessions: 0, tribs: 0, tribFails: 0, missions: 0, tones: 0, demons: 0, totalQi: 0 },
+    u: 0,
+  };
+}
+
 const listeners = new Set();
 export function onChange(fn) {
   listeners.add(fn);
@@ -45,6 +66,7 @@ export const state = {
   tones: {}, // tone pattern ("3", "21") -> [right, total]
   best: {}, // drill -> best score
   resetAt: 0, // when progress was last erased (propagates to other devices)
+  game: defaultGame(),
   sync: { status: "local", at: 0 }, // local | syncing | synced | offline
 };
 
@@ -89,6 +111,7 @@ function writeLocalNow({ force = false, replace = false } = {}) {
         tones: state.tones,
         best: state.best,
         resetAt: state.resetAt,
+        game: state.game,
       }),
     );
   } catch {
@@ -114,6 +137,11 @@ function mergeSnapshot(saved) {
     if (v[1] > cur[1]) state.tones[k] = [...v];
   }
   for (const [k, v] of Object.entries(saved.best || {})) state.best[k] = Math.max(state.best[k] || 0, v);
+  mergeGame(saved.game);
+}
+
+function mergeGame(g) {
+  if (g && (g.u || 0) > (state.game.u || 0)) state.game = { ...defaultGame(), ...g };
 }
 
 function applySnapshot(saved) {
@@ -124,6 +152,7 @@ function applySnapshot(saved) {
   state.tones = saved.tones || {};
   state.best = saved.best || {};
   state.resetAt = saved.resetAt || 0;
+  state.game = { ...defaultGame(), ...(saved.game || {}) };
 }
 
 // ---------- settings ----------
@@ -189,6 +218,31 @@ export function logActivity({ isNew = false, correct = null, ms = 0 } = {}) {
   markDirty("meta");
 }
 
+/** Add to one of today's counters (s sessions, tc tones, lc listening, rd sentences, dm demons). */
+export function bumpDay(field, n = 1) {
+  const d = today();
+  d[field] = (d[field] || 0) + n;
+  saveLocal();
+  markDirty("meta");
+}
+
+/** Keep today's best value of a counter (sp speed score). */
+export function maxDay(field, v) {
+  const d = today();
+  if ((d[field] || 0) >= v) return;
+  d[field] = v;
+  saveLocal();
+  markDirty("meta");
+}
+
+/** Save after a change to state.game. */
+export function saveGame() {
+  state.game.u = Date.now();
+  saveLocal();
+  markDirty("meta");
+  emit({ type: "game" });
+}
+
 export function logTone(pattern, right) {
   const t = state.tones[pattern] || [0, 0];
   t[1] += 1;
@@ -245,6 +299,7 @@ export function resetAll() {
   state.days = {};
   state.tones = {};
   state.best = {};
+  state.game = { ...defaultGame(), u: Date.now() };
   state.resetAt = Date.now();
   writeLocalNow({ force: true, replace: true });
   markAllDirty();
@@ -259,6 +314,7 @@ function applyReset(at) {
   state.days = {};
   state.tones = {};
   state.best = {};
+  if ((state.game.u || 0) < at) state.game = { ...defaultGame(), u: at };
 }
 
 function mergeCards(incoming) {
@@ -276,13 +332,9 @@ function mergeCards(incoming) {
 function mergeDays(incoming) {
   for (const [k, v] of Object.entries(incoming)) {
     const cur = state.days[k] || { n: 0, r: 0, c: 0, ms: 0 };
-    state.days[k] = {
-      n: Math.max(cur.n, v.n || 0),
-      r: Math.max(cur.r, v.r || 0),
-      c: Math.max(cur.c, v.c || 0),
-      ms: Math.max(cur.ms, v.ms || 0),
-      b: Math.max(cur.b || 0, v.b || 0),
-    };
+    const out = { ...cur };
+    for (const [f, x] of Object.entries(v || {})) if (typeof x === "number") out[f] = Math.max(cur[f] || 0, x);
+    state.days[k] = out;
   }
 }
 
@@ -318,6 +370,7 @@ function bucketBody(name) {
       tones: state.tones,
       best: state.best,
       resetAt: state.resetAt,
+      game: state.game,
     };
   }
   const cards = {};
@@ -380,6 +433,11 @@ async function pullCloud() {
           localNewer = true;
         }
         mergeDays(body.days || {});
+        if (body.game && (body.game.u || 0) > (state.game.u || 0)) state.game = { ...defaultGame(), ...body.game };
+        else if ((state.game.u || 0) > (body.game?.u || 0)) {
+          cloud.dirty.add("meta");
+          localNewer = true;
+        }
         for (const [k, v] of Object.entries(body.tones || {})) {
           const cur = state.tones[k] || [0, 0];
           if (v[1] > cur[1]) state.tones[k] = [...v];

@@ -45,7 +45,7 @@ export function sealHTML(card) {
 /** Play a word. Autoplay stays quiet if nothing can play; a tap (explicit) explains why. */
 export async function playWord(word, opts = {}) {
   const ok = await playWordSound(word, opts);
-  if (!ok && opts.explicit) toast("Couldn't play this word. Check your volume, or see Prefs → Audio.");
+  if (!ok && opts.explicit) toast("Couldn't play this word. Check your volume, or see Sect Hall → Audio.");
   return ok;
 }
 
@@ -95,7 +95,7 @@ export function sentenceBlock(sent, { highlight, showEnglish = true } = {}) {
     "aria-label": "Play sentence",
     html: icon("sound"),
     onclick: async () => {
-      if (!canSpeakSentences() || !(await speak(text))) toast("Sentences need a Mandarin voice on this device. See Prefs → Audio.");
+      if (!canSpeakSentences() || !(await speak(text))) toast("Sentences need a Mandarin voice on this device. See Sect Hall → Audio.");
     },
   });
   const en = h("p.sent-en", sent.en);

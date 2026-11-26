@@ -3,7 +3,9 @@ import { deckWords, ensureKeys, loadSentences, words } from "../data.js";
 import { TONE_SIGNS, esc, hanziHTML, pinyinHTML, syllables } from "../pinyin.js";
 import { canSpeakSentences } from "../speech.js";
 import { status } from "../srs.js";
-import { getCard, logTone, setBest, state } from "../state.js";
+import { bumpDay, getCard, logTone, maxDay, setBest, state } from "../state.js";
+import { QI, addStat } from "../game.js";
+import { gainQi } from "./rewards.js";
 import { h, icon, plural, sample, shuffle, toast, toneContour } from "../ui.js";
 import { faceHTML, openWord, optionHTML, playWord, sentenceBlock, soundButton } from "./common.js";
 import { buildPracticeSession } from "./study.js";
@@ -26,11 +28,11 @@ export async function practicePool(min = 12) {
 }
 
 const DRILLS = [
-  ["drill-tones", "tone", "Tone trainer", "Hear a word and pick each syllable's tone. Train your ear on tone pairs, the way words are really spoken."],
-  ["drill-listen", "ear", "Listening", "Hear a word, find it among four. Builds the ear-to-meaning link conversations need."],
-  ["drill-read", "book", "Sentences", "Real sentences made of words you've studied, with audio and a hidden translation."],
-  ["drill-speed", "bolt", "Speed round", "60 seconds of quick recognition. Fast recall frees your attention for listening."],
-  ["drill-tricky", "knot", "Tricky words", "The words you've missed most, in one focused round. Doesn't change your schedule."],
+  ["drill-tones", "tone", "音律试炼", "Tone Trial", "Hear a word and pick each syllable's tone. Train your ear on tone pairs, the way words are really spoken."],
+  ["drill-listen", "ear", "听风试炼", "Listening Trial", "Hear a word, find it among four. Builds the ear-to-meaning link conversations need."],
+  ["drill-read", "book", "读经试炼", "Reading Trial", "Real sentences made of words you've studied, with audio and a hidden translation."],
+  ["drill-speed", "bolt", "疾风试炼", "Speed Trial", "60 seconds of quick recognition. Fast recall frees your attention for listening."],
+  ["drill-tricky", "knot", "心魔", "Inner Demons", "The words that keep defeating you, in one focused battle. Extra Qi, and your schedule stays as it is."],
 ];
 
 export async function renderPractice(root, nav) {
@@ -40,21 +42,21 @@ export async function renderPractice(root, nav) {
   const { pool, source } = await practicePool();
   page.append(
     h("header.page-head", {
-      html: `<p class="eyebrow">Extra practice</p><h1><span lang="zh-CN" class="h1-zh">练习</span> Practice</h1>
-      <p class="lede">${
+      html: `<p class="eyebrow">试炼 · Trials</p><h1><span lang="zh-CN" class="h1-zh calli">试炼</span> Trials</h1>
+      <p class="lede">Trials earn Qi and complete sect missions. ${
         source === "studied"
-          ? `Drills use the ${plural(pool.length, "word")} you've started.`
-          : `Drills use the first words of your current deck until you've studied a dozen or so.`
-      } None of these change your review schedule.</p>`,
+          ? `They test the ${plural(pool.length, "word")} you've comprehended.`
+          : `Until you've comprehended a dozen words they use the first words of your scripture.`
+      } They never change your review schedule.</p>`,
     }),
   );
   const list = h("div.drill-list");
-  for (const [route, ic, title, desc] of DRILLS) {
+  for (const [route, ic, zh, title, desc] of DRILLS) {
     const best = state.best[route];
     list.append(
       h("a.drill", {
         href: "#" + route,
-        html: `<span class="drill-ic">${icon(ic)}</span><span class="drill-text"><b>${title}</b><span>${desc}</span></span>${
+        html: `<span class="drill-ic">${icon(ic)}</span><span class="drill-text"><b><span lang="zh-CN">${zh}</span> ${title}</b><span>${desc}</span></span>${
           best ? `<span class="tag">Best ${best}</span>` : ""
         }${icon("right", "chev")}`,
       }),
@@ -64,7 +66,7 @@ export async function renderPractice(root, nav) {
   if (!canSpeakSentences()) {
     page.append(
       h("p.notice", {
-        html: `${icon("info")} Words play from built-in recordings, but whole sentences need a Mandarin voice on this device. See Prefs → Audio for how to add one.`,
+        html: `${icon("info")} Words play from built-in recordings, but whole sentences need a Mandarin voice on this device. See Sect Hall → Audio for how to add one.`,
       }),
     );
   }
@@ -136,7 +138,7 @@ function endScreen(stage, { title, score, total, best, again, onExit, missed = [
   setKeys(null);
   stage.innerHTML = "";
   const box = h("div.summary");
-  box.innerHTML = `<div class="summary-seal" aria-hidden="true">练</div><h2>${esc(title)}</h2>
+  box.innerHTML = `<div class="summary-seal" aria-hidden="true">试</div><p class="eyebrow">试炼结束 · Trial complete</p><h2>${esc(title)}</h2>
     <div class="stats"><div><b>${score}${total ? "/" + total : ""}</b><span>${total ? "correct" : "correct answers"}</span></div></div>
     ${best ? `<p class="streak-line">New best score</p>` : ""}`;
   if (missed.length) {
@@ -147,7 +149,7 @@ function endScreen(stage, { title, score, total, best, again, onExit, missed = [
     }
     box.append(chips);
   }
-  const actions = h("div.actions", h("button.btn.ghost", { type: "button", text: "Back", onclick: onExit }), h("button.btn.primary", { type: "button", text: "Go again", onclick: again }));
+  const actions = h("div.actions", h("button.btn.ghost", { type: "button", text: "Leave the trial", onclick: onExit }), h("button.btn.primary", { type: "button", text: "Try again", onclick: again }));
   box.append(actions);
   stage.append(box);
   actions.lastChild.focus({ preventScroll: true });
@@ -162,7 +164,7 @@ export async function renderTones(root, onExit) {
   });
   const two = cands.filter((w) => syllables(w).filter((s) => s.s !== "r").length === 2);
   const round = sample(two.length >= 6 ? two.concat(sample(cands, 3)) : cands, 10);
-  const shell = drillShell(root, "Tone trainer", onExit);
+  const shell = drillShell(root, "音律试炼 · Tone Trial", onExit);
   let i = 0;
   let score = 0;
   const missed = [];
@@ -171,7 +173,7 @@ export async function renderTones(root, onExit) {
   function question() {
     if (i >= round.length) {
       const best = setBest("drill-tones", score);
-      endScreen(shell.stage, { title: "Tone trainer", score, total: round.length, best, missed, again: () => renderTones(root, onExit), onExit });
+      endScreen(shell.stage, { title: "Tone Trial", score, total: round.length, best, missed, again: () => renderTones(root, onExit), onExit });
       return;
     }
     shell.progress(i, round.length);
@@ -220,8 +222,12 @@ export async function renderTones(root, onExit) {
       const right = syl.every((s, k) => s.t === picks[k] || (s.t === 5 && picks[k] === 5));
       const pattern = syl.map((s) => s.t).join("");
       logTone(pattern, right);
-      if (right) score += 1;
-      else missed.push(word);
+      if (right) {
+        score += 1;
+        gainQi(QI.tone, pickers, { source: "trial" });
+        bumpDay("tc");
+        addStat("tones");
+      } else missed.push(word);
       pickers.querySelectorAll(".tone-row").forEach((row, k) => {
         row.querySelectorAll(".tone-btn").forEach((b, n) => {
           b.disabled = true;
@@ -263,14 +269,14 @@ export async function renderTones(root, onExit) {
 export async function renderListen(root, onExit) {
   const { pool } = await practicePool(12);
   const round = sample(pool, Math.min(10, pool.length));
-  const shell = drillShell(root, "Listening", onExit);
+  const shell = drillShell(root, "听风试炼 · Listening Trial", onExit);
   let i = 0;
   let score = 0;
   const missed = [];
   function question() {
     if (i >= round.length) {
       const best = setBest("drill-listen", score);
-      endScreen(shell.stage, { title: "Listening", score, total: round.length, best, missed, again: () => renderListen(root, onExit), onExit });
+      endScreen(shell.stage, { title: "Listening Trial", score, total: round.length, best, missed, again: () => renderListen(root, onExit), onExit });
       return;
     }
     shell.progress(i, round.length);
@@ -303,8 +309,11 @@ export async function renderListen(root, onExit) {
       if (done) return;
       done = true;
       const right = opts[k] === word;
-      if (right) score += 1;
-      else missed.push(word);
+      if (right) {
+        score += 1;
+        gainQi(QI.listen, btns[k], { source: "trial" });
+        bumpDay("lc");
+      } else missed.push(word);
       btns.forEach((b, n) => {
         b.disabled = true;
         if (opts[n] === word) b.classList.add("is-right");
@@ -343,7 +352,7 @@ export async function renderListen(root, onExit) {
 // ---------- speed round ----------
 export async function renderSpeed(root, onExit) {
   const { pool } = await practicePool(12);
-  const shell = drillShell(root, "Speed round", onExit);
+  const shell = drillShell(root, "疾风试炼 · Speed Trial", onExit);
   if (pool.length < 4) {
     shell.stage.append(h("p.muted", "Study a few words first."));
     return;
@@ -371,7 +380,8 @@ export async function renderSpeed(root, onExit) {
       if (left <= 0) {
         clearInterval(ticker);
         const best = setBest("drill-speed", score);
-        endScreen(stage, { title: "Speed round", score, total: 0, best, missed: [...missed].slice(0, 12), again: () => renderSpeed(root, onExit), onExit });
+        maxDay("sp", score);
+        endScreen(stage, { title: "Speed Trial", score, total: 0, best, missed: [...missed].slice(0, 12), again: () => renderSpeed(root, onExit), onExit });
       }
     }
     ticker = setInterval(tick, 200);
@@ -396,8 +406,10 @@ export async function renderSpeed(root, onExit) {
         if (locked || Date.now() >= ends) return;
         locked = true;
         const right = opts[k] === word;
-        if (right) score += 1;
-        else {
+        if (right) {
+          score += 1;
+          gainQi(QI.speed, btns[k], { source: "trial" });
+        } else {
           wrong += 1;
           missed.add(word);
         }
@@ -416,7 +428,7 @@ export async function renderSpeed(root, onExit) {
 
 // ---------- sentences ----------
 export async function renderRead(root, onExit) {
-  const shell = drillShell(root, "Sentences", onExit);
+  const shell = drillShell(root, "读经试炼 · Reading Trial", onExit);
   const stage = shell.stage;
   stage.append(h("p.muted", "Loading sentences…"));
   let all;
@@ -443,6 +455,7 @@ export async function renderRead(root, onExit) {
   if (list.length < 5) list = shuffle(all.filter((s) => s.h === 1)).slice(0, 20);
   list = shuffle(list);
   let i = 0;
+  const readDone = new Set();
   function show() {
     shell.progress(i + 1, list.length);
     stage.innerHTML = "";
@@ -458,6 +471,11 @@ export async function renderRead(root, onExit) {
       show();
     });
     nextBtn.addEventListener("click", () => {
+      if (!readDone.has(i)) {
+        readDone.add(i);
+        gainQi(QI.read, nextBtn, { source: "trial" });
+        bumpDay("rd");
+      }
       if (i + 1 >= list.length) return onExit();
       i += 1;
       show();
@@ -485,10 +503,10 @@ export async function startTricky(nav) {
   await ensureKeys(keys);
   const list = keys.map((k) => words.get(k)).filter(Boolean);
   if (list.length < 3) {
-    toast("No tricky words yet. Words you get wrong will collect here.");
-    nav("practice");
+    toast("No Inner Demons yet. Words that defeat you will gather here.");
+    nav("trials");
     return;
   }
-  buildPracticeSession(list, "Tricky words");
+  buildPracticeSession(list, "Inner Demons");
   nav("study");
 }

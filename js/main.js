@@ -1,22 +1,31 @@
-// App shell: header with the 汉字/pīnyīn switch, navigation, hash routing.
+// App shell: header (realm, spirit stones, 汉字/pīnyīn switch), the Qi line,
+// navigation between the cultivator's places, and hash routing.
 import { deckById, loadFile, loadMeta } from "./data.js";
+import { claimableCount, qiNeed, realm, FINAL_REALM, tribulationReady } from "./game.js";
+import { drawMountains } from "./fx.js";
 import { initCloud, loadState, onChange, setSetting, state } from "./state.js";
 import { initClaudeVoice, stopSpeaking } from "./speech.js";
 import { anySheetOpen, closeTopSheet, h, icon } from "./ui.js";
+import { renderCave } from "./views/cave.js";
 import { renderDeck, renderWords } from "./views/words.js";
 import { renderGuide } from "./views/guide.js";
 import { renderListen, renderPractice, renderRead, renderSpeed, renderTones, startTricky, stopDrillKeys } from "./views/practice.js";
 import { renderPrefs } from "./views/prefs.js";
+import { renderSect } from "./views/sect.js";
 import { endSession, hasSession, renderStudy, stopKeys } from "./views/study.js";
-import { renderToday } from "./views/today.js";
+import { renderTreasury } from "./views/treasury.js";
+import { renderTribulation, stopTribulationKeys } from "./views/tribulation.js";
 
 const NAV = [
-  ["today", "today", "Today"],
-  ["words", "words", "Words"],
-  ["practice", "practice", "Practice"],
-  ["guide", "guide", "Guide"],
-  ["prefs", "prefs", "Prefs"],
+  ["cave", "cave", "洞府", "Cave"],
+  ["library", "library", "藏经阁", "Library"],
+  ["trials", "trials", "试炼", "Trials"],
+  ["treasury", "treasury", "宝库", "Treasury"],
+  ["sect", "sect", "宗门", "Sect"],
 ];
+
+// old routes from before the cultivation update still work
+const ALIASES = { today: "cave", words: "library", practice: "trials" };
 
 const SCRIPT_MODES = [
   ["both", "汉字 + pīnyīn", "汉+pīn"],
@@ -27,10 +36,12 @@ const SCRIPT_MODES = [
 let main;
 let navEl;
 let scriptEl;
+let statusEl;
+let qiLine;
 
 function currentRoute() {
-  const r = location.hash.replace(/^#/, "");
-  return r || "today";
+  const r = location.hash.replace(/^#/, "") || "cave";
+  return ALIASES[r] || r;
 }
 
 export function nav(route) {
@@ -38,11 +49,8 @@ export function nav(route) {
   else location.hash = route;
 }
 
-function applyTheme() {
+function applyDisplay() {
   const root = document.documentElement;
-  const t = state.settings.theme;
-  if (t === "auto") root.removeAttribute("data-theme");
-  else root.setAttribute("data-theme", t);
   root.classList.toggle("no-tones", !state.settings.toneColors);
   root.dataset.script = state.settings.script;
 }
@@ -51,7 +59,8 @@ function buildShell() {
   const app = document.getElementById("app");
   app.innerHTML = "";
   const header = h("header.topbar");
-  const brand = h("a.brand", { href: "#today", "aria-label": "Hask, today", html: `<span class="brand-mark" lang="zh-CN">学</span><span class="brand-name">Hask</span>` });
+  const brand = h("a.brand", { href: "#cave", "aria-label": "Hask, your cave", html: `<span class="brand-mark" lang="zh-CN">学</span>` });
+  statusEl = h("a.realm-chip", { href: "#cave" });
   scriptEl = h("div.script-switch", { role: "radiogroup", "aria-label": "Show Chinese as" });
   for (const [mode, long, short] of SCRIPT_MODES) {
     const b = h("button", {
@@ -65,28 +74,60 @@ function buildShell() {
     scriptEl.append(b);
   }
   const sync = h("span.sync-dot", { title: "", "aria-hidden": "true" });
-  header.append(brand, scriptEl, sync);
+  qiLine = h("div.qi-line", { "aria-hidden": "true" }, h("i"));
+  header.append(brand, statusEl, scriptEl, sync, qiLine);
 
   navEl = h("nav.tabbar", { "aria-label": "Main" });
-  for (const [route, ic, label] of NAV) {
-    navEl.append(h("a.tab", { href: "#" + route, "data-route": route, html: `${icon(ic)}<span>${label}</span>` }));
+  for (const [route, ic, zh, label] of NAV) {
+    navEl.append(
+      h("a.tab", { href: "#" + route, "data-route": route, html: `${icon(ic)}<span class="tab-zh" lang="zh-CN">${zh}</span><span class="tab-en">${label}</span><i class="tab-dot" hidden></i>` }),
+    );
   }
   main = h("main#view", { tabindex: "-1" });
   app.append(header, navEl, main);
   updateScriptSwitch();
+  updateStatus();
 }
 
 function updateScriptSwitch() {
   scriptEl?.querySelectorAll("button").forEach((b) => b.setAttribute("aria-checked", String(b.dataset.mode === state.settings.script)));
 }
 
+/** Realm chip, spirit stones and the Qi line under the header. */
+function updateStatus() {
+  const g = state.game;
+  const r = realm(g.realm);
+  const done = g.realm >= FINAL_REALM;
+  const ready = tribulationReady();
+  statusEl.innerHTML = `<span class="rc-realm" lang="zh-CN">${r.zh}${done ? "" : `<b>${g.stage}</b>`}</span><span class="rc-stones"><span class="res-ic stone" aria-hidden="true"></span>${g.stones.toLocaleString()}</span>`;
+  statusEl.setAttribute("aria-label", `${r.name}${done ? "" : `, layer ${g.stage}`}, ${g.stones} spirit stones`);
+  statusEl.classList.toggle("ready", ready);
+  const frac = done ? 1 : Math.min(1, g.qi / qiNeed(g.realm, g.stage));
+  qiLine.firstChild.style.width = `${(frac * 100).toFixed(1)}%`;
+  qiLine.classList.toggle("ready", ready);
+  const sectDot = navEl?.querySelector('[data-route="sect"] .tab-dot');
+  if (sectDot) sectDot.hidden = claimableCount() === 0;
+  const caveDot = navEl?.querySelector('[data-route="cave"] .tab-dot');
+  if (caveDot) caveDot.hidden = !ready;
+}
+
+const SECTIONS = {
+  library: "library",
+  trials: "trials",
+  treasury: "treasury",
+  sect: "sect",
+  guide: "sect",
+  prefs: "sect",
+  tribulation: "cave",
+};
+
 function updateNav(route) {
-  const base = route.startsWith("deck-") ? "words" : route.startsWith("drill-") ? "practice" : route;
+  const base = route.startsWith("deck-") ? "library" : route.startsWith("drill-") ? "trials" : SECTIONS[route] || "cave";
   navEl.querySelectorAll(".tab").forEach((a) => {
     if (a.dataset.route === base) a.setAttribute("aria-current", "page");
     else a.removeAttribute("aria-current");
   });
-  document.body.dataset.route = route.startsWith("drill-") || route === "study" ? "focus" : base;
+  document.body.dataset.route = route.startsWith("drill-") || route === "study" || route === "tribulation" ? "focus" : base;
 }
 
 let renderToken = 0;
@@ -95,37 +136,38 @@ async function render() {
   const token = ++renderToken;
   stopKeys();
   stopDrillKeys();
-  if (route !== "study" && hasSession()) {
-    /* leaving mid-session keeps it for later */
-  }
+  stopTribulationKeys();
   updateNav(route);
-  const back = () => nav("today");
-  const toPractice = () => nav("practice");
+  const back = () => nav("cave");
+  const toTrials = () => nav("trials");
   try {
-    if (route === "today") await renderToday(main, nav);
-    else if (route === "words") await renderWords(main, nav);
+    if (route === "cave") await renderCave(main, nav);
+    else if (route === "library") await renderWords(main, nav);
     else if (route.startsWith("deck-")) await renderDeck(main, route.slice(5), nav);
-    else if (route === "practice") await renderPractice(main, nav);
+    else if (route === "trials") await renderPractice(main, nav);
+    else if (route === "treasury") renderTreasury(main);
+    else if (route === "sect") renderSect(main);
     else if (route === "guide") await renderGuide(main);
     else if (route === "prefs") await renderPrefs(main);
     else if (route === "study") renderStudy(main, { onExit: back });
-    else if (route === "drill-tones") await renderTones(main, toPractice);
-    else if (route === "drill-listen") await renderListen(main, toPractice);
-    else if (route === "drill-speed") await renderSpeed(main, toPractice);
-    else if (route === "drill-read") await renderRead(main, toPractice);
+    else if (route === "tribulation") await renderTribulation(main, nav);
+    else if (route === "drill-tones") await renderTones(main, toTrials);
+    else if (route === "drill-listen") await renderListen(main, toTrials);
+    else if (route === "drill-speed") await renderSpeed(main, toTrials);
+    else if (route === "drill-read") await renderRead(main, toTrials);
     else if (route === "drill-tricky") await startTricky(nav);
     else {
-      history.replaceState(null, "", "#today");
-      await renderToday(main, nav);
+      history.replaceState(null, "", "#cave");
+      await renderCave(main, nav);
     }
   } catch (e) {
     console.error(e);
     if (token === renderToken) {
       main.innerHTML = "";
-      main.append(h("div.page", h("h1", "Something went wrong"), h("p", e.message || String(e)), h("a.btn.primary", { href: "#today", text: "Back to Today" })));
+      main.append(h("div.page", h("h1", "Your Qi went astray"), h("p", e.message || String(e)), h("a.btn.primary", { href: "#cave", text: "Return to your cave" })));
     }
   }
-  if (token === renderToken && !["study"].includes(route) && !route.startsWith("drill-")) {
+  if (token === renderToken && route !== "study" && route !== "tribulation" && !route.startsWith("drill-")) {
     window.scrollTo({ top: 0 });
   }
 }
@@ -139,25 +181,31 @@ function onKey(e) {
 
 function boot() {
   loadState();
-  applyTheme();
+  applyDisplay();
+  drawMountains();
   buildShell();
   window.addEventListener("hashchange", () => {
     stopSpeaking();
+    while (closeTopSheet()) {
+      /* close any open sheet: it belonged to the page we're leaving */
+    }
     if (currentRoute() !== "study" && hasSession() === false) endSession();
     render();
   });
   document.addEventListener("keydown", onKey);
 
   onChange((ev) => {
-    if (ev.type === "settings") {
-      applyTheme();
+    if (ev.type === "game") {
+      updateStatus();
+    } else if (ev.type === "settings") {
+      applyDisplay();
       updateScriptSwitch();
       const route = currentRoute();
       // re-render content that depends on how Chinese is shown
       if (["script", "toneColors"].includes(ev.key)) {
         if (route === "study" || route.startsWith("drill-")) refreshFaces();
-        else render();
-      } else if (ev.key === "deck" && route === "words") render();
+        else if (route !== "tribulation") render();
+      } else if (ev.key === "deck" && route === "library") render();
     } else if (ev.type === "sync") {
       const dot = document.querySelector(".sync-dot");
       if (dot) {
@@ -165,17 +213,20 @@ function boot() {
         dot.title = state.sync.status === "synced" ? "Progress synced" : state.sync.status === "syncing" ? "Syncing…" : "";
       }
     } else if (ev.type === "sync-pulled" || ev.type === "import" || ev.type === "reset") {
-      applyTheme();
+      applyDisplay();
       updateScriptSwitch();
+      updateStatus();
       const route = currentRoute();
-      if (route !== "study" && !route.startsWith("drill-")) render();
+      if (route !== "study" && route !== "tribulation" && !route.startsWith("drill-")) render();
     }
   });
 
   render();
-  // warm the most used data
+  // warm the most used data; the Top list is needed to measure Qi Refining comprehension
   loadMeta().catch(() => {});
-  loadFile("top").catch(() => {});
+  loadFile("top")
+    .then(updateStatus)
+    .catch(() => {});
   const d = deckById(state.settings.deck);
   if (d.kind === "hsk") loadFile("hsk" + d.level).catch(() => {});
   initCloud();
@@ -183,11 +234,10 @@ function boot() {
   registerServiceWorker();
 }
 
-/** Inside a running drill or session the script switch should not reset progress: swap faces in place. */
+/** Inside a running session the script switch should not reset progress: re-render the same card. */
 function refreshFaces() {
   document.documentElement.dataset.script = state.settings.script;
-  const route = currentRoute();
-  if (route === "study") renderStudy(main, { onExit: () => nav("today") });
+  if (currentRoute() === "study") renderStudy(main, { onExit: () => nav("cave") });
 }
 
 function registerServiceWorker() {

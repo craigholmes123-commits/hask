@@ -1,6 +1,29 @@
 # Hask 汉语
 
-A simplified-Chinese study app built on the **official HSK 3.0 word lists** (the HSK examination syllabus published in November 2025, used for exams since July 2026), plus the **Top 100 / 200 / 300 most common words**. It runs in any modern browser, installs to a phone's home screen, and works offline.
+A cultivation game for learning simplified Chinese. You rise from **Qi Refining (炼气)** to **Immortal (仙人)** by mastering the **official HSK 3.0 word lists** (the HSK examination syllabus published in November 2025, used for exams since July 2026) and the **Top 100 / 200 / 300 most common words**. It runs in any modern browser, installs to a phone's home screen, and works offline.
+
+## The cultivation game
+
+Progress comes only from study; nothing accumulates while you're away.
+
+| Realm | Scripture (word list) |
+|---|---|
+| 炼气 Qi Refining | Top 100 |
+| 筑基 Foundation Establishment | HSK 1 |
+| 金丹 Golden Core | HSK 2 |
+| 元婴 Nascent Soul | HSK 3 |
+| 化神 Spirit Transformation | HSK 4 |
+| 炼虚 Void Refining | HSK 5 |
+| 合体 Body Integration | HSK 6 |
+| 大乘 Mahayana | HSK 7–9 |
+| 仙人 Immortal | all of them |
+
+- **洞府 Cave**: your realm and layer (1–9), a dantian ring that fills with **灵气 Qi** from every answer, and the comprehension gauge. A layer needs Qi *and* enough of the scripture's words learned (the **瓶颈 bottleneck**); Qi that overflows a bottleneck condenses into spirit stones.
+- **天劫 Heavenly Tribulation**: at layer nine with 80% of the scripture learned, a 6–9 bolt quiz on the realm's words. Wrong answers are lightning strikes against your Dao Hearts. Survive to enter the next realm (the next scripture becomes your study deck); fail and lose 30% of your gathered Qi.
+- **修炼 Cultivate**: the spaced-repetition session. **试炼 Trials** are the drills, and **心魔 Inner Demons** fights your most-missed words.
+- **宝库 Treasury**: spend **灵石 spirit stones** on pills (double Qi, extra Dao Heart, beast growth) and on the **聚灵阵 Spirit-Gathering Array** (+10% Qi per level). Collect **法宝 treasures** and **道号 titles** earned by milestones.
+- **灵兽 Spirit beast**: an egg appears after your first session, grows each day you cultivate, and hatches into an Ink Fox, Cloud Crane, Jade Rabbit or Qilin with its own bonus.
+- **宗门 Sect**: three daily and two weekly missions that pay spirit stones, your cultivator's record, the **Elder's Teachings** (the learning guide) and the **Sect Hall** (settings).
 
 ## What's inside
 
@@ -12,11 +35,11 @@ A simplified-Chinese study app built on the **official HSK 3.0 word lists** (the
 - **Native-speaker audio** for 99.6% of the 11,000 words, built in and cached for offline use: whole-word recordings where they exist, otherwise the word's syllables read in the right tones. Sentences use the device's Mandarin voice (or Claude's voice when hosted on claude.ai).
 - **New-word cards** with tone-coloured characters in 田字格 practice squares, audio (normal and slow), how each character is built (meaning part + sound part), and an example sentence.
 - **Word pages**: all meanings, measure words, character breakdowns, words that share a character, and up to three example sentences with per-word pinyin.
-- **Practice drills**: Tone trainer (tone pairs by ear), Listening, Sentences (only sentences made of words you've studied), Speed round, Tricky words.
-- **Guide**: habits that speed learning up, tones with pitch-contour diagrams and audio, pinyin sounds that surprise English speakers, tone-change rules, the HSK 3.0 table and a realistic timeline.
+- **Trials**: Tone (tone pairs by ear), Listening, Reading (only sentences made of words you've studied), Speed, Inner Demons (most-missed words).
+- **Elder's Teachings**: how cultivation works, habits that speed learning up, tones with pitch-contour diagrams and audio, pinyin sounds that surprise English speakers, tone-change rules, the HSK 3.0 table and a realistic timeline.
 - **Progress** saved on the device, with backup and restore. When the app runs as a claude.ai artifact, progress also syncs between devices.
 
-Words play from the built-in recordings on any device. Whole sentences need a Mandarin text-to-speech voice on the device; Prefs → Audio has a sound check and shows how to add one on iPhone, Android, Windows and Mac.
+Words play from the built-in recordings on any device. Whole sentences need a Mandarin text-to-speech voice on the device; Sect → Sect Hall → Audio has a sound check and shows how to add one on iPhone, Android, Windows and Mac.
 
 ## Running it
 
@@ -34,10 +57,12 @@ index.html, css/app.css      app shell and styles
 js/main.js                   routing, header switch, boot
 js/srs.js                    scheduler (pure functions, unit-tested)
 js/pinyin.js                 tone/pinyin helpers (unit-tested)
-js/state.js                  settings, progress, local storage, optional cloud sync
+js/state.js                  settings, progress, game state, local storage, optional cloud sync
+js/game.js                   cultivation rules: realms, Qi, bottlenecks, tribulations, shop, missions, beasts (unit-tested)
+js/fx.js                     ink-wash mountains, Qi floats, lightning, banners
 js/audio.js, js/speech.js    recordings, device voice and Claude voice playback
 js/data.js                   deck loading, search, word families
-js/views/*.js                Today, Words, Study session, Practice, Guide, Prefs
+js/views/*.js                Cave, Library, Cultivate (study), Trials, Tribulation, Treasury, Sect, Teachings, Sect Hall
 data/*.json                  generated vocabulary, sentences, characters
 audio/*.mp3                  packed native-speaker recordings (~200 clips per file)
 tools/build_data.py          regenerates data/ and audio/ from the original sources

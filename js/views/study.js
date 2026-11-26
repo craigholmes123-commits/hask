@@ -6,7 +6,9 @@ import { prefetch } from "../audio.js";
 import {
   AGAIN, EASY, GOOD, HARD, LEARNING, NEW, RELEARNING, grade, introduce, isDue, markKnown, previewLabel,
 } from "../srs.js";
-import { getCard, logActivity, newAllowance, putCard, state, streak } from "../state.js";
+import { bumpDay, getCard, logActivity, newAllowance, putCard, state, streak } from "../state.js";
+import { QI, addStat, finishSession } from "../game.js";
+import { gainQi, resetNotices, showUnlocks } from "./rewards.js";
 import { h, icon, shuffle } from "../ui.js";
 import { faceHTML, openWord, optionHTML, playWord, sentenceBlock, soundButton } from "./common.js";
 
@@ -79,7 +81,10 @@ function newSession(queue, { title, practice = false }) {
     correct: 0,
     started: Date.now(),
     finished: false,
+    qi: 0,
+    rewarded: null,
   };
+  resetNotices();
   // warm caches used by intro cards, and the recordings for the first words
   prefetch(queue.map((q) => q.word));
   loadSentences().catch(() => {});
@@ -114,7 +119,8 @@ export function renderStudy(root, { onExit }) {
   const closeBtn = h("button.icon-btn", { type: "button", "aria-label": "End session", html: icon("close"), onclick: () => finish(wrap, onExit) });
   const bar = h("div.progress", h("div.progress-fill", { style: { width: `${progressPct()}%` } }));
   const count = h("span.study-count", `${session.done}/${Math.max(session.total, session.done + session.queue.length)}`);
-  top.append(closeBtn, bar, count);
+  const qiChip = h("span.session-qi", { html: `+${session.qi} <span lang="zh-CN">灵气</span>`, title: "Qi gathered this session" });
+  top.append(closeBtn, bar, count, qiChip);
   wrap.append(top);
 
   const stage = h("div.stage");
@@ -159,7 +165,7 @@ function renderIntro(stage, item, done) {
   const { word } = item;
   const card = h("article.intro");
   card.innerHTML = `
-    <p class="eyebrow">New word${word.r ? ` · Top ${word.r}` : ""}${word.l ? ` · HSK ${word.l === "7-9" ? "7–9" : word.l}` : ""}</p>
+    <p class="eyebrow"><span lang="zh-CN">新经文</span> · New word${word.r ? ` · Top ${word.r}` : ""}${word.l ? ` · HSK ${word.l === "7-9" ? "7–9" : word.l}` : ""}</p>
     <div class="tianzige ${[...word.w].length > 2 ? "long" : ""}" lang="zh-CN">${hanziHTML(word)}</div>
     <div class="intro-py">${pinyinHTML(word)}</div>
     <p class="intro-gloss">${esc(word.g)}</p>`;
@@ -208,8 +214,8 @@ function renderIntro(stage, item, done) {
   }
 
   const actions = h("div.actions");
-  const knowBtn = h("button.btn.ghost", { type: "button", text: "I already know it" });
-  const gotBtn = h("button.btn.primary", { type: "button", html: `Got it ${icon("right")}` });
+  const knowBtn = h("button.btn.ghost", { type: "button", text: "Already mastered" });
+  const gotBtn = h("button.btn.primary", { type: "button", html: `Comprehended ${icon("right")}` });
   actions.append(knowBtn, gotBtn);
   stage.append(actions);
 
@@ -220,6 +226,7 @@ function renderIntro(stage, item, done) {
       if (known) putCard(word.k, markKnown(cur));
       else putCard(word.k, introduce(cur));
       logActivity({ isNew: true, ms: Date.now() - item.shownAt });
+      session.qi += gainQi(known ? 5 : QI.intro, gotBtn).gained;
     }
     session.newLearned += 1;
     if (!known) {
@@ -385,14 +392,22 @@ function record(item, rating, right) {
   session.results.set(word.k, res);
   if (right) session.correct += 1;
   session.reviewed += 1;
+  const anchor = document.querySelector(".study-top .session-qi") || document.querySelector(".study-top");
   if (session.practice) {
-    if (!right) reinsert(item, 3);
+    if (right) {
+      // Inner Demons: tricky words, practised without touching the schedule
+      session.qi += gainQi(QI.demon, anchor, { source: "demon" }).gained;
+      bumpDay("dm");
+      addStat("demons");
+    } else reinsert(item, 3);
     return;
   }
   const before = getCard(word.k) || {};
   const after = grade(before, rating);
   putCard(word.k, after);
   logActivity({ correct: right, ms });
+  const base = !right ? QI.wrong : rating === HARD ? QI.hard : before.s === 2 ? QI.review : QI.learn;
+  session.qi += gainQi(base, anchor).gained;
   if (after.s === LEARNING || after.s === RELEARNING) reinsert(item, right ? 5 : 3);
 }
 
@@ -510,23 +525,31 @@ function showSummary(wrap, onExit) {
   setKeys(null);
   session.finished = true;
   wrap.innerHTML = "";
+  window.scrollTo({ top: 0 });
   const mins = Math.max(1, Math.round((Date.now() - session.started) / 60000));
   const acc = session.reviewed ? Math.round((session.correct / session.reviewed) * 100) : null;
+  if (!session.practice && !session.rewarded && (session.reviewed || session.newLearned)) {
+    session.rewarded = finishSession({ correct: session.correct, answers: session.reviewed });
+    if (session.rewarded.qi) session.qi += session.rewarded.qi.gained;
+  }
+  const rw = session.rewarded;
   const s = streak();
   const box = h("div.summary");
   box.innerHTML = `
-    <div class="summary-seal" aria-hidden="true">${session.practice ? "练" : "好"}</div>
-    <h2>${session.practice ? "Practice done" : "Session complete"}</h2>
+    <div class="summary-seal" aria-hidden="true">${session.practice ? "斩" : "修"}</div>
+    <p class="eyebrow">${session.practice ? "心魔 · Inner Demons" : "修炼圆满 · Cultivation complete"}</p>
+    <h2>${session.practice ? "Your demons retreat" : "Your Qi settles"}</h2>
     <div class="stats">
+      <div><b class="qi-text">+${session.qi}</b><span><span lang="zh-CN">灵气</span> Qi</span></div>
+      ${rw ? `<div><b class="stone-text">+${rw.stones}</b><span><span lang="zh-CN">灵石</span> stones</span></div>` : ""}
       ${session.practice ? "" : `<div><b>${session.newLearned}</b><span>new words</span></div>`}
-      <div><b>${session.reviewed}</b><span>answers</span></div>
-      <div><b>${acc === null ? "–" : acc + "%"}</b><span>correct</span></div>
-      <div><b>${mins}</b><span>${mins === 1 ? "minute" : "minutes"}</span></div>
+      <div><b>${acc === null ? "–" : acc + "%"}</b><span>correct · ${mins} min</span></div>
     </div>
-    ${!session.practice && s > 0 ? `<p class="streak-line">${icon("flame")} ${s}-day streak</p>` : ""}`;
+    ${!session.practice && s > 0 ? `<p class="streak-line">${icon("flame")} ${s}-day streak${rw && rw.first ? " · first session of the day bonus" : ""}</p>` : ""}
+    ${rw && rw.egg ? `<p class="egg-line"><span class="beast-medal egg small" lang="zh-CN">蛋</span> A spirit egg has appeared in your cave!</p>` : rw && rw.fed ? `<p class="muted small">Your spirit beast feeds on your practice: +10 growth.</p>` : ""}`;
   const missed = [...session.results.values()].filter((r) => r.wrong > 0).map((r) => r.word);
   if (missed.length) {
-    box.append(h("h3", "Worth another look"));
+    box.append(h("h3", { html: `<span lang="zh-CN">心魔</span> Words that resisted you` }));
     const chips = h("div.chips");
     for (const w of missed.slice(0, 16)) {
       chips.append(
@@ -540,8 +563,8 @@ function showSummary(wrap, onExit) {
     box.append(chips);
   }
   const actions = h("div.actions");
-  const again = h("button.btn.ghost", { type: "button", text: session.practice ? "Practice again" : "Another session" });
-  const home = h("button.btn.primary", { type: "button", text: "Done" });
+  const again = h("button.btn.ghost", { type: "button", text: session.practice ? "Face them again" : "Cultivate again" });
+  const home = h("button.btn.primary", { type: "button", text: "Return to cave" });
   again.addEventListener("click", async () => {
     if (session.practice) {
       const list = [...session.results.values()].map((r) => r.word);
@@ -558,6 +581,7 @@ function showSummary(wrap, onExit) {
   });
   actions.append(again, home);
   box.append(actions);
+  setTimeout(() => wrap.isConnected && showUnlocks(), 500); // only if still on the summary
   wrap.append(box);
   home.focus({ preventScroll: true });
 }
