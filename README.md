@@ -19,7 +19,7 @@ Progress comes only from study; nothing accumulates while you're away.
 | 仙人 Immortal | all of them |
 
 - **洞府 Cave**: your realm and layer (1–9), a dantian ring that fills with **灵气 Qi** from every answer, and the comprehension gauge. A layer needs Qi *and* enough of the scripture's words learned (the **瓶颈 bottleneck**); Qi that overflows a bottleneck condenses into spirit stones.
-- **天劫 Heavenly Tribulation**: at layer nine with 80% of the scripture learned, a 6–9 bolt quiz on the realm's words. Wrong answers are lightning strikes against your Dao Hearts. Survive to enter the next realm (the next scripture becomes your study deck); fail and lose 30% of your gathered Qi.
+- **天劫 Heavenly Tribulation**: at layer nine with 80% of the scripture learned, a 6–9 bolt quiz on the realm's words with **pinyin sealed**: characters only, no pinyin or tone colours, so you must know the hanzi (each word's pinyin is revealed after you answer). Wrong answers are lightning strikes against your Dao Hearts. Survive to enter the next realm (the next scripture becomes your study deck); fail and lose 30% of your gathered Qi.
 - **修炼 Cultivate**: the spaced-repetition session. **试炼 Trials** are the drills, and **心魔 Inner Demons** fights your most-missed words.
 - **宝库 Treasury**: spend **灵石 spirit stones** on pills (double Qi, extra Dao Heart, beast growth) and on the **聚灵阵 Spirit-Gathering Array** (+10% Qi per level). Collect **法宝 treasures** and **道号 titles** earned by milestones.
 - **灵兽 Spirit beast**: an egg appears after your first session, grows each day you cultivate, and hatches into an Ink Fox, Cloud Crane, Jade Rabbit or Qilin with its own bonus.

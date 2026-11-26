@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { words } from "../js/data.js";
 import {
   QI, awardQi, bonuses, buyPill, checkUnlocks, claimMission, comprehended, dailyMissions, finishSession,
-  finishTribulation, gate, missionBoard, nextStep, qiNeed, tribulationReady, tribulationSetup, upgradeArray,
+  finishTribulation, gate, missionBoard, nextStep, qiNeed, tribulationOptions, tribulationReady, tribulationSetup, upgradeArray,
   usePill, weekStart, weeklyMissions,
 } from "../js/game.js";
 import { defaultGame, state } from "../js/state.js";
@@ -132,4 +132,35 @@ test("treasures and titles unlock from study milestones", () => {
   assert.equal(checkUnlocks().length, 0);
   assert.ok(bonuses().qi >= 0.05);
   assert.equal(QI.intro, 10);
+});
+
+test("tribulation choices: no shared characters, meanings or exact homophones", () => {
+  const W = (k, w, p, g) => ({ k, w, p, g });
+  const target = W("a", "是", "shì", "to be");
+  const pool = [
+    target,
+    W("b", "事", "shì", "matter; thing"), // same sound: impossible to tell apart by ear
+    W("c", "是", "shì", "yes"), // same characters (a homograph)
+    W("d", "在", "zài", "to be; at"), // same first meaning
+    W("e", "十", "shí", "ten"), // different tone: fair for listening
+    W("f", "四", "sì", "four"),
+    W("g", "大", "dà", "big"),
+    W("h", "学生", "xuésheng", "student"),
+    W("i", "老师", "lǎoshī", "teacher"),
+  ];
+  for (let n = 0; n < 50; n++) {
+    let seed = n + 1;
+    const rand = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+    for (const kind of ["meaning", "reverse", "listen"]) {
+      const opts = tribulationOptions(pool, target, kind, rand);
+      assert.equal(opts.length, 4);
+      assert.equal(opts.filter((w) => w === target).length, 1);
+      const others = opts.filter((w) => w !== target);
+      assert.ok(others.every((w) => w.w !== "是" && w.k !== "d"), kind);
+      assert.equal(new Set(opts.map((w) => w.w)).size, 4);
+      if (kind === "listen") assert.ok(others.every((w) => w.k !== "b"));
+      // character choices match the answer's length when they can
+      if (kind !== "meaning") assert.ok(others.every((w) => [...w.w].length === 1), kind);
+    }
+  }
 });

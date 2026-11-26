@@ -38,6 +38,7 @@ let navEl;
 let scriptEl;
 let statusEl;
 let qiLine;
+let sealed = false; // pinyin is sealed during the Heavenly Tribulation
 
 function currentRoute() {
   const r = location.hash.replace(/^#/, "") || "cave";
@@ -90,7 +91,15 @@ function buildShell() {
 }
 
 function updateScriptSwitch() {
-  scriptEl?.querySelectorAll("button").forEach((b) => b.setAttribute("aria-checked", String(b.dataset.mode === state.settings.script)));
+  if (!scriptEl) return;
+  // the tribulation shows characters only, whatever the setting; the setting itself is untouched
+  const shown = sealed ? "hanzi" : state.settings.script;
+  scriptEl.classList.toggle("sealed", sealed);
+  scriptEl.title = sealed ? "Pinyin is sealed during the Heavenly Tribulation" : "";
+  scriptEl.querySelectorAll("button").forEach((b) => {
+    b.setAttribute("aria-checked", String(b.dataset.mode === shown));
+    b.disabled = sealed;
+  });
 }
 
 /** Realm chip, spirit stones and the Qi line under the header. */
@@ -128,6 +137,8 @@ function updateNav(route) {
     else a.removeAttribute("aria-current");
   });
   document.body.dataset.route = route.startsWith("drill-") || route === "study" || route === "tribulation" ? "focus" : base;
+  sealed = route === "tribulation";
+  updateScriptSwitch();
 }
 
 let renderToken = 0;

@@ -212,6 +212,43 @@ export function tribulationSetup(g = state.game) {
   return { bolts: 6 + Math.min(3, g.realm), hearts: 3 + bonuses(g).hearts + g.heartBonus };
 }
 
+/**
+ * Answer choices for one tribulation bolt. Pinyin is sealed during the
+ * tribulation, so "reverse" and "listen" bolts are answered in characters
+ * alone. Distractors never share the answer's characters or its first English
+ * meaning; for "listen" they never sound exactly the same (是/事/市 can't be
+ * told apart by ear), and character choices prefer the answer's length so a
+ * two-character answer doesn't stand out among single characters.
+ */
+export function tribulationOptions(pool, word, kind, rand = Math.random) {
+  const meaning = (w) => (w.g || "").split(";")[0].trim().toLowerCase();
+  const sound = (w) => (w.p || "").normalize("NFC").toLowerCase().replace(/[\s'’·-]/g, "");
+  const seenW = new Set([word.w]);
+  const seenG = new Set([meaning(word)]);
+  const cands = [];
+  for (const w of mix(pool, rand)) {
+    if (w.k === word.k || seenW.has(w.w) || seenG.has(meaning(w))) continue;
+    if (kind === "listen" && sound(w) === sound(word)) continue;
+    seenW.add(w.w);
+    seenG.add(meaning(w));
+    cands.push(w);
+  }
+  if (kind !== "meaning") {
+    const len = [...word.w].length;
+    cands.sort((a, b) => Math.abs([...a.w].length - len) - Math.abs([...b.w].length - len)); // stable: random within ties
+  }
+  return mix([word, ...cands.slice(0, 3)], rand);
+}
+
+function mix(list, rand) {
+  const a = list.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 export function finishTribulation(success) {
   const g = state.game;
   const from = g.realm;

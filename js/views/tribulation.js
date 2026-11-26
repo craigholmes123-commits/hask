@@ -1,13 +1,13 @@
 // 天劫 Heavenly Tribulation: the quiz that ends a realm.
 import { deckWords, loadFile, words } from "../data.js";
-import { FINAL_REALM, REALMS, finishTribulation, realm, tribulationReady, tribulationSetup } from "../game.js";
+import { FINAL_REALM, REALMS, finishTribulation, realm, tribulationOptions, tribulationReady, tribulationSetup } from "../game.js";
 import { banner, lightning } from "../fx.js";
-import { esc } from "../pinyin.js";
+import { esc, hanziHTML, pinyinHTML } from "../pinyin.js";
 import { REVIEW, RELEARNING } from "../srs.js";
 import { canPlayWord } from "../speech.js";
 import { state } from "../state.js";
 import { h, icon, shuffle } from "../ui.js";
-import { faceHTML, optionHTML, playWord } from "./common.js";
+import { playWord } from "./common.js";
 import { showUnlocks } from "./rewards.js";
 
 let keyHandler = null;
@@ -49,6 +49,7 @@ export async function renderTribulation(root, nav) {
       <div><span class="hearts">${heartIcons(hearts, hearts)}</span><span class="muted small">${hearts} Dao Hearts</span></div>
       <div><span class="bolts">${boltIcons(bolts, 0)}</span><span class="muted small">${bolts} bolts</span></div>
     </div>
+    <p class="trib-seal"><span class="seal" lang="zh-CN" aria-hidden="true">封</span><span><b>Pinyin is sealed.</b> The lightning shows characters only, with no pinyin and no tone colours, so you must know the hanzi themselves. Each word's pinyin is revealed after you answer.</span></p>
     <p class="muted small center">Failing costs 30% of your gathered Qi. You can try again once you have gathered it back.</p>`;
   const begin = h("button.btn.tribulation-btn.big", { type: "button", html: `${icon("bolt")} <span>Begin the tribulation</span>` });
   const back = h("a.btn.ghost", { href: "#cave", text: "Not yet" });
@@ -70,6 +71,11 @@ async function tribulationPool(r) {
     return c && (c.s === REVIEW || c.s === RELEARNING);
   });
   return learned.length >= 12 ? learned : list.slice(0, Math.max(40, learned.length));
+}
+
+/** Characters alone, in plain ink: no pinyin and no tone colours to lean on. */
+function sealedHanzi(word, size = "") {
+  return `<span class="hz ${size}" lang="zh-CN">${esc(word.w)}</span>`;
 }
 
 function heartIcons(left, total) {
@@ -101,14 +107,14 @@ function run(page, pool, bolts, hearts, nav) {
       }),
     );
     const prompt = h("div.prompt.paper");
-    const others = shuffle(pool.filter((w) => w.k !== word.k && w.g.split(";")[0] !== word.g.split(";")[0])).slice(0, 3);
-    const opts = shuffle([word, ...others]);
+    const opts = tribulationOptions(pool, word, kind);
+    const bolt = `第${i + 1}道天雷 · Bolt ${i + 1}`;
     if (kind === "meaning") {
-      prompt.innerHTML = `<p class="eyebrow">第${i + 1}道天雷 · Bolt ${i + 1}: what does this mean?</p><div class="prompt-face">${faceHTML(word, { size: "xl" })}</div>`;
+      prompt.innerHTML = `<p class="eyebrow">${bolt}: what does this mean?</p><div class="prompt-face"><span class="face">${sealedHanzi(word, "xl")}</span></div>`;
     } else if (kind === "reverse") {
-      prompt.innerHTML = `<p class="eyebrow">第${i + 1}道天雷 · Bolt ${i + 1}: which word means…</p><p class="prompt-en">${esc(word.g)}</p>`;
+      prompt.innerHTML = `<p class="eyebrow">${bolt}: which characters mean…</p><p class="prompt-en">${esc(word.g)}</p>`;
     } else {
-      prompt.innerHTML = `<p class="eyebrow">第${i + 1}道天雷 · Bolt ${i + 1}: what did you hear?</p>`;
+      prompt.innerHTML = `<p class="eyebrow">${bolt}: which characters did you hear?</p>`;
       const big = h("button.listen-btn", { type: "button", "aria-label": "Play again", html: icon("sound") });
       big.addEventListener("click", () => playWord(word, { explicit: true }));
       prompt.append(big);
@@ -120,7 +126,7 @@ function run(page, pool, bolts, hearts, nav) {
     const btns = opts.map((w, k) => {
       const b = h("button.option", {
         type: "button",
-        html: `<kbd>${k + 1}</kbd>${kind === "reverse" ? optionHTML(w) : `<span class="opt-en">${esc(w.g)}</span>`}`,
+        html: `<kbd>${k + 1}</kbd>${kind === "meaning" ? `<span class="opt-en">${esc(w.g)}</span>` : sealedHanzi(w)}`,
       });
       b.addEventListener("click", () => answer(k));
       grid.append(b);
@@ -136,15 +142,22 @@ function run(page, pool, bolts, hearts, nav) {
         if (opts[n] === word) b.classList.add("is-right");
         else if (n === k) b.classList.add("is-wrong");
       });
+      // the seal lifts once the bolt has struck: add whatever the question didn't show
+      const py = `<span class="py">${pinyinHTML(word)}</span>`;
+      const hz = `<span class="hz" lang="zh-CN">${hanziHTML(word)}</span>`;
+      const gloss = `<span class="tr-gloss">${esc(word.g)}</span>`;
+      const reveal = kind === "meaning" ? py : kind === "reverse" ? hz + py : hz + py + gloss;
+      prompt.append(h("div.trib-reveal", { html: reveal }));
       if (right) {
-        page.querySelector(".prompt").classList.add("shielded");
+        prompt.classList.add("shielded");
       } else {
         left -= 1;
         lightning();
         page.querySelector(".hearts").innerHTML = heartIcons(left, hearts);
       }
+      if (kind !== "listen" && state.settings.autoplay) playWord(word);
       i += 1;
-      setTimeout(question, right ? 700 : 1500);
+      setTimeout(question, right ? 1200 : 2400);
     }
     setKeys((e) => {
       const n = Number(e.key);

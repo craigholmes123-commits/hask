@@ -60,7 +60,7 @@ export async function renderCave(root, nav) {
     const gauge = h("div.gauge");
     const msg =
       step.kind === "tribulation"
-        ? "Your foundation is complete. The heavens are gathering their lightning."
+        ? "Your foundation is complete. The heavens are gathering their lightning. Pinyin will be sealed: know your characters."
         : step.kind === "words"
           ? `Bottleneck: learn ${needW - have} more ${needW - have === 1 ? "word" : "words"} from ${r.scripture} to ${g.stage < 9 ? `reach layer ${g.stage + 1}` : "face your tribulation"}.`
           : `Gather ${(need - Math.floor(g.qi)).toLocaleString()} more Qi. Every correct answer feeds your dantian.`;

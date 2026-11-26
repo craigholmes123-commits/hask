@@ -3012,6 +3012,62 @@ h3 {
 .bolt-ic.done .icon {
   color: var(--line);
 }
+/* pinyin is sealed during the tribulation */
+.trib-seal {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+.trib-seal .seal {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  font-size: 18px;
+  margin-top: 2px;
+}
+.script-switch.sealed {
+  opacity: 0.55;
+}
+.script-switch.sealed button {
+  cursor: not-allowed;
+}
+.trib-reveal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: min(100%, 300px);
+  margin: 12px auto 0;
+  padding-top: 10px;
+  border-top: 1px dashed var(--line);
+  animation: rise 0.25s ease-out;
+}
+.trib-reveal .hz {
+  font-family: var(--font-hz);
+  font-size: 1.7rem;
+  line-height: 1.2;
+}
+.trib-reveal .py {
+  font-size: 1.25rem;
+}
+.trib-reveal .tr-gloss {
+  color: var(--muted);
+  font-size: 0.9rem;
+  text-align: center;
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
 .trib-bar {
   display: flex;
   flex-wrap: wrap;
