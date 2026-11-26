@@ -1,0 +1,39 @@
+# id: gift
+# title: 生日礼物
+# en: The Birthday Present
+# level: 3
+# blurb: Dad and I can't decide what to give Mum. Mum has her own plan.
+---
+下 个 星期 是 妈妈 的 生日 。 | Next week is Mum's birthday.
+爸爸 问 我 ： “ 你 说 ， 我们 送 妈妈 什么 礼物 好 ？ ” | Dad asks me: "What do you think we should give Mum?"
+我 想 了 想 ： “ 衣服 怎么样 ？ ” | I think for a moment: "How about some clothes?"
+“ 她 的 衣服 已经 太 多 了 。 ” | "She already has too many clothes."
+“ 那 买 一 本 书 吧 ， 妈妈 最 爱 看 书 了 。 ” | "Then let's buy a book. Mum loves reading."
+“ 书 也 不 行 。 她 说 今年 要 少 买 书 ， 多 去 图书馆 。 ” | "Not a book either. She says this year she'll buy fewer books and go to the library more."
+我们 想 了 很 久 ， 还是 不 知道 买 什么 。 | We think for a long time and still don't know what to buy.
+最后 爸爸 说 ： “ 我们 自己 做 吧 ！ 你 画 一 张 画 ， 我 给 她 做 一 大 桌子 菜 。 ” | Finally Dad says: "Let's make something ourselves! You paint a picture, and I'll cook her a whole table of food."
+
+妈妈 生日 那 天 ， 爸爸 很 早 就 起床 了 。 | On Mum's birthday, Dad gets up very early.
+他 忙 了 一个 上午 ， 做 了 很 多 菜 。 | He's busy all morning and cooks lots of dishes.
+我 在 房间 里 画 画 ， 画 上 有 我们 三 个 人 ， 还 有 我们 的 小 狗 。 | I paint in my room. In the picture are the three of us, and our little dog.
+晚上 妈妈 回 到 家 ， 看见 一 大 桌子 菜 和 我 的 画 ， 非常 高兴 。 | When Mum gets home that evening and sees the table full of food and my picture, she's overjoyed.
+“ 这 是 我 今年 收到 的 最 好 的 礼物 ！ ” | "This is the best present I've had all year!"
+
+吃 完 饭 ， 妈妈 说 ： “ 我 也 有 一个 礼物 要 给 你们 。 ” | After dinner, Mum says: "I have a present for you two as well."
+她 拿 出 三 张 火车 票 。 | She takes out three train tickets.
+“ 今年 生日 ， 我 想 和 你们 一起 去 旅游 。 下 个 星期 ， 我们 去 海 边 ！ ” | "For my birthday this year, I want to go travelling with you both. Next week, we're going to the seaside!"
+爸爸 和 我 都 笑 了 。 | Dad and I both laugh.
+是 妈妈 的 生日 ， 但是 礼物 是 给 我们 的 ！ | It's Mum's birthday, but the present is for us!
+---
+? 爸爸 为什么 不 想 送 妈妈 衣服 ？ | Why doesn't Dad want to give Mum clothes?
+* 她 的 衣服 已经 太 多 了 。
+- 衣服 太 贵 了 。
+- 妈妈 不 喜欢 新 衣服 。
+? 最后 ， 爸爸 和 “ 我 ” 送 了 妈妈 什么 ？ | In the end, what did Dad and "I" give Mum?
+- 一 本 书 和 一 件 衣服
+* 一 大 桌子 菜 和 一 张 画
+- 三 张 火车 票
+? 妈妈 给 他们 的 礼物 是 什么 ？ | What was Mum's present to them?
+- 一 张 画
+- 一 本 书
+* 三 张 火车 票

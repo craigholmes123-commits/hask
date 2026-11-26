@@ -1,0 +1,46 @@
+# id: boy-5
+# title: 第一课
+# en: The First Lesson
+# level: 4
+# series: 茶馆少年 | The Teahouse Boy | 5
+# blurb: Xiao Lin wants to learn to fly. His master hands him a broom.
+# words: @小林|Xiǎo Lín|Xiao Lin (a boy's name); 茶馆|chá guǎn|teahouse; @青云门|Qīng yún Mén|the Azure Cloud Sect; 师父|shī fu|master (teacher of a craft or martial art); 弟子; 修炼|xiū liàn|to cultivate (body, mind and spirit); 扫|sǎo|to sweep; 扫帚
+---
+小林 现在 是 青云门 的 弟子 了 ， 那个 老人 就 是 他 的 师父 。 | Xiao Lin was now a disciple of the Azure Cloud Sect, and the old man was his master.
+第 一 天 早上 ， 小林 很 早 就 起床 了 。 | On the first morning, Xiao Lin got up very early.
+他 心里 很 激动 ： “ 今天 师父 会 教 我 什么 呢 ？ 是 不 是 飞 ？ ” | He was thrilled: "What will Master teach me today? Flying, maybe?"
+
+师父 给 了 他 一 把 扫帚 。 | His master handed him a broom.
+“ 先 把 门 前 的 地|dì 扫 干净 。 ” | "First, sweep the ground in front of the gate."
+小林 扫 了 一个 上午 。 | Xiao Lin swept all morning.
+下午 ， 师父 又 让 他 去 山 下 打 水 。 | In the afternoon, his master sent him down the mountain to fetch water.
+晚上 ， 师父 让 他 学习 十 个 新 字 。 | In the evening, his master had him learn ten new characters.
+
+一个 月 过去 了 ， 每 天 都 是 这样 。 | A month passed, and every day was the same.
+小林 终于 不 想 再 等 了 ： “ 师父 ， 我 是 来 修炼 的 ， 不 是 来 扫 地|dì 的 ！ 什么 时候 才 能 学 飞 ？ ” | At last Xiao Lin couldn't wait any longer: "Master, I came here to cultivate, not to sweep floors! When will I learn to fly?"
+师父 没有 生气 。 他 在 地|dì 上 写 了 一个 字 ： 飞 。 | His master didn't get angry. He wrote a character on the ground: 飞, fly.
+“ 你 认识 这个 字 吗 ？ ” | "Do you know this character?"
+“ 当然 认识 ， 这 是 ‘ 飞 ’ 。 ” | "Of course. It's 飞."
+“ 你 读 这个 字 ， 用 了 多 长 时间 ？ ” | "How long did it take you to read it?"
+“ 一 秒 都 不 到 。 ” | "Less than a second."
+
+师父 笑 了 ： “ 一 年 前 ， 你 在 茶馆 里 ， 连 ‘ 道 ’ 字 都 不 认识 。 ” | His master smiled: "A year ago, in the teahouse, you couldn't even read 道."
+“ 现在 ， 一千 个 字 你 都 认识 ， 看 书 像 飞 一样 快 。 ” | "Now you know a thousand characters, and you read as fast as flying."
+“ 你 每 天 扫 地|dì 、 打 水 、 学 字 ， 就 是 在 修炼 。 ” | "Sweeping, fetching water, learning characters every day: that is cultivation."
+“ 你 已经 在 飞 了 ， 只是 自己 不 知道 。 ” | "You're already flying. You just don't know it yet."
+小林 拿 起 扫帚 ， 又 去 扫 地|dì 了 。 | Xiao Lin picked up the broom and went back to sweeping.
+这 一 次 ， 他 一边 扫 ， 一边 笑 。 | This time, he smiled as he swept.
+（ 第 五 回 完 ） | (End of chapter five)
+---
+? 第 一 天 ， 师父 让 小林 做 什么 ？ | On the first day, what did the master have Xiao Lin do?
+* 扫 地|dì
+- 学 飞
+- 写 书
+? 一个 月 后 ， 小林 为什么 不 高兴 ？ | Why was Xiao Lin unhappy after a month?
+* 他 想 学 飞 ， 但是 每 天 都 在 扫 地|dì 。
+- 师父 对 他 生气 了 。
+- 他 想 回 茶馆 。
+? 师父 说 ， 什么 是 修炼 ？ | According to the master, what is cultivation?
+- 每 天 学 飞
+* 每 天 扫 地|dì 、 打 水 、 学 字
+- 每 天 在 茶馆 工作

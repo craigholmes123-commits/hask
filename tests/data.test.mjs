@@ -79,3 +79,41 @@ test("spot checks against the 2025 syllabus", () => {
   assert.match(find("穿").g, /wear/);
   assert.match(find("号", "hào").g, /day|number/);
 });
+
+test("graded stories: every word resolves, readings line up, questions are answerable", () => {
+  const { stories } = load("stories");
+  const keys = new Set([...all.map((w) => "h" + w.i), ...load("top").words.map((w) => w.k)]);
+  const ids = new Set();
+  const HAN = /\p{Script=Han}/u;
+  for (const s of stories) {
+    assert.ok(!ids.has(s.id), `duplicate ${s.id}`);
+    ids.add(s.id);
+    assert.ok(s.lv >= 0 && s.lv <= 7, `${s.id} level`);
+    const own = new Set(s.w.map((w) => w.w));
+    const lines = [...s.p.flat(), ...s.q, ...s.q.flatMap((q) => q.o)];
+    for (const x of lines) {
+      const z = x.z.split("|");
+      const y = x.y.split("|");
+      const k = x.k.split("|");
+      assert.equal(y.length, z.length, `${s.id}: ${x.z}`);
+      assert.equal(k.length, z.length, `${s.id}: ${x.z}`);
+      z.forEach((t, i) => {
+        if (!HAN.test(t)) return assert.equal(k[i], "", `${s.id}: punctuation ${t}`);
+        assert.equal(y[i].split(" ").length, [...t].length, `${s.id}: ${t} ${y[i]}`);
+        if (k[i] === "#") return;
+        if (k[i].startsWith("g:")) return assert.ok(own.has(t), `${s.id}: ${t} must be in its word list`);
+        assert.ok(keys.has(k[i]), `${s.id}: ${t} → unknown key ${k[i]}`);
+      });
+    }
+    assert.ok(s.q.length >= 2, `${s.id} needs questions`);
+    for (const q of s.q) assert.ok(q.a >= 0 && q.a < q.o.length && q.o.length >= 2, `${s.id} question ${q.z}`);
+  }
+  // every realm from Qi Refining to Spirit Transformation has at least two tales
+  for (let lv = 0; lv <= 4; lv++) assert.ok(stories.filter((s) => s.lv === lv).length >= 2, `level ${lv}`);
+  // a serial's parts run 1, 2, 3… in order of difficulty
+  const parts = stories.filter((s) => s.s).sort((a, b) => a.s[2] - b.s[2]);
+  parts.forEach((s, i) => {
+    assert.equal(s.s[2], i + 1);
+    if (i) assert.ok(s.lv >= parts[i - 1].lv);
+  });
+});

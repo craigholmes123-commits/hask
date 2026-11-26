@@ -1,0 +1,39 @@
+# id: new-friend
+# title: 第一个朋友
+# en: My First Friend
+# level: 2
+# blurb: A newcomer to China meets the girl next door, and learns to make dumplings.
+# words: @马克|Mǎ kè|Mark (a name); @安安|Ān an|Anan (a girl's name); 欢迎; 英国|Yīng guó|Britain, the UK; 包饺子|bāo jiǎo zi|to make dumplings
+---
+上 个 星期 ， 我 来 到 了 中国 。 | Last week, I came to China.
+一 天 晚上 ， 门 外 有 人 说 ： “ 你好 ！ 有 人 在 家 吗 ？ ” | One evening, someone outside the door says: "Hello! Is anyone home?"
+我 开 门 ， 看见 一个 女孩儿 。 | I open the door and see a girl.
+她 说 ： “ 你好 ！ 我 叫 安安 ， 住 在 你 旁边 。 欢迎 你 ！ ” | She says: "Hi! I'm Anan, I live next door. Welcome!"
+
+我 说 ： “ 谢谢 ！ 我 叫 马克 。 我 的 汉语 不 太 好 ， 请 你 说 慢 一点儿 。 ” | I say: "Thank you! I'm Mark. My Chinese isn't very good; please speak a little slowly."
+安安 笑 了 ， 说 得 很 慢 ： “ 好 。 你 是 哪 国 人 ？ ” | Anan smiles and speaks slowly: "Okay. Where are you from?"
+“ 我 是 英国 人 。 我 来 中国 学习 汉语 。 ” | "I'm British. I came to China to study Chinese."
+“ 你 喜欢 中国 吗 ？ ” | "Do you like China?"
+“ 很 喜欢 ！ 中国 菜 很 好吃 ， 人 也 很 好 。 ” | "Very much! Chinese food is delicious, and the people are lovely."
+“ 你 会 做 中国 菜 吗 ？ ” | "Can you cook Chinese food?"
+“ 不 会 。 我 就 会 吃 ！ ” | "No. I can only eat it!"
+
+安安 说 ： “ 那 明天 晚上 来 我 家 吧 ！ 我们 一起 包饺子 。 ” | Anan says: "Then come to my place tomorrow evening! We'll make dumplings together."
+第 二 天 晚上 ， 我 去 了 安安 家 。 | The next evening, I go to Anan's home.
+她 的 妈妈 教 我 包饺子 。 | Her mum teaches me how to make dumplings.
+我 包 的 饺子 不 好看 ， 但是 很 好吃 ！ | My dumplings don't look pretty, but they taste great!
+安安 说 ： “ 你 看 ， 现在 你 也 会 做 中国 菜 了 ！ ” | Anan says: "See? Now you can cook Chinese food too!"
+那 天 ， 我 在 中国 有 了 第 一 个 朋友 。 | That day, I made my first friend in China.
+---
+? 马克 为什么 来 中国 ？ | Why did Mark come to China?
+* 学习 汉语
+- 工作
+- 看 朋友
+? 安安 的 妈妈 教 马克 做 什么 ？ | What does Anan's mum teach Mark to make?
+- 包子
+* 饺子
+- 面条儿
+? 马克 做 的 饺子 怎么样 ？ | What are Mark's dumplings like?
+* 不 好看 ， 但是 很 好吃 。
+- 很 好看 ， 也 很 好吃 。
+- 很 好看 ， 但是 不 好吃 。

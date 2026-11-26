@@ -53,6 +53,7 @@ export async function renderGuide(root) {
     <a href="#guide" data-jump="g-cult">Cultivation</a>
     <a href="#guide" data-jump="g-loop">Daily loop</a>
     <a href="#guide" data-jump="g-habits">Habits</a>
+    <a href="#guide" data-jump="g-ci">Teahouse</a>
     <a href="#guide" data-jump="g-tones">Tones</a>
     <a href="#guide" data-jump="g-pinyin">Pinyin</a>
     <a href="#guide" data-jump="g-switch">汉字 / pīnyīn</a>
@@ -72,6 +73,7 @@ export async function renderGuide(root) {
       <li><b><span lang="zh-CN">法宝</span> Treasures and <span lang="zh-CN">道号</span> titles</b> are earned by milestones: a 7-day streak, 500 mastered words, surviving a tribulation…</li>
       <li><b><span lang="zh-CN">灵兽</span> Spirit beast.</b> An egg appears after your first session. It grows each day you cultivate, hatches into a companion you choose, and grants a bonus that grows with it.</li>
       <li><b><span lang="zh-CN">心魔</span> Inner Demons</b> are the words you keep getting wrong. Fight them in the Trials for extra Qi.</li>
+      <li><b><span lang="zh-CN">茶馆</span> Teahouse.</b> Finishing a tale gathers Qi (2 per sentence and 5 per right answer, once per tale each day) and 10 spirit stones the first time. Chatter sentences give 2 Qi each.</li>
     </ul>
   </section>
 
@@ -80,6 +82,17 @@ export async function renderGuide(root) {
     <p>Every session starts with the words that are due for review, then adds new words from the deck you're studying (${daily} a day right now).</p>
     <p>A new word is shown in full: characters, pinyin, sound and meaning. Say it out loud, then the app quizzes you on it a few cards later and again before the session ends.</p>
     <p>Each correct answer pushes the next review further out: roughly 10 minutes, 1 day, 3 days, a week, a month. A miss brings the word back sooner. Once a word's gap reaches three weeks it counts as known and gets the <span class="seal inline">熟</span> seal.</p>
+  </section>
+
+  <section id="g-ci" class="card prose">
+    <h2><span lang="zh-CN">听书</span> Comprehensible input: the Teahouse</h2>
+    <p>Flashcards teach you words; <b>input</b> teaches you the language. You acquire Chinese by hearing and reading a great deal of it that you <i>almost</i> understand: enough known words to follow the meaning, a few new ones you can work out from context. Researchers put the sweet spot for easy reading at about 95–98% of words known; with the help on hand here (pinyin, a tap for any word, the English one tap away), around 85% works.</p>
+    <ul class="rules">
+      <li><b>Tales</b> are short stories written for each realm, using that scripture's words and a few new ones taught at the top. Each tale shows how much of it you know, and the storyteller suggests the one that fits you best. Words you haven't studied yet are underlined; tap one to see it, or tap <i>Learn next</i> to put it first in your next session.</li>
+      <li><b>Chatter</b> is a stream of real sentences with exactly one word you haven't learned (“i + 1”). Each one teaches a word in context.</li>
+      <li><b>How to use them:</b> listen to the whole tale first, then read along with the sound. Guess before you tap. Reread a tale the next day: it will feel easier, and that ease is the learning.</li>
+      <li><b>Then go beyond.</b> Once the tales feel easy, the Teahouse lists podcasts, videos and graded readers made for learners.</li>
+    </ul>
   </section>
 
   <section id="g-habits" class="prose">
@@ -92,7 +105,7 @@ export async function renderGuide(root) {
       <div class="habit"><h3>Use the parts of each character</h3><p>About two in three HSK characters combine a meaning part and a sound part. 妈 mā is 女 “woman” + 马 mǎ for the sound. Every word page shows how its characters are built.</p></div>
       <div class="habit"><h3>Grow word families</h3><p>Know 学 and you're halfway to 学生 student, 学校 school, 同学 classmate. Word pages list the other words that share a character.</p></div>
       <div class="habit"><h3>Hide the pinyin early</h3><p>Pinyin is a crutch for reading. Once a word feels familiar, switch the top toggle to 汉字 so the pinyin only appears after you answer. The Heavenly Tribulation seals pinyin away, so this is also how you prepare for it.</p></div>
-      <div class="habit"><h3>Read real sentences</h3><p>The Sentences drill picks sentences built only from words you've studied, so you practise reading without a dictionary.</p></div>
+      <div class="habit"><h3>Read and listen every day</h3><p>Pair each session with a tale or some chatter in the Teahouse. Reviews keep words alive; meeting them again in a story is what makes them yours.</p></div>
       <div class="habit"><h3>Skip what you know</h3><p>Tap “I already know it” on a new word you've learned elsewhere. It goes straight to a monthly check instead of using up your daily slots.</p></div>
       <div class="habit"><h3>Welcome mistakes</h3><p>A missed review isn't a failure. Struggling to recall and then seeing the answer is what moves a word into long-term memory.</p></div>
     </div>

@@ -23,6 +23,7 @@ Progress comes only from study; nothing accumulates while you're away.
 - **修炼 Cultivate**: the spaced-repetition session. **试炼 Trials** are the drills, and **心魔 Inner Demons** fights your most-missed words.
 - **宝库 Treasury**: spend **灵石 spirit stones** on pills (double Qi, extra Dao Heart, beast growth) and on the **聚灵阵 Spirit-Gathering Array** (+10% Qi per level). Collect **法宝 treasures** and **道号 titles** earned by milestones.
 - **灵兽 Spirit beast**: an egg appears after your first session, grows each day you cultivate, and hatches into an Ink Fox, Cloud Crane, Jade Rabbit or Qilin with its own bonus.
+- **茶馆 Teahouse**: comprehensible input. Finishing a tale gathers Qi and, the first time, spirit stones; ten tales earn the Storyteller's Gavel (+25% Qi in the Teahouse).
 - **宗门 Sect**: three daily and two weekly missions that pay spirit stones, your cultivator's record, the **Elder's Teachings** (the learning guide) and the **Sect Hall** (settings).
 
 ## What's inside
@@ -35,6 +36,7 @@ Progress comes only from study; nothing accumulates while you're away.
 - **Native-speaker audio** for 99.6% of the 11,000 words, built in and cached for offline use: whole-word recordings where they exist, otherwise the word's syllables read in the right tones. Sentences use the device's Mandarin voice (or Claude's voice when hosted on claude.ai).
 - **New-word cards** with tone-coloured characters in 田字格 practice squares, audio (normal and slow), how each character is built (meaning part + sound part), and an example sentence.
 - **Word pages**: all meanings, measure words, character breakdowns, words that share a character, and up to three example sentences with per-word pinyin.
+- **茶馆 Teahouse (comprehensible input)**: 14 original graded tales from Top 100 to HSK 4, including the serial *茶馆少年 The Teahouse Boy*, about a boy who learns that every character is a step on the Dao. Each tale uses only its realm's words plus a few pre-taught ones, shows how much of it you know, and underlines words you haven't studied. Tap any word to look it up or to *Learn next* (it comes first in your next session), reveal English one sentence at a time, listen to one sentence or the whole tale, then answer the storyteller's questions. **Chatter** serves real sentences with exactly one word you haven't learned (i + 1). The Teahouse also lists podcasts, videos and graded readers for more input.
 - **Trials**: Tone (tone pairs by ear), Listening, Reading (only sentences made of words you've studied), Speed, Inner Demons (most-missed words).
 - **Elder's Teachings**: how cultivation works, habits that speed learning up, tones with pitch-contour diagrams and audio, pinyin sounds that surprise English speakers, tone-change rules, the HSK 3.0 table and a realistic timeline.
 - **Progress** saved on the device, with backup and restore. When the app runs as a claude.ai artifact, progress also syncs between devices.
@@ -62,10 +64,13 @@ js/game.js                   cultivation rules: realms, Qi, bottlenecks, tribula
 js/fx.js                     ink-wash mountains, Qi floats, lightning, banners
 js/audio.js, js/speech.js    recordings, device voice and Claude voice playback
 js/data.js                   deck loading, search, word families
-js/views/*.js                Cave, Library, Cultivate (study), Trials, Tribulation, Treasury, Sect, Teachings, Sect Hall
+js/ci.js                     comprehensible input: story coverage, suggestions, i+1 sentences (unit-tested)
+js/views/*.js                Cave, Library, Teahouse, Cultivate (study), Trials, Tribulation, Treasury, Sect, Teachings, Sect Hall
 data/*.json                  generated vocabulary, sentences, characters
 audio/*.mp3                  packed native-speaker recordings (~200 clips per file)
 tools/build_data.py          regenerates data/ and audio/ from the original sources
+tools/stories/*.txt          the graded tales, written word by word with English and questions
+tools/build_stories.py       checks every tale against its level and writes data/stories.json
 tests/*.test.mjs             unit + data-integrity tests (npm test)
 sw.js, manifest.webmanifest  offline support and install metadata
 ```
@@ -74,11 +79,12 @@ sw.js, manifest.webmanifest  offline support and install metadata
 
 ```
 pip install -r tools/requirements.txt   # also needs git and ffmpeg for the audio
-npm run build-data          # downloads sources into tools/.cache, writes data/ and audio/
+npm run build-data          # downloads sources into tools/.cache, writes data/ and audio/, then the stories
+npm run build-stories       # only the tales: fast, offline, needs the data/ files
 npm test
 ```
 
-The build parses the syllabus PDF, checks that all 11,000 entries and the official per-level counts are present, aligns every pinyin syllable with its character, matches English definitions to the official reading, and picks example sentences that use the easiest possible surrounding words. It fails loudly if the syllabus can't be parsed exactly. The audio step trims silence from every recording, evens out loudness, re-encodes to one small format and packs the clips into files of about 200; add `--no-audio` to skip it.
+The build parses the syllabus PDF, checks that all 11,000 entries and the official per-level counts are present, aligns every pinyin syllable with its character, matches English definitions to the official reading, and picks example sentences that use the easiest possible surrounding words. It fails loudly if the syllabus can't be parsed exactly. `build_stories.py` rejects any word in a tale that is above the tale's level and not pre-taught, any word with several readings unless the tale marks the one it means (只|zhī) or it has a default (的 de, 地 de), and any pre-taught word the tale never uses. Defaults can still be wrong in context (地 dì, "ground"), so new tales need their readings checked by eye. The audio step trims silence from every recording, evens out loudness, re-encodes to one small format and packs the clips into files of about 200; add `--no-audio` to skip it.
 
 ## Sources and licences
 
@@ -89,6 +95,7 @@ The build parses the syllabus PDF, checks that all 11,000 entries and the offici
 | Curated learner glosses | [HSKStory hsk-3-vocabulary](https://github.com/bezlant/hsk-3-vocabulary) | CC BY-SA 4.0 |
 | Word and syllable recordings | [audio-cmn](https://github.com/hugolpz/audio-cmn), read by Yue Tan (Shtooka project) and Chen Wang | CC BY-SA |
 | Example sentences | [Tatoeba](https://tatoeba.org) via [manythings.org](https://www.manythings.org/anki/) | CC BY 2.0 FR |
+| Teahouse tales | Original stories written for Hask (`tools/stories/`) | Same terms as `data/` |
 | Character decomposition and origins | [Make Me a Hanzi](https://github.com/skishore/makemeahanzi) `dictionary.txt` | LGPL-3.0 |
 | App icon stroke outlines | Make Me a Hanzi `graphics.txt` (Arphic fonts) | Arphic Public License |
 | Word frequency | [wordfreq](https://github.com/rspeer/wordfreq) and [FrequencyWords](https://github.com/hermitdave/FrequencyWords) (OpenSubtitles 2018) | CC BY-SA 4.0 |

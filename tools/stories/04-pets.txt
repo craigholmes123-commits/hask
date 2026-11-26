@@ -1,0 +1,37 @@
+# id: cat-dog
+# title: 猫和狗
+# en: The Cat and the Dog
+# level: 1
+# blurb: Huahua the cat only wants to sleep. Dada the dog only wants to play.
+# words: @花花|Huā hua|Huahua (the cat's name, "Flowery"); @大大|Dà da|Dada (the dog's name, "Biggy")
+---
+我 家 有 一 只|zhī 猫 和 一 只|zhī 狗 。 | My family has a cat and a dog.
+猫 叫 花花 ， 狗 叫 大大 。 | The cat is called Huahua, and the dog is called Dada.
+花花 很 小 ， 大大 很 大 。 | Huahua is small, and Dada is big.
+
+花花 喜欢 睡觉 。 | Huahua likes to sleep.
+它 早上 睡 ， 下午 睡 ， 晚上 也 睡 。 | She sleeps in the morning, in the afternoon, and at night too.
+大大 喜欢 玩 。 | Dada likes to play.
+它 早上 玩 ， 下午 玩 ， 晚上 还 想 玩 。 | He plays in the morning, in the afternoon, and still wants to play at night.
+大大 很 想 和 花花 玩 ， 但是 花花 不 想 。 | Dada really wants to play with Huahua, but Huahua doesn't want to.
+
+有 一 天 ， 下 大 雨 了 。 | One day, it rains hard.
+大大 不能 去 外边 玩 ， 很 不 高兴 。 | Dada can't go outside to play, and he's very unhappy.
+它 在 房间 里 走 来 走 去 。 | He walks back and forth around the room.
+花花 看 了 看 大大 ， 走 到 它 那儿 。 | Huahua looks at Dada and walks over to him.
+它 在 大大 那儿 睡 了 。 | She lies down next to Dada and falls asleep.
+大大 看 着 花花 ， 也 不 想 玩 了 。 | Dada looks at Huahua and doesn't feel like playing any more.
+那 天 下午 ， 两 个 好 朋友 都 在 睡觉 。 | That afternoon, the two good friends are both asleep.
+---
+? 花花 喜欢 做 什么 ？ | What does Huahua like to do?
+* 睡觉
+- 玩
+- 吃 饭
+? 大大 为什么 不 高兴 ？ | Why is Dada unhappy?
+* 下 雨 了 ， 它 不能 去 外边 玩 。
+- 花花 不 喜欢 它 。
+- 它 没有 饭 吃 。
+? 那 天 下午 ， 大大 在 做 什么 ？ | What is Dada doing that afternoon?
+- 在 外边 玩
+* 在 睡觉
+- 在 吃 饭

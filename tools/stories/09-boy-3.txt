@@ -1,0 +1,44 @@
+# id: boy-3
+# title: 日、月、明
+# en: Sun, Moon, Bright
+# level: 2
+# series: 茶馆少年 | The Teahouse Boy | 3
+# blurb: The old man disappears for a month. When he comes back, he brings a book.
+# words: @小林|Xiǎo Lín|Xiao Lin (a boy's name); 茶馆|chá guǎn|teahouse; 老人; 太阳; 月亮; 明|míng|bright; 明白; @青云山|Qīng yún Shān|Azure Cloud Mountain
+---
+那 天 后 ， 老人 很 多 天 没 来 茶馆 。 | After that day, the old man didn't come to the teahouse for many days.
+小林 每 天 都 在 等 他 。 | Every day, Xiao Lin waited for him.
+他 工作 的 时候 也 在 写 字 。 | Even while he worked, he was writing characters.
+他 写 “ 人 ” ， 写 “ 大 ” ， 写 “ 天 ” ， 每 个 字 都 写 了 很 多 次 。 | He wrote 人, 大 and 天, each one many, many times.
+茶馆 里 的 人 都 说 ： “ 这个 孩子 在 做 什么 ？ ” | Everyone in the teahouse said: "What is that boy doing?"
+
+一个 月 后 ， 老人 来 了 。 | A month later, the old man came.
+小林 跑 过去 ： “ 先生 ， 您 去 哪儿 了 ？ ” | Xiao Lin ran over: "Sir, where have you been?"
+老人 笑 了 笑 ， 看 了 看 桌子 上 的 字 ： “ 你 每 天 都 写 ？ ” | The old man smiled and looked at the characters on the table: "You've been writing every day?"
+“ 对 ！ 每 天 都 写 。 ” | "Yes! Every day."
+“ 好 。 今天 我 教 你 一个 新 字 。 ” | "Good. Today I'll teach you a new character."
+
+他 写 了 一个 “ 日 ” ： “ 这 是 白天 的 太阳 。 ” | He wrote 日: "This is the sun in the daytime."
+又 写 了 一个 “ 月 ” ： “ 这 是 晚上 的 月亮 。 ” | Then he wrote 月: "This is the moon at night."
+他 把 两 个 字 写 在 一起 ： 明 。 | Then he wrote the two characters together: 明.
+“ 太阳 和 月亮 在 一起 ， 就 是 ‘ 明 ’ 。 ” | "Sun and moon together make 明, bright."
+小林 说 ： “ 是 ‘ 明天 ’ 的 ‘ 明 ’ ！ ” | Xiao Lin said: "It's the 明 of 明天, tomorrow!"
+老人 说 ： “ 也 是 ‘ 明白 ’ 的 ‘ 明 ’ 。 现在 你 明白 了 吗 ？ ” | The old man said: "And the 明 of 明白, to understand. Now do you understand?"
+
+老人 拿 出 一 本 书 ， 给 了 小林 。 | The old man took out a book and gave it to Xiao Lin.
+“ 这 本 书 里 有 一千 个 字 。 你 都 认识 了 ， 就 来 找 我 。 ” | "There are a thousand characters in this book. When you know them all, come and find me."
+小林 问 ： “ 去 哪儿 找 您 ？ ” | Xiao Lin asked: "Where should I look for you?"
+老人 已经 走 了 。 书 上 写 着 三 个 字 ： 青云山 。 | The old man had already gone. On the book were three characters: 青云山, Azure Cloud Mountain.
+---
+? 老人 没 来 的 时候 ， 小林 每 天 做 什么 ？ | While the old man was away, what did Xiao Lin do every day?
+* 写 字
+- 睡觉
+- 去 找 老人
+? “ 日 ” 和 “ 月 ” 在 一起 ， 是 什么 字 ？ | 日 and 月 together make which character?
+- 天
+- 大
+* 明
+? 小林 认识 了 书 里 的 字 后 ， 要 去 哪儿 ？ | Once Xiao Lin knows the characters in the book, where should he go?
+* 青云山
+- 茶馆
+- 学校

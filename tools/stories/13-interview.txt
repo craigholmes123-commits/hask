@@ -1,0 +1,43 @@
+# id: interview
+# title: 面试
+# en: The Interview
+# level: 4
+# blurb: Xiao Zhang's first job interview is at ten. At nine, someone on the street needs help.
+# words: @小张|Xiǎo Zhāng|Xiao Zhang (a name); 面试; 地铁站|dì tiě zhàn|metro station; 老奶奶|lǎo nǎi nai|elderly lady, granny
+---
+小张 大学 毕业 已经 三 个 月 了 ， 还 没有 找 到 工作 。 | Xiao Zhang graduated three months ago and still hasn't found a job.
+今天 上午 十 点 ， 他 要 去 一 家 很 有名 的 公司 面试 。 | At ten this morning, he has an interview at a well-known company.
+为了 这 次 面试 ， 他 准备 了 一个 星期 。 | He's spent a whole week preparing for it.
+他 八 点 就 出 门 了 ， 时间 应该 来得及 。 | He leaves home at eight, so there should be plenty of time.
+
+在 地铁站 门口 ， 他 看见 一 位 老奶奶 坐 在 地|dì 上 。 | At the entrance to the metro station, he sees an elderly lady sitting on the ground.
+老奶奶 看 起来 病 了 。 | She looks ill.
+旁边 的 人 都 很 忙 ， 没有 人 停 下来 。 | Everyone around is in a hurry, and nobody stops.
+小张 看 了 看 手表 ： 九 点 。 | Xiao Zhang checks his watch: nine o'clock.
+他 想 了 一下 ， 还是 走 了 过去 ： “ 奶奶 ， 您 怎么 了 ？ ” | He hesitates, then walks over anyway: "Granny, are you all right?"
+“ 我 有点儿 不 舒服 。 ” | "I'm not feeling very well."
+小张 给 她 买 了 水 ， 又 帮 她 给 家人 打 了 电话 。 | Xiao Zhang buys her some water and helps her phone her family.
+一直 等到 老奶奶 的 儿子 来 了 ， 他 才 离开 。 | He waits until her son arrives before he leaves.
+
+到 公司 的 时候 ， 已经 十 点 二十 了 。 | By the time he reaches the company, it's twenty past ten.
+小张 心里 很 难受 ： “ 第 一 次 面试 就 迟到 ， 肯定 没 希望 了 。 ” | Xiao Zhang feels awful: "Late for my very first interview. There's no chance now."
+面试 他 的 是 一 位 中年 男人 。 | His interviewer is a middle-aged man.
+男人 看 了 看 他 的 材料 ， 问 ： “ 你 为什么 迟到 ？ ” | The man looks over his documents and asks: "Why were you late?"
+小张 把 刚才 的 事情 都 告诉 了 他 。 | Xiao Zhang tells him exactly what happened.
+
+男人 听 完 ， 拿 出 手机 看 了 看 ， 笑 了 。 | The man listens, takes out his phone, looks at it, and smiles.
+“ 我 妈妈 刚才 给 我 发 了 消息 ， 说 一个 年轻 人 在 地铁站 帮 了 她 。 原来 就是 你 。 ” | "My mother just sent me a message saying a young man helped her at the metro station. So that was you."
+“ 我们 公司 需要 能力 强 的 人 ， 但是 更 需要 你 这样 的 人 。 明天 来 上班 吧 。 ” | "Our company needs capable people, but even more, it needs people like you. Start tomorrow."
+---
+? 小张 为什么 迟到 了 ？ | Why was Xiao Zhang late?
+* 他 在 地铁站 帮助 了 一 位 老奶奶 。
+- 他 起床 起 晚 了 。
+- 他 找 不 到 那 家 公司 。
+? 老奶奶 是 谁 ？ | Who was the elderly lady?
+- 小张 的 同学
+* 面试 小张 的 那个 人 的 妈妈
+- 小张 的 奶奶
+? 面试 的 结果|jiéguǒ 怎么样 ？ | How did the interview turn out?
+* 小张 明天 就 可以 去 上班 了 。
+- 小张 没有 得到 这个 工作 。
+- 小张 要 再 面试 一 次 。

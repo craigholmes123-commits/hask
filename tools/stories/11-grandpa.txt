@@ -1,0 +1,41 @@
+# id: grandpa-phone
+# title: 爷爷的手机
+# en: Grandpa's Phone
+# level: 3
+# blurb: I teach Grandpa to use a smartphone. Maybe I taught him too well.
+# words: 语音|yǔ yīn|voice message; 孙子; 响
+---
+爷爷 今年 七十 岁 了 。 | Grandpa is seventy this year.
+他 一直 用 一个 很 旧 的 手机 ， 只 能 打电话 。 | He's always used a very old phone that can only make calls.
+今年 过年 的 时候 ， 我 送 了 爷爷 一个 新 手机 。 | This Chinese New Year, I gave Grandpa a new phone.
+爷爷 说 ： “ 新 手机 太 难 用 了 ， 我 学 不 会 。 ” | Grandpa said: "New phones are too hard to use. I'll never learn."
+我 说 ： “ 没 问题 ， 我 教 您 。 ” | I said: "No problem, I'll teach you."
+
+第 一 天 ， 我 教 他 怎么 用 手机 照相 。 | On the first day, I taught him how to take photos with the phone.
+第 二 天 ， 我 教 他 怎么 用 手机 看 新闻 。 | On the second day, I taught him how to read the news on it.
+第 三 天 ， 我 教 他 怎么 发 语音 。 | On the third day, I taught him how to send voice messages.
+爷爷 学 得 很 快 。 他 说 ： “ 这么 简单 啊 ！ ” | Grandpa learned fast. He said: "It's that easy!"
+
+一 个 星期 以后 ， 我 的 手机 一直 在 响 。 | A week later, my phone wouldn't stop ringing.
+是 爷爷 ！ 他 一 天 给 我 发 了 五十 个 语音 。 | It was Grandpa! He'd sent me fifty voice messages in one day.
+“ 孙子 ， 你 吃 饭 了 吗 ？ ” | "Grandson, have you eaten?"
+“ 孙子 ， 今天 很 冷 ， 多 穿 一点儿 衣服 。 ” | "Grandson, it's cold today. Wear something warm."
+“ 孙子 ， 你 看 ， 这 是 我 照 的 花 ！ ” | "Grandson, look, here's a flower I photographed!"
+
+我 给 爷爷 打电话 ： “ 爷爷 ， 您 一 天 发 五十 个 语音 ， 是 不 是 太 多 了 ？ ” | I called Grandpa: "Grandpa, fifty voice messages a day, isn't that a bit much?"
+爷爷 说 ： “ 多 吗 ？ 我 一个 人 在 家 ， 每 天 都 想 和 你 说话 。 ” | Grandpa said: "Is it? I'm on my own at home. I want to talk with you every day."
+听 爷爷 这么 说 ， 我 不 知道 说 什么 好 。 | When I heard him say that, I didn't know what to say.
+那 个 周末 ， 我 回 家 去 看 爷爷 了 。 | That weekend, I went home to see Grandpa.
+---
+? 爷爷 的 新 手机 是 谁 送 的 ？ | Who gave Grandpa his new phone?
+* 他 的 孙子
+- 他 的 儿子
+- 他 的 朋友
+? 爷爷 学 用 新 手机 ， 学 得 怎么样 ？ | How did Grandpa do at learning to use the new phone?
+* 很 快
+- 很 慢
+- 学 不 会
+? 爷爷 为什么 发 那么 多 语音 ？ | Why did Grandpa send so many voice messages?
+* 他 一个 人 在 家 ， 想 和 孙子 说话 。
+- 他 的 手机 坏 了 。
+- 他 想 学 汉字 。

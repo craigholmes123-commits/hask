@@ -15,10 +15,12 @@ import { renderSect } from "./views/sect.js";
 import { endSession, hasSession, renderStudy, stopKeys } from "./views/study.js";
 import { renderTreasury } from "./views/treasury.js";
 import { renderTribulation, stopTribulationKeys } from "./views/tribulation.js";
+import { refreshTeahouse, renderChatter, renderTale, renderTeahouse, stopTeahouse } from "./views/teahouse.js";
 
 const NAV = [
   ["cave", "cave", "洞府", "Cave"],
   ["library", "library", "藏经阁", "Library"],
+  ["teahouse", "tea", "茶馆", "Teahouse"],
   ["trials", "trials", "试炼", "Trials"],
   ["treasury", "treasury", "宝库", "Treasury"],
   ["sect", "sect", "宗门", "Sect"],
@@ -128,10 +130,12 @@ const SECTIONS = {
   guide: "sect",
   prefs: "sect",
   tribulation: "cave",
+  teahouse: "teahouse",
+  chatter: "teahouse",
 };
 
 function updateNav(route) {
-  const base = route.startsWith("deck-") ? "library" : route.startsWith("drill-") ? "trials" : SECTIONS[route] || "cave";
+  const base = route.startsWith("deck-") ? "library" : route.startsWith("drill-") ? "trials" : route.startsWith("tale-") ? "teahouse" : SECTIONS[route] || "cave";
   navEl.querySelectorAll(".tab").forEach((a) => {
     if (a.dataset.route === base) a.setAttribute("aria-current", "page");
     else a.removeAttribute("aria-current");
@@ -148,6 +152,7 @@ async function render() {
   stopKeys();
   stopDrillKeys();
   stopTribulationKeys();
+  stopTeahouse();
   updateNav(route);
   const back = () => nav("cave");
   const toTrials = () => nav("trials");
@@ -155,6 +160,9 @@ async function render() {
     if (route === "cave") await renderCave(main, nav);
     else if (route === "library") await renderWords(main, nav);
     else if (route.startsWith("deck-")) await renderDeck(main, route.slice(5), nav);
+    else if (route === "teahouse") await renderTeahouse(main);
+    else if (route.startsWith("tale-")) await renderTale(main, route.slice(5));
+    else if (route === "chatter") await renderChatter(main);
     else if (route === "trials") await renderPractice(main, nav);
     else if (route === "treasury") renderTreasury(main);
     else if (route === "sect") renderSect(main);
@@ -215,7 +223,10 @@ function boot() {
       // re-render content that depends on how Chinese is shown
       if (["script", "toneColors"].includes(ev.key)) {
         if (route === "study" || route.startsWith("drill-")) refreshFaces();
-        else if (route !== "tribulation") render();
+        else if (route.startsWith("tale-") || route === "chatter") {
+          // keep your place in the tale: redraw the text where it is
+          if (!refreshTeahouse()) render();
+        } else if (route !== "tribulation") render();
       } else if (ev.key === "deck" && route === "library") render();
     } else if (ev.type === "sync") {
       const dot = document.querySelector(".sync-dot");

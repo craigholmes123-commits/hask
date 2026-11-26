@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { words } from "../js/data.js";
 import {
   QI, awardQi, bonuses, buyPill, checkUnlocks, claimMission, comprehended, dailyMissions, finishSession,
-  finishTribulation, gate, missionBoard, nextStep, qiNeed, tribulationOptions, tribulationReady, tribulationSetup, upgradeArray,
+  finishTale, finishTribulation, gate, missionBoard, nextStep, qiNeed, tribulationOptions, tribulationReady, tribulationSetup, upgradeArray,
   usePill, weekStart, weeklyMissions,
 } from "../js/game.js";
 import { defaultGame, state } from "../js/state.js";
@@ -163,4 +163,17 @@ test("tribulation choices: no shared characters, meanings or exact homophones", 
       if (kind !== "meaning") assert.ok(others.every((w) => [...w.w].length === 1), kind);
     }
   }
+});
+
+test("tales pay Qi once per tale per day, and stones the first time", () => {
+  fresh();
+  const a = finishTale("boy-1", { sentences: 10, correct: 3 });
+  assert.deepEqual(a, { first: true, qiBase: 10 * QI.tale + 3 * QI.taleAnswer, stones: 10 });
+  const b = finishTale("boy-1", { sentences: 10, correct: 3 });
+  assert.equal(b.qiBase, 0);
+  assert.equal(b.stones, 0);
+  assert.equal(state.game.tales["boy-1"].n, 2);
+  assert.equal(state.game.stats.tales, 2);
+  for (let i = 0; i < 3; i++) finishTale("t" + i, { sentences: 5 });
+  assert.ok(checkUnlocks().some((u) => u.item.id === "teahouse"));
 });

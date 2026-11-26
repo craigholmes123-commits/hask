@@ -162,6 +162,38 @@ export function loadSentences() {
   return sentP;
 }
 
+// ---------- graded stories (the Teahouse) ----------
+function splitTokens(x) {
+  const ys = x.y.split("|");
+  const ks = x.k.split("|");
+  return x.z.split("|").map((t, i) => ({ t, p: ys[i] || "", k: ks[i] || "" }));
+}
+
+let storiesP = null;
+export function loadStories() {
+  if (!storiesP) {
+    storiesP = fetchJSON("data/stories.json").then((j) =>
+      j.stories.map((s) => {
+        const paras = s.p.map((para) => para.map((x) => ({ tokens: splitTokens(x), en: x.e })));
+        return {
+          id: s.id,
+          title: s.t,
+          en: s.en,
+          level: s.lv,
+          blurb: s.b,
+          series: s.s ? { zh: s.s[0], en: s.s[1], part: s.s[2] } : null,
+          words: s.w.map((w) => ({ w: w.w, p: w.p, g: w.g, k: w.k || null, name: !!w.n })),
+          paras,
+          sentences: paras.flat(),
+          questions: s.q.map((q) => ({ tokens: splitTokens(q), en: q.e, options: q.o.map(splitTokens), answer: q.a })),
+        };
+      }),
+    );
+    storiesP.catch(() => (storiesP = null));
+  }
+  return storiesP;
+}
+
 // ---------- search ----------
 const HAN = /[㐀-鿿]/;
 

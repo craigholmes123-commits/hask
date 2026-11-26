@@ -1,0 +1,37 @@
+# id: restaurant
+# title: 在饭店
+# en: At the Restaurant
+# level: 1
+# blurb: Two friends order lunch. How much will it cost?
+# words: @小李|Xiǎo Lǐ|Xiao Li (a name); 服务员|fú wù yuán|waiter, waitress
+---
+中午 ， 我 和 朋友 小李 去 饭店 吃 饭 。 | At noon, my friend Xiao Li and I go to a restaurant for lunch.
+服务员 ： “ 你们 好 ！ 请 坐 。 你们 想 喝 什么 ？ ” | Waiter: "Hello! Please sit down. What would you like to drink?"
+小李 ： “ 我们 喝 茶 。 ” | Xiao Li: "We'll have tea."
+服务员 ： “ 好 的 。 你们 想 吃 什么 ？ ” | Waiter: "Sure. What would you like to eat?"
+
+我 ： “ 你们 这儿 的 饺子 好吃 吗 ？ ” | Me: "Are the dumplings good here?"
+服务员 ： “ 很 好吃 ！ 我们 的 包子 也 很 好吃 。 ” | Waiter: "Very good! Our steamed buns are good too."
+小李 ： “ 那 我们 要 饺子 ， 也 要 包子 。 ” | Xiao Li: "Then we'll have dumplings, and buns too."
+我 ： “ 再 来 一个 菜 。 ” | Me: "And one vegetable dish, please."
+服务员 ： “ 好 。 要 米饭 吗 ？ ” | Waiter: "Okay. Would you like rice?"
+小李 ： “ 不要 了 ， 谢谢 。 ” | Xiao Li: "No, thank you."
+
+饭 很 好吃 ， 我们 都 吃 了 很 多 。 | The food is delicious, and we both eat a lot.
+我 ： “ 你好 ， 多少 钱 ？ ” | Me: "Excuse me, how much is it?"
+服务员 ： “ 九十 块 。 ” | Waiter: "Ninety kuai."
+小李 ： “ 不 贵 ！ ” | Xiao Li: "That's not expensive!"
+我 ： “ 很 便宜 ， 也 很 好吃 。 我们 明天 再 来 吧 ！ ” | Me: "Cheap and tasty. Let's come back tomorrow!"
+---
+? 他们 喝 什么 ？ | What do they drink?
+* 茶
+- 牛奶
+- 水
+? 他们 没有 要 什么 ？ | What don't they order?
+- 饺子
+- 包子
+* 米饭
+? 饭 多少 钱 ？ | How much is the meal?
+* 九十 块
+- 十九 块
+- 九 块

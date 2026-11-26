@@ -1,0 +1,37 @@
+# id: boy-1
+# title: 老人
+# en: The Old Man
+# level: 0
+# series: 茶馆少年 | The Teahouse Boy | 1
+# blurb: A boy, a teahouse, and an old man who never says a word.
+# words: @小林|Xiǎo Lín|Xiao Lin (a boy's name); 茶馆|chá guǎn|teahouse; 茶; 老人; 写; 字; 道|dào|the Way, the Dao
+---
+小林 在 茶馆 工作 。 | Xiao Lin works in a teahouse.
+茶馆 里 有 很 多 人 。 | There are lots of people in the teahouse.
+有 一个 老人 什么 都 不 说 。 | One old man never says anything at all.
+他 就 看 着 自己 的 茶 。 | He just looks at his tea.
+
+小林 想 ： “ 他 是 谁 ？ ” | Xiao Lin wonders: "Who is he?"
+小林 对 老人 说 ： “ 你 是 谁 ？ ” | Xiao Lin says to the old man: "Who are you?"
+老人 看 了 看 他 ， 说 ： “ 我 是 一个 人 。 ” | The old man looks him over and says: "I am a person."
+小林 说 ： “ 我 知道 你 是 人 ！ 我 是 说 ， 你 是 什么 人 ？ ” | Xiao Lin says: "I know you're a person! I mean, what kind of person are you?"
+
+老人 没 说 什么 。 | The old man doesn't say anything.
+他 用 茶 写 了 一个 字 ： 道 。 | With his tea, he writes a character: 道.
+小林 说 ： “ 这个 字 ， 我 不 知道 。 ” | Xiao Lin says: "I don't know this character."
+老人 说 ： “ 你 知道 。 你 说 ‘ 知道 ’ 的 时候 ， 就 已经 在 用 它 了 。 ” | The old man says: "You do. When you say zhīdào, you are already using it."
+小林 又 看 了 看 这个 字 。 是 “ 知道 ” 的 “ 道 ” ！ | Xiao Lin looks at the character again. It's the 道 of 知道!
+
+老人 说 ： “ 如果 你 还 想 知道 ， 我 会 再 来 。 ” | The old man says: "If you want to know more, I will come again."
+老人 走 了 。 | The old man leaves.
+小林 看 着 这个 字 ， 想 ： “ 道 ， 是 什么 ？ ” | Xiao Lin looks at the character and wonders: "What is the Dao?"
+---
+? 小林 在 茶馆 工作 。 | Xiao Lin works in a teahouse.
+* 对
+- 不 对
+? 老人 说 了 很 多 。 | The old man talked a lot.
+- 对
+* 不 对
+? 老人 用 茶 写 了 一个 字 。 | The old man wrote a character with tea.
+* 对
+- 不 对

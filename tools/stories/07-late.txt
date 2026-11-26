@@ -1,0 +1,37 @@
+# id: late
+# title: 要迟到了！
+# en: Running Late!
+# level: 2
+# blurb: Old Wang wakes up at half past eight. Work starts at nine.
+# words: @老王|Lǎo Wáng|Old Wang (a name); 迟到; 醒; 星期六|xīng qī liù|Saturday
+---
+老王 早上 醒 了 ， 看 了 看 手机 ： 八 点 半 ！ | Old Wang wakes up and looks at his phone: half past eight!
+“ 不 好 ！ 我 要 迟到 了 ！ ” | "Oh no! I'm going to be late!"
+他 九 点 上班 ， 公司 离 家 很 远 。 | He starts work at nine, and his office is a long way from home.
+他 没有 时间 吃 早饭 ， 也 没有 时间 喝 咖啡 。 | No time for breakfast, no time for coffee.
+他 穿 上 衣服 就 跑 了 出去 。 | He throws on his clothes and runs out.
+
+外边 在 下 雨 ， 路 上 车 很 多 。 | It's raining outside, and the roads are full of cars.
+老王 坐 上 了 出租车 ， 但是 车 走 得 很 慢 。 | Old Wang gets into a taxi, but it crawls along.
+他 想 ： “ 太 慢 了 ！ 我 自己 跑 吧 ！ ” | He thinks: "Too slow! I'll run!"
+他 下 了 车 ， 跑 到 公司 。 | He gets out and runs to the office.
+九 点 五 分 ， 他 到 了 。 | At five past nine, he arrives.
+
+但是 公司 里 一个 人 也 没有 。 | But there's nobody in the office.
+老王 很 累 。 他 想 ： “ 人 呢 ？ ” | Old Wang is worn out. He wonders: "Where is everyone?"
+他 又 看 了 看 手机 ： 今天 是 星期六 ！ | He looks at his phone again: today is Saturday!
+老王 笑 了 。 | Old Wang laughs.
+他 坐 车 回 家 ， 又 睡 了 一个 上午 。 | He goes home and sleeps the whole morning.
+---
+? 老王 为什么 没有 吃 早饭 ？ | Why doesn't Old Wang eat breakfast?
+* 他 觉得 自己 要 迟到 了 。
+- 家 里 没有 东西 吃 。
+- 他 不 喜欢 吃 早饭 。
+? 老王 是 怎么 到 公司 的 ？ | How does Old Wang get to the office?
+- 他 坐 出租车 到 了 公司 。
+* 他 下 了 车 ， 跑 到 了 公司 。
+- 他 开车 到 了 公司 。
+? 公司 里 为什么 没有 人 ？ | Why is nobody at the office?
+* 那 天 是 星期六 。
+- 大家 都 迟到 了 。
+- 大家 都 生病 了 。

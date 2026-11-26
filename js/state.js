@@ -2,7 +2,7 @@
 // Saved to localStorage on this device; when the page runs inside a claude.ai
 // artifact viewer with the `db` capability, also synced to the viewer's own
 // private documents so progress follows them between phone and desktop.
-import { dayKey, newCard } from "./srs.js";
+import { NEW, dayKey, newCard } from "./srs.js";
 
 const LS_KEY = "hask.v1";
 const BUCKETS = 16;
@@ -20,6 +20,8 @@ export const DEFAULT_SETTINGS = {
   theme: "auto", // auto | light | dark
   deck: "top100",
   level: "beginner",
+  ciTrans: false, // Teahouse: show every translation (otherwise tap to reveal)
+  ciMark: true, // Teahouse: underline words you haven't studied yet
 };
 
 /** Cultivation progress. Only study changes it (see game.js for the rules). */
@@ -38,7 +40,8 @@ export function defaultGame() {
     title: "mortal",
     beast: null, // {kind: null|"fox"|"crane"|"rabbit"|"qilin", growth, fed: dayKey}
     claimed: {}, // missions claimed: {"2026-11-26": ["session"], "w2026-11-23": ["days5"]}
-    stats: { sessions: 0, tribs: 0, tribFails: 0, missions: 0, tones: 0, demons: 0, totalQi: 0 },
+    stats: { sessions: 0, tribs: 0, tribFails: 0, missions: 0, tones: 0, demons: 0, totalQi: 0, tales: 0 },
+    tales: {}, // Teahouse: {storyId: {n: times finished, d: last day Qi was paid, c: best right answers}}
     u: 0,
   };
 }
@@ -183,6 +186,34 @@ export function resetCard(key) {
   saveLocal();
   markDirty(bucketOf(key));
   emit({ type: "card", key });
+}
+
+/** "Learn next": put an unstudied word at the front of the new-word queue. */
+export function pinWord(key) {
+  const c = state.cards[key];
+  if (c && c.s !== NEW) return false;
+  putCard(key, { ...(c || newCard()), pin: Date.now() });
+  return true;
+}
+
+export function unpinWord(key) {
+  const c = state.cards[key];
+  if (!c || !c.pin) return;
+  const { pin, ...rest } = c;
+  putCard(key, rest);
+}
+
+export function isPinned(key) {
+  const c = state.cards[key];
+  return !!(c && c.pin && c.s === NEW);
+}
+
+/** Words waiting to be learned next, oldest pick first. */
+export function pinnedKeys() {
+  return Object.entries(state.cards)
+    .filter(([, c]) => c.pin && c.s === NEW)
+    .sort((a, b) => a[1].pin - b[1].pin)
+    .map(([k]) => k);
 }
 
 // ---------- activity ----------

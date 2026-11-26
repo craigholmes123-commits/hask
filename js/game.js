@@ -22,7 +22,7 @@ export const REALMS = [
 export const FINAL_REALM = REALMS.length - 1;
 
 /** Base Qi for each kind of study action, before bonuses. */
-export const QI = { intro: 10, learn: 5, review: 6, wrong: 1, hard: 3, tone: 3, listen: 2, speed: 1, read: 2, demon: 3, session: 20, tribulation: 0 };
+export const QI = { intro: 10, learn: 5, review: 6, wrong: 1, hard: 3, tone: 3, listen: 2, speed: 1, read: 2, demon: 3, session: 20, tribulation: 0, tale: 2, taleAnswer: 5 };
 
 const COMPREHENSION_SHARE = 0.8; // share of a realm's words to learn before its tribulation
 
@@ -78,6 +78,7 @@ export const TREASURES = [
   { id: "bowl", zh: "聚宝盆", name: "Treasure Bowl", effect: "+10% spirit stones", how: "Complete 20 sect missions", bonus: { stones: 0.1 }, test: (c) => c.missions >= 20 },
   { id: "scroll", zh: "万字卷", name: "Scroll of Ten Thousand Words", effect: "+10% Qi", how: "Master 500 words", bonus: { qi: 0.1 }, test: (c) => c.known >= 500 },
   { id: "page", zh: "天书残页", name: "Page of the Heavenly Book", effect: "+15% Qi", how: "Reach the Golden Core realm", bonus: { qi: 0.15 }, test: (c) => c.realm >= 2 },
+  { id: "gavel", zh: "醒木", name: "Storyteller's Gavel", effect: "+25% Qi in the Teahouse", how: "Finish 10 tales in the Teahouse", bonus: { tale: 0.25 }, test: (c) => c.tales >= 10 },
   { id: "mirror", zh: "照妖镜", name: "Demon-Revealing Mirror", effect: "+50% Qi against Inner Demons", how: "Defeat 50 Inner Demons", bonus: { demon: 0.5 }, test: (c) => c.demons >= 50 },
 ];
 
@@ -86,6 +87,7 @@ export const TITLES = [
   { id: "seeker", zh: "求道者", name: "Seeker of the Dao", how: "Complete your first cultivation session", test: (c) => c.sessions >= 1 },
   { id: "hundred", zh: "百字书生", name: "Hundred-Word Scholar", how: "Master 100 words", test: (c) => c.known >= 100 },
   { id: "listener", zh: "闻音者", name: "Listener of Tones", how: "Get 100 tones right in the Tone Trial", test: (c) => c.tones >= 100 },
+  { id: "teahouse", zh: "听书客", name: "Teahouse Regular", how: "Finish 5 tales in the Teahouse", test: (c) => c.tales >= 5 },
   { id: "steadfast", zh: "道心坚定", name: "Steadfast Dao Heart", how: "Cultivate 30 days in a row", test: (c) => c.streak >= 30 },
   { id: "demonslayer", zh: "斩魔者", name: "Demon Slayer", how: "Defeat 100 Inner Demons", test: (c) => c.demons >= 100 },
   { id: "thousand", zh: "千字真人", name: "Thousand-Word Sage", how: "Master 1,000 words", test: (c) => c.known >= 1000 },
@@ -121,7 +123,7 @@ export function beastStage(b = state.game.beast) {
 
 /** All active bonuses: array level, treasures and the spirit beast. */
 export function bonuses(g = state.game) {
-  const b = { qi: 0.1 * g.arrayLv, stones: 0, hearts: 0, discount: 0, trial: 0, demon: 0 };
+  const b = { qi: 0.1 * g.arrayLv, stones: 0, hearts: 0, discount: 0, trial: 0, demon: 0, tale: 0 };
   for (const t of TREASURES) {
     if (!g.treasures.includes(t.id)) continue;
     for (const [k, v] of Object.entries(t.bonus)) b[k] += v;
@@ -143,7 +145,7 @@ export function awardQi(base, { source = "study" } = {}) {
   const g = state.game;
   const out = { gained: 0, layers: [], blocked: false, stones: 0, ready: false };
   const b = bonuses(g);
-  let mult = 1 + b.qi + (source === "trial" ? b.trial : 0) + (source === "demon" ? b.demon + b.trial : 0);
+  let mult = 1 + b.qi + (source === "trial" ? b.trial : 0) + (source === "demon" ? b.demon + b.trial : 0) + (source === "tale" ? b.tale : 0);
   if (g.qiBoost > 0) {
     mult *= 2;
     g.qiBoost -= 1;
@@ -191,6 +193,34 @@ export function earnStones(n) {
   g.stones += add;
   saveGame();
   return add;
+}
+
+// ---------- the Teahouse (comprehensible input) ----------
+/**
+ * Record a finished tale. Qi comes once per tale per day (2 per sentence and 5
+ * per right answer); the first time ever also pays 10 spirit stones. Rereading
+ * is always welcome, it just doesn't pay twice in one day.
+ * Returns { first, qiBase, stones } for the screen to award and show.
+ */
+export function finishTale(id, { sentences, correct = 0 }) {
+  const g = state.game;
+  g.tales = g.tales || {};
+  const t = g.tales[id] || { n: 0, d: "", c: 0 };
+  const dk = dayKey();
+  const first = t.n === 0;
+  const qiBase = t.d === dk ? 0 : sentences * QI.tale + correct * QI.taleAnswer;
+  t.n += 1;
+  t.d = dk;
+  t.c = Math.max(t.c, correct);
+  g.tales[id] = t;
+  g.stats.tales = (g.stats.tales || 0) + 1;
+  const stones = first ? earnStones(10) : 0;
+  saveGame();
+  return { first, qiBase, stones };
+}
+
+export function taleRecord(id, g = state.game) {
+  return (g.tales && g.tales[id]) || null;
 }
 
 export function tribulationReady(g = state.game) {
@@ -336,6 +366,7 @@ export const DAILY = [
   { id: "read5", zh: "读经", text: "Reading Trial: read 5 sentences", goal: 5, stat: (d) => d.rd || 0, reward: 15 },
   { id: "speed12", zh: "疾风", text: "Speed Trial: score 12 or more", goal: 12, stat: (d) => d.sp || 0, reward: 20 },
   { id: "demons5", zh: "斩魔", text: "Defeat 5 Inner Demons", goal: 5, stat: (d) => d.dm || 0, reward: 20 },
+  { id: "tea10", zh: "听书", text: "Teahouse: read 10 sentences", goal: 10, stat: (d) => d.ci || 0, reward: 15 },
 ];
 export const WEEKLY = [
   { id: "days5", zh: "恒心", text: "Cultivate on 5 days this week", goal: 5, stat: (days) => days.filter((d) => (d.s || 0) > 0).length, reward: 80 },
@@ -450,7 +481,7 @@ function unlockContext(g = state.game) {
     if (c.s === REVIEW || c.s === RELEARNING) learned++;
     if (isKnown(c)) known++;
   }
-  return { known, learned, streak: streak(), tones: g.stats.tones, sessions: g.stats.sessions, missions: g.stats.missions, tribs: g.stats.tribs, demons: g.stats.demons, realm: g.realm };
+  return { known, learned, streak: streak(), tones: g.stats.tones, sessions: g.stats.sessions, missions: g.stats.missions, tribs: g.stats.tribs, demons: g.stats.demons, tales: g.stats.tales || 0, realm: g.realm };
 }
 
 /** Grant any treasures and titles whose conditions are now met. Returns the new ones. */

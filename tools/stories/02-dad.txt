@@ -1,0 +1,32 @@
+# id: dad-work
+# title: 你在做什么？
+# en: What Are You Doing?
+# level: 0
+# blurb: A small boy asks his dad a big question about work.
+# words: @小明|Xiǎo Míng|Xiao Ming (a boy's name); 爸爸; 钱
+---
+小明 ： “ 爸爸 ， 你 在 做 什么 ？ ” | Xiao Ming: "Dad, what are you doing?"
+爸爸 ： “ 我 在 工作 。 ” | Dad: "I'm working."
+小明 ： “ 你 为什么 要 工作 ？ ” | Xiao Ming: "Why do you have to work?"
+爸爸 ： “ 因为 我们 需要 钱 。 ” | Dad: "Because we need money."
+
+小明 ： “ 我们 为什么 需要 钱 ？ ” | Xiao Ming: "Why do we need money?"
+爸爸 ： “ 有 钱 ， 我们 就 能 做 很 多 事 。 ” | Dad: "With money, we can do lots of things."
+小明 ： “ 什么 事 ？ ” | Xiao Ming: "What things?"
+爸爸 ： “ 啊 …… 这个 问题 很 好 。 你 说 呢 ？ ” | Dad: "Ah... that's a good question. What do you think?"
+
+小明 想 了 想 ， 说 ： “ 如果 我们 有 很 多 钱 ， 你 就 不 需要 工作 了 。 ” | Xiao Ming thinks for a moment and says: "If we had lots of money, you wouldn't need to work any more."
+爸爸 ： “ 可能 吧 。 但是 没有 工作 ， 就 没有 钱 。 ” | Dad: "Maybe. But no work, no money."
+小明 ： “ 那 我 来 工作 ！ ” | Xiao Ming: "Then I'll work!"
+爸爸 ： “ 好 啊 ！ 你 会 做 什么 ？ ” | Dad: "Great! What can you do?"
+小明 ： “ 我 会 说 ： ‘ 爸爸 ， 给 我 钱 ！ ’ ” | Xiao Ming: "I can say: 'Dad, give me money!'"
+---
+? 爸爸 在 工作 。 | Dad is working.
+* 对
+- 不 对
+? 爸爸 说 ， 我们 不 需要 钱 。 | Dad says we don't need money.
+- 对
+* 不 对
+? 小明 想 给 爸爸 钱 。 | Xiao Ming wants to give Dad money.
+- 对
+* 不 对

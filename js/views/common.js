@@ -3,7 +3,7 @@ import { family, freqLabel, levelName, loadChars, loadSentences, posLabel, byHan
 import { esc, hanziHTML, pinyinHTML, rubyHTML, tokenHTML } from "../pinyin.js";
 import { canSpeakSentences, playWordSound, speak } from "../speech.js";
 import { formatSpan, isDue, markKnown, status } from "../srs.js";
-import { getCard, putCard, resetCard, state } from "../state.js";
+import { getCard, isPinned, pinWord, putCard, resetCard, state, unpinWord } from "../state.js";
 import { h, icon, openSheet, toast } from "../ui.js";
 
 export const STATUS_TEXT = { new: "New", learning: "Learning", review: "Reviewing", known: "Known" };
@@ -186,6 +186,21 @@ function renderWordSheet(root, word) {
         : `${STATUS_TEXT[st]} · next review ${isDue(card) ? "today" : "in " + formatSpan(card.due - Date.now())}`;
   prog.append(h("span.ws-status", { html: `${sealHTML(card)} ${esc(label)}` }));
   const actions = h("div.ws-actions");
+  if (st === "new") {
+    const pinned = isPinned(word.k);
+    actions.append(
+      h("button.btn.ghost.small", {
+        type: "button",
+        title: pinned ? "Tap to undo" : "Introduce this word at the start of your next cultivation session",
+        onclick: () => {
+          if (pinned) unpinWord(word.k);
+          else if (pinWord(word.k)) toast(`${word.w} will come first in your next session`);
+          renderWordSheet(root, word);
+        },
+        text: pinned ? "Learning next ✓" : "Learn next",
+      }),
+    );
+  }
   if (st !== "known") {
     actions.append(
       h("button.btn.ghost.small", {

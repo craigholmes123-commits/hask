@@ -1,0 +1,42 @@
+# id: boy-4
+# title: 上山
+# en: Up the Mountain
+# level: 3
+# series: 茶馆少年 | The Teahouse Boy | 4
+# blurb: A year later, Xiao Lin climbs Azure Cloud Mountain. At the gate waits one last character.
+# words: @小林|Xiǎo Lín|Xiao Lin (a boy's name); 茶馆|chá guǎn|teahouse; @青云山|Qīng yún Shān|Azure Cloud Mountain; 云; 石头; 仙|xiān|immortal; @青云门|Qīng yún Mén|the Azure Cloud Sect; 弟子
+---
+一 年 过去 了 。 | A year went by.
+小林 每 天 晚上 都 看 那 本 书 。 现在 ， 书 里 的 一千 个 字 他 都 认识 了 。 | Every night Xiao Lin read that book. Now he knew all one thousand characters in it.
+他 对 茶馆 的 人 说 ： “ 我 要 去 青云山 了 。 ” | He told the people at the teahouse: "I'm going to Azure Cloud Mountain."
+大家 都 说 ： “ 青云山 很 远 ， 路 也 很 难 走 。 你 真的 要 去 吗 ？ ” | Everyone said: "Azure Cloud Mountain is far away, and the road is hard. Do you really want to go?"
+小林 说 ： “ 我 一定 要 去 。 ” | Xiao Lin said: "I have to go."
+
+小林 走 了 十 天 ， 才 到 了 青云山 下 。 | It took Xiao Lin ten days to reach the foot of Azure Cloud Mountain.
+山 很 高 ， 山 上 都 是 云 。 | The mountain was high, its top lost in clouds.
+他 又 爬 了 一 天 ， 才 看见 一个 很 大 的 门 。 | He climbed for another whole day before he saw a huge gate.
+门 前 站 着 一个 年轻 人 。 | A young man stood in front of the gate.
+年轻 人 问 ： “ 你 来 这里 做 什么 ？ ” | The young man asked: "What are you doing here?"
+“ 我 来 找 一个 老人 ， 是 他 让 我 来 的 。 ” | "I've come to find an old man. He told me to come."
+年轻 人 看 了 看 门 边 的 一 块 大 石头 ： “ 先 把 上面 的 字 读 出来 。 ” | The young man glanced at a big stone beside the gate: "First, read the character on it."
+
+石头 上 只 有 一个 字 ： 仙 。 | There was just one character on the stone: 仙.
+这个 字 小林 没 见 过|guo 。 | Xiao Lin had never seen this character.
+但是 他 看 了 很 久 ， 慢 慢 地 笑 了 。 | But he looked at it for a long time, and slowly began to smile.
+“ 左边 是 ‘ 人 ’ ， 右边 是 ‘ 山 ’ 。 人 在 山 上 ， 就 是 ‘ 仙 ’ 。 ” | "On the left is 人, person. On the right is 山, mountain. A person on the mountain: 仙, an immortal."
+大 门 开 了 。 | The great gate opened.
+门 里 坐 着 的 ， 就 是 茶馆 的 那个 老人 。 | Sitting inside was the old man from the teahouse.
+老人 说 ： “ 你 来 了 。 从 今天 开始 ， 你 就 是 青云门 的 弟子 了 。 ” | The old man said: "You've come. From today on, you are a disciple of the Azure Cloud Sect."
+---
+? 小林 走 了 多 久 ， 才 到 了 青云山 下 ？ | How long did Xiao Lin walk to reach the foot of Azure Cloud Mountain?
+- 一 天
+* 十 天
+- 一 年
+? 石头 上 是 什么 字 ？ | Which character was on the stone?
+- 山
+* 仙
+- 天
+? 大 门 里 坐 着 的 是 谁 ？ | Who was sitting inside the gate?
+* 茶馆 的 那个 老人
+- 小林 的 爸爸
+- 一个 年轻 人

@@ -1,0 +1,39 @@
+# id: boy-2
+# title: 人、大、天
+# en: Person, Big, Sky
+# level: 1
+# series: 茶馆少年 | The Teahouse Boy | 2
+# blurb: The old man returns and shows Xiao Lin how characters grow.
+# words: @小林|Xiǎo Lín|Xiao Lin (a boy's name); 茶馆|chá guǎn|teahouse; 老人; 横|héng|a horizontal stroke (一); 道|dào|the Way, the Dao; 长|zhǎng|to grow
+---
+三 天 后 ， 老人 又 来 茶馆 了 。 | Three days later, the old man comes to the teahouse again.
+他 坐 在 那边 ， 喝 着 茶 ， 什么 都 不 说 。 | He sits over there drinking his tea, saying nothing.
+小林 很 高兴 。 | Xiao Lin is delighted.
+他 问 老人 ： “ 先生 ， 您 今天 能 给 我 写 几 个 字 吗 ？ ” | He asks the old man: "Sir, could you write a few characters for me today?"
+老人 说 ： “ 好 。 ” | The old man says: "All right."
+
+他 用 茶 在 桌子 上 写 了 一个 字 ： 人 。 | With tea, he writes a character on the table: 人.
+“ 这 是 ‘ 人 ’ 。 你 看 ， 一个 人 在 走 。 ” | "This is 人, a person. Look: a person walking."
+他 在 “ 人 ” 上 写 了 一 横 ： 大 。 | Across 人 he writes one horizontal stroke: 大.
+“ 人 多 了 一 横 ， 就 是 ‘ 大 ’ 。 你 看 ， 这个 人 很 大 ！ ” | "Give 人 one more stroke and it's 大, big. Look how big this person is!"
+老人 又 写 了 一 横 ： 天 。 | Then he writes another stroke: 天.
+“ ‘ 大 ’ 上 再 有 一 横 ， 就 是 ‘ 天 ’ 。 人 再 大 ， 也 大 不 过 天 。 ” | "One more stroke above 大 and it's 天, the sky. However big a person is, the sky is bigger."
+
+小林 看 着 这 三 个 字 ： 人 ， 大 ， 天 。 | Xiao Lin looks at the three characters: 人, 大, 天.
+“ 先生 ， 字 也 会 长 大 ！ ” | "Sir, characters grow up too!"
+老人 说 ： “ 对 。 一个 字 ， 一个 字 ， 你 的 道 也 会 长 大 。 ” | The old man says: "Yes. One character at a time, your Dao will grow too."
+老人 喝 了 茶 ， 走 了 。 | The old man finishes his tea and leaves.
+那 天 晚上 ， 小林 在 桌子 上 写 了 很 多 很 多 字 。 | That evening, Xiao Lin writes character after character on the table.
+---
+? 老人 写 的 第 一 个 字 是 什么 ？ | What is the first character the old man writes?
+* 人
+- 大
+- 天
+? “ 人 ” 多 了 一 横 ， 是 什么 字 ？ | 人 plus one stroke is which character?
+- 天
+* 大
+- 字
+? 那 天 晚上 ， 小林 做 了 什么 ？ | What does Xiao Lin do that evening?
+* 写 字
+- 睡觉
+- 喝 茶

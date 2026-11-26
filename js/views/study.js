@@ -6,7 +6,7 @@ import { prefetch } from "../audio.js";
 import {
   AGAIN, EASY, GOOD, HARD, LEARNING, NEW, RELEARNING, grade, introduce, isDue, markKnown, previewLabel,
 } from "../srs.js";
-import { bumpDay, getCard, logActivity, newAllowance, putCard, state, streak } from "../state.js";
+import { bumpDay, getCard, logActivity, newAllowance, pinnedKeys, putCard, state, streak } from "../state.js";
 import { QI, addStat, finishSession } from "../game.js";
 import { gainQi, resetNotices, showUnlocks } from "./rewards.js";
 import { h, icon, shuffle } from "../ui.js";
@@ -27,7 +27,9 @@ export async function planCounts() {
   let available = 0;
   try {
     const list = await deckWords(state.settings.deck, state.settings.order);
-    available = list.filter((w) => !getCard(w.k) || getCard(w.k).s === NEW).length;
+    const pinned = pinnedKeys();
+    const inDeck = new Set(list.map((w) => w.k));
+    available = list.filter((w) => !getCard(w.k) || getCard(w.k).s === NEW).length + pinned.filter((k) => !inDeck.has(k)).length;
   } catch {
     /* offline and not cached */
   }
@@ -48,7 +50,12 @@ export async function buildSession() {
   const remainingNew = newAllowance();
   const newCount = Math.min(remainingNew, Math.max(0, size - reviews.length), 10);
   const deckList = await deckWords(state.settings.deck, state.settings.order);
-  const fresh = deckList.filter((w) => !getCard(w.k) || getCard(w.k).s === NEW).slice(0, newCount);
+  // words picked with "Learn next" (from the Teahouse or a word page) come first
+  const pinned = pinnedKeys();
+  await ensureKeys(pinned);
+  const pinnedWords = pinned.map((k) => words.get(k)).filter(Boolean);
+  const seen = new Set(pinnedWords.map((w) => w.k));
+  const fresh = [...pinnedWords, ...deckList.filter((w) => !seen.has(w.k) && (!getCard(w.k) || getCard(w.k).s === NEW))].slice(0, newCount);
 
   // interleave: a couple of reviews, then a new word
   const queue = [];

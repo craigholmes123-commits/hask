@@ -1,0 +1,38 @@
+# id: my-day
+# title: 我的一天
+# en: My Day
+# level: 1
+# blurb: A university student's ordinary day, from breakfast to bed.
+# words: @小月|Xiǎo Yuè|Xiao Yue (a girl's name)
+---
+我 叫 小月 ， 今年 二十 岁 ， 是 大学生 。 | My name is Xiao Yue. I'm twenty this year, and I'm a university student.
+我 早上 七 点 起床 。 | I get up at seven in the morning.
+早饭 ， 我 喝 牛奶 ， 吃 面包 和 鸡蛋 。 | For breakfast I drink milk and eat bread and eggs.
+八 点 ， 我 坐 车 去 学校 。 | At eight, I take the bus to school.
+
+上午 我 有 课 。 | I have classes in the morning.
+我们 的 老师 很 好 ， 她 的 课 也 很 好玩儿 。 | Our teacher is great, and her classes are fun too.
+中午 ， 我 和 同学 在 学校 吃 午饭 。 | At noon I have lunch at school with my classmates.
+我 喜欢 吃 饺子 ， 我 的 同学 喜欢 吃 面条儿 。 | I like dumplings; my classmate likes noodles.
+
+下午 没有 课 ， 我 去 书店 买 书 。 | There are no classes in the afternoon, so I go to the bookshop to buy books.
+书店 里 的 书 很 多 ， 也 不 贵 。 | The bookshop has lots of books, and they aren't expensive.
+晚上 ， 我 给 妈妈 打电话 。 | In the evening, I call my mum.
+妈妈 问 我 ： “ 你 今天 忙 不 忙 ？ ” | Mum asks me: "Were you busy today?"
+我 说 ： “ 很 忙 ， 但是 我 很 高兴 。 ” | I say: "Very busy, but I'm happy."
+
+十一 点 ， 我 睡觉 了 。 | At eleven, I go to sleep.
+明天 ， 又 是 新 的 一 天 ！ | Tomorrow is another new day!
+---
+? 小月 今年 多少 岁 ？ | How old is Xiao Yue this year?
+* 二十 岁
+- 十二 岁
+- 七 岁
+? 小月 早上 不 吃 什么 ？ | What does Xiao Yue NOT eat in the morning?
+- 面包
+- 鸡蛋
+* 饺子
+? 晚上 小月 给 谁 打电话 ？ | Who does Xiao Yue call in the evening?
+* 妈妈
+- 老师
+- 同学
