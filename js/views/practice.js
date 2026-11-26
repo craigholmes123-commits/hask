@@ -1,7 +1,7 @@
 // Practice drills: tones, listening, speed round, sentence reading, tricky words.
 import { deckWords, ensureKeys, loadSentences, words } from "../data.js";
 import { TONE_SIGNS, esc, hanziHTML, pinyinHTML, syllables } from "../pinyin.js";
-import { canSpeakMandarin } from "../speech.js";
+import { canSpeakSentences } from "../speech.js";
 import { status } from "../srs.js";
 import { getCard, logTone, setBest, state } from "../state.js";
 import { h, icon, plural, sample, shuffle, toast, toneContour } from "../ui.js";
@@ -61,10 +61,10 @@ export async function renderPractice(root, nav) {
     );
   }
   page.append(list);
-  if (!canSpeakMandarin()) {
+  if (!canSpeakSentences()) {
     page.append(
       h("p.notice", {
-        html: `${icon("info")} No Mandarin voice was found on this device, so the audio drills will be silent. Install a Chinese (China) voice in your system's speech settings, then reload.`,
+        html: `${icon("info")} Words play from built-in recordings, but whole sentences need a Mandarin voice on this device. See Prefs → Audio for how to add one.`,
       }),
     );
   }
@@ -248,7 +248,7 @@ export async function renderTones(root, onExit) {
         e.preventDefault();
         nextQ();
       } else if (!done && /^[0-5]$/.test(e.key)) choose(active, e.key === "0" ? 5 : Number(e.key) || 5);
-      else if (e.key.toLowerCase() === "r") playWord(word);
+      else if (e.key.toLowerCase() === "r") playWord(word, { explicit: true });
     });
     setTimeout(() => playWord(word), 200);
   }
@@ -329,7 +329,7 @@ export async function renderListen(root, onExit) {
       else if (done && (e.key === "Enter" || e.key === " ")) {
         e.preventDefault();
         nextQ();
-      } else if (e.key.toLowerCase() === "r") playWord(word);
+      } else if (e.key.toLowerCase() === "r") playWord(word, { explicit: true });
     });
     setTimeout(() => playWord(word), 200);
   }
@@ -464,7 +464,7 @@ export async function renderRead(root, onExit) {
     });
     actions.append(prev, nextBtn);
     stage.append(actions);
-    if (state.settings.autoplay && canSpeakMandarin()) stage.querySelector(".sentence .sound")?.click();
+    if (state.settings.autoplay && canSpeakSentences()) stage.querySelector(".sentence .sound")?.click();
     setKeys((e) => {
       if (e.key === "ArrowRight" || e.key === "Enter") nextBtn.click();
       else if (e.key === "ArrowLeft") prev.click();

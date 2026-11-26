@@ -1,9 +1,14 @@
 // Prefs: display, study, audio, backup, about.
-import { loadMeta } from "../data.js";
+import { byHanzi, loadFile, loadMeta } from "../data.js";
 import { esc } from "../pinyin.js";
-import { hasSpeech, mandarinVoices, onVoices, speak } from "../speech.js";
+import { hasClaudeVoice, hasSpeech, onVoices, playWordSound, speak } from "../speech.js";
 import { exportJSON, importJSON, resetAll, setSetting, state } from "../state.js";
 import { h, icon, toast } from "../ui.js";
+
+function pickedName(voices) {
+  const v = voices.find((x) => x.voiceURI === state.settings.voice) || voices[0];
+  return `${v.name}${voices.length > 1 ? ` and ${voices.length - 1} more` : ""}`;
+}
 
 function field(label, control, hint) {
   const id = control.id;
@@ -36,6 +41,77 @@ export async function renderPrefs(root) {
   root.append(page);
   page.append(h("header.page-head", { html: `<p class="eyebrow">Settings</p><h1><span lang="zh-CN" class="h1-zh">设置</span> Prefs</h1>` }));
   const s = state.settings;
+
+  // audio
+  const audio = h("section.card.form");
+  audio.append(h("h2", "Audio"));
+  const check = h("div.sound-check", { role: "status" });
+  audio.append(h("p.muted.small", "Words play from recordings of a native speaker built into the app. Whole sentences use a Mandarin voice on your device."));
+  audio.append(check);
+  const tests = h("div.row.wrap");
+  const testWord = h("button.btn.ghost.small", { type: "button", html: `${icon("sound")} Play a word: 谢谢` });
+  const testSentence = h("button.btn.ghost.small", { type: "button", html: `${icon("sound")} Play a sentence` });
+  tests.append(testWord, testSentence);
+  audio.append(tests);
+  const result = h("p.small.test-result", { role: "status", "aria-live": "polite" });
+  audio.append(result);
+  testWord.addEventListener("click", async () => {
+    result.textContent = "Playing…";
+    await loadFile("hsk1").catch(() => {});
+    const w = byHanzi.get("谢谢")?.[0];
+    const ok = w && (await playWordSound(w));
+    result.textContent = ok
+      ? "If you heard “xièxie”, word audio works. Nothing? Check the volume, and on iPhone the silent switch."
+      : "Couldn't play the recording. Check your connection, then try again.";
+  });
+  testSentence.addEventListener("click", async () => {
+    result.textContent = "Playing…";
+    const ok = await speak("你好，欢迎你来学习汉语！");
+    result.textContent = ok ? "If you heard a sentence, sentence audio works." : "No Mandarin voice is available here, so sentences can't be read aloud. See below.";
+  });
+
+  audio.append(toggle("pref-autoplay", "Play words automatically", s.autoplay, (v) => setSetting("autoplay", v)));
+  const rate = h("input", { type: "range", id: "pref-rate", min: "0.5", max: "1.2", step: "0.05", value: String(s.rate) });
+  const rateOut = h("output", { for: "pref-rate", text: `${Math.round(s.rate * 100)}%` });
+  rate.addEventListener("input", () => (rateOut.textContent = `${Math.round(rate.value * 100)}%`));
+  rate.addEventListener("change", () => setSetting("rate", Number(rate.value)));
+  audio.append(h("div.field", h("label", { for: "pref-rate", text: "Sentence speaking speed" }), h("div.range-row", rate, rateOut)));
+  const voiceSel = h("select#pref-voice");
+  const voiceField = field("Sentence voice", voiceSel, "The Mandarin voices installed on this device.");
+  audio.append(voiceField);
+  const help = h("details.voice-help");
+  help.innerHTML = `<summary>How to add a Mandarin voice for sentences</summary>
+    <ul>
+      <li><b>iPhone / iPad:</b> Settings → Accessibility → Spoken Content → Voices → Chinese (China mainland) → download a voice. Use Safari.</li>
+      <li><b>Android:</b> use Chrome. Settings → System → Languages → Text-to-speech → Google → install the Chinese (Mandarin) voice data.</li>
+      <li><b>Windows:</b> Settings → Time &amp; language → Speech → Add voices → Chinese (Simplified, China). Chrome and Edge also include online Chinese voices.</li>
+      <li><b>Mac:</b> System Settings → Accessibility → Spoken Content → System voice → Manage Voices → Chinese (China mainland).</li>
+    </ul>
+    <p class="muted small">Then reload this page. Inside the Claude mobile app pages can't use the phone's voices; open the app in Safari or Chrome instead.</p>`;
+  audio.append(help);
+  const renderCheck = (voices) => {
+    const rows = [
+      ["Word recordings", true, "Built in for almost every word"],
+      [
+        "Device Mandarin voice",
+        voices.length > 0,
+        voices.length ? pickedName(voices) : hasSpeech() ? "None found on this device" : "This browser can't speak",
+      ],
+    ];
+    if (window.claude) rows.push(["Claude voice", hasClaudeVoice(), hasClaudeVoice() ? "Available as a backup" : "Not available in this view"]);
+    check.innerHTML = rows
+      .map(([label, ok, note]) => `<div class="sc-row"><span class="sc-dot ${ok ? "ok" : "no"}" aria-hidden="true"></span><b>${esc(label)}</b><span class="muted">${esc(note)}</span></div>`)
+      .join("");
+    voiceSel.innerHTML = "";
+    voiceSel.append(h("option", { value: "", text: "Best available" }));
+    for (const v of voices) voiceSel.append(h("option", { value: v.voiceURI, text: `${v.name} (${v.lang})` }));
+    voiceSel.value = s.voice && voices.some((v) => v.voiceURI === s.voice) ? s.voice : "";
+    voiceField.hidden = voices.length === 0;
+    help.open = voices.length === 0 && !hasClaudeVoice();
+  };
+  onVoices(renderCheck);
+  voiceSel.addEventListener("change", () => setSetting("voice", voiceSel.value));
+  page.append(audio);
 
   // display
   const display = h("section.card.form");
@@ -76,40 +152,6 @@ export async function renderPrefs(root) {
     ),
   );
   page.append(study);
-
-  // audio
-  const audio = h("section.card.form");
-  audio.append(h("h2", "Audio"));
-  audio.append(toggle("pref-autoplay", "Play words automatically", s.autoplay, (v) => setSetting("autoplay", v)));
-  const rate = h("input", { type: "range", id: "pref-rate", min: "0.5", max: "1.2", step: "0.05", value: String(s.rate) });
-  const rateOut = h("output", { for: "pref-rate", text: `${Math.round(s.rate * 100)}%` });
-  rate.addEventListener("input", () => (rateOut.textContent = `${Math.round(rate.value * 100)}%`));
-  rate.addEventListener("change", () => setSetting("rate", Number(rate.value)));
-  const rateField = h("div.field", h("label", { for: "pref-rate", text: "Speaking speed" }), h("div.range-row", rate, rateOut));
-  audio.append(rateField);
-  const voiceSel = h("select#pref-voice");
-  const voiceField = field("Voice", voiceSel, "Uses the Mandarin voices installed on this device.");
-  audio.append(voiceField);
-  const test = h("button.btn.ghost.small", { type: "button", html: `${icon("sound")} Test: 你好，欢迎！`, onclick: () => speak("你好，欢迎！") });
-  audio.append(test);
-  const noVoice = h("p.notice", {
-    hidden: true,
-    html: `${icon("info")} No Mandarin voice found. On iPhone/iPad: Settings → Accessibility → Spoken Content → Voices → Chinese (China). On Android: install Google Speech Services and the Chinese voice data. On Windows: Settings → Time & language → Speech → add Chinese (Simplified). Then reload this page.`,
-  });
-  audio.append(noVoice);
-  onVoices((voices) => {
-    voiceSel.innerHTML = "";
-    voiceSel.append(h("option", { value: "", text: "Best available" }));
-    for (const v of voices) voiceSel.append(h("option", { value: v.voiceURI, text: `${v.name} (${v.lang})` }));
-    voiceSel.value = s.voice && voices.some((v) => v.voiceURI === s.voice) ? s.voice : "";
-    noVoice.hidden = voices.length > 0;
-    if (!hasSpeech()) {
-      noVoice.hidden = false;
-      noVoice.innerHTML = `${icon("info")} This browser can't speak. Try Chrome, Edge or Safari.`;
-    }
-  });
-  voiceSel.addEventListener("change", () => setSetting("voice", voiceSel.value));
-  page.append(audio);
 
   // data
   const data = h("section.card.form");
@@ -223,10 +265,11 @@ export async function renderPrefs(root) {
     <ul class="credits">
       <li><b>Word lists, levels, pinyin, parts of speech:</b> 《HSK考试大纲》 HSK examination syllabus, 中外语言交流合作中心 (Center for Language Education and Cooperation), published November 2025${meta ? `; ${meta.cumulative["7-9"].toLocaleString()} entries` : ""}. Not an official product.</li>
       <li><b>English meanings:</b> <a href="https://www.mdbg.net/chinese/dictionary?page=cedict" target="_blank" rel="noopener">CC-CEDICT</a>${meta?.cedict ? ` (${esc(meta.cedict)})` : ""}, CC BY-SA 4.0, and <a href="https://github.com/bezlant/hsk-3-vocabulary" target="_blank" rel="noopener">HSKStory's curated HSK 3.0 glosses</a>, CC BY-SA 4.0.</li>
+      <li><b>Word and syllable recordings:</b> <a href="https://github.com/hugolpz/audio-cmn" target="_blank" rel="noopener">audio-cmn</a>, read by Yue Tan (Shtooka project) and Chen Wang, CC BY-SA.</li>
       <li><b>Example sentences:</b> <a href="https://tatoeba.org" target="_blank" rel="noopener">Tatoeba</a> via manythings.org, CC BY 2.0 FR.</li>
       <li><b>Character parts and origins:</b> <a href="https://github.com/skishore/makemeahanzi" target="_blank" rel="noopener">Make Me a Hanzi</a>, LGPL-3.0.</li>
       <li><b>Word frequency (Top 100/200/300):</b> <a href="https://github.com/rspeer/wordfreq" target="_blank" rel="noopener">wordfreq</a> and <a href="https://github.com/hermitdave/FrequencyWords" target="_blank" rel="noopener">FrequencyWords</a> (OpenSubtitles 2018), CC BY-SA 4.0.</li>
     </ul>
-    <p class="muted small">${meta ? `Data built ${esc(meta.built)}. ` : ""}Pronunciation uses your device's own text-to-speech voice.</p>`;
+    <p class="muted small">${meta ? `Data built ${esc(meta.built)}. ` : ""}Sentences are read by your device's own Mandarin voice.</p>`;
   page.append(about);
 }

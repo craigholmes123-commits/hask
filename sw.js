@@ -1,12 +1,13 @@
 // Offline support: the app shell and core data are cached on install;
-// everything else (other HSK levels, sentences, fonts) is cached the first time it loads.
-const VERSION = "hask-v1";
+// everything else (other HSK levels, recordings, sentences, fonts) is cached the first time it loads.
+const VERSION = "hask-v2";
 const SHELL = [
   "./",
   "index.html",
   "manifest.webmanifest",
   "css/app.css",
   "js/main.js",
+  "js/audio.js",
   "js/data.js",
   "js/pinyin.js",
   "js/speech.js",

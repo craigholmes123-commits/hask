@@ -1,7 +1,7 @@
 // Integrity checks for the generated data files (run after tools/build_data.py).
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, statSync } from "node:fs";
 
 const load = (f) => JSON.parse(readFileSync(new URL(`../data/${f}.json`, import.meta.url), "utf8"));
 const LEVELS = ["1", "2", "3", "4", "5", "6", "7-9"];
@@ -49,6 +49,24 @@ test("Top 300 is ranked 1..300 and starts with the core words", () => {
 test("example sentence references are valid", () => {
   const n = load("sentences").s.length;
   for (const w of all) for (const i of w.e || []) assert.ok(i >= 0 && i < n, `${w.w} -> ${i}`);
+});
+
+test("audio references point inside their packed files, and beginners are covered", () => {
+  const size = new Map();
+  const check = (ref, label) => {
+    const [file, off, len] = ref;
+    if (!size.has(file)) size.set(file, statSync(new URL(`../audio/${file}.mp3`, import.meta.url)).size);
+    assert.ok(off >= 0 && len > 0 && off + len <= size.get(file), `${label} -> ${ref}`);
+  };
+  const top = load("top").words;
+  for (const w of [...all, ...top]) {
+    if (w.a) check(w.a, w.w);
+    for (const r of w.as || []) check(r, w.w);
+  }
+  const beginner = [...load("hsk1").words, ...load("hsk2").words, ...top];
+  const silent = beginner.filter((w) => !w.a && !w.as).map((w) => w.w);
+  assert.ok(silent.length <= 10, `beginner words without audio: ${silent.join(" ")}`);
+  for (const ref of Object.values(load("meta").audio.tones)) check(ref, "tone guide");
 });
 
 test("spot checks against the 2025 syllabus", () => {

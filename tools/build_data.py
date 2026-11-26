@@ -215,6 +215,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--cache", required=True)
     ap.add_argument("--out", default=os.path.join(os.path.dirname(__file__), "..", "data"))
+    ap.add_argument("--audio-out", help="where packed recordings go (default: audio/ next to --out)")
+    ap.add_argument("--no-audio", action="store_true", help="skip packaging the native-speaker recordings")
     args = ap.parse_args()
     os.makedirs(args.cache, exist_ok=True)
     os.makedirs(args.out, exist_ok=True)
@@ -332,6 +334,17 @@ def main():
     # ---------- 5. characters ----------
     chars = build_chars(args.cache, words, top, ced, char_levels)
 
+    # ---------- 6. native-speaker recordings ----------
+    audio_meta = None
+    if not args.no_audio:
+        import build_audio
+
+        audio_out = args.audio_out or os.path.join(os.path.dirname(os.path.abspath(args.out)), "audio")
+        audio_meta = build_audio.build(words, top, chars, by_word, syllabus.LEVEL_KEYS, args.cache, audio_out)
+        ma = next((w for w in by_word.get("吗", []) if "a" in w), None)
+        if ma:
+            audio_meta["tones"]["ma5"] = ma["a"]
+
     # ---------- write ----------
     for lv, name in LEVEL_FILE.items():
         lw = [w for w in words if w["l"] == lv]
@@ -351,6 +364,8 @@ def main():
     }
     meta["coverage"] = coverage(top, words)
     meta["char_counts"] = {k: sum(1 for v in char_levels.values() if v == k) for k in syllabus.LEVEL_KEYS}
+    if audio_meta:
+        meta["audio"] = audio_meta
     write_json(os.path.join(args.out, "meta.json"), meta)
     print(json.dumps(meta, ensure_ascii=False), file=sys.stderr)
 

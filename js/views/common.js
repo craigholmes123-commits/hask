@@ -1,7 +1,7 @@
 // Shared view pieces: word faces in each script mode, rows, the word sheet.
 import { family, freqLabel, levelName, loadChars, loadSentences, posLabel, byHanzi, words } from "../data.js";
 import { esc, hanziHTML, pinyinHTML, rubyHTML, tokenHTML } from "../pinyin.js";
-import { canSpeakMandarin, speak } from "../speech.js";
+import { canSpeakSentences, playWordSound, speak } from "../speech.js";
 import { formatSpan, isDue, markKnown, status } from "../srs.js";
 import { getCard, putCard, resetCard, state } from "../state.js";
 import { h, icon, openSheet, toast } from "../ui.js";
@@ -42,13 +42,11 @@ export function sealHTML(card) {
   return `<span class="dot dot-review" title="Reviewing"></span>`;
 }
 
-/** Speak a word. Autoplay stays silent without a voice; a tap (explicit) explains why nothing plays. */
-export function playWord(word, opts = {}) {
-  if (!canSpeakMandarin()) {
-    if (opts.explicit) toast("No Mandarin voice found on this device. See Prefs → Audio.");
-    return Promise.resolve(false);
-  }
-  return speak(word.w, opts);
+/** Play a word. Autoplay stays quiet if nothing can play; a tap (explicit) explains why. */
+export async function playWord(word, opts = {}) {
+  const ok = await playWordSound(word, opts);
+  if (!ok && opts.explicit) toast("Couldn't play this word. Check your volume, or see Prefs → Audio.");
+  return ok;
 }
 
 export function soundButton(word, { slow = false, label } = {}) {
@@ -96,7 +94,9 @@ export function sentenceBlock(sent, { highlight, showEnglish = true } = {}) {
     type: "button",
     "aria-label": "Play sentence",
     html: icon("sound"),
-    onclick: () => (canSpeakMandarin() ? speak(text) : toast("No Mandarin voice found on this device.")),
+    onclick: async () => {
+      if (!canSpeakSentences() || !(await speak(text))) toast("Sentences need a Mandarin voice on this device. See Prefs → Audio.");
+    },
   });
   const en = h("p.sent-en", sent.en);
   if (!showEnglish) {

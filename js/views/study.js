@@ -1,7 +1,8 @@
 // Study session: introduce new words, quiz them, review what's due.
 import { deckById, deckWords, ensureKeys, loadChars, loadSentences, words } from "../data.js";
 import { esc, hanziHTML, pinyinHTML, toneVariants } from "../pinyin.js";
-import { canSpeakMandarin } from "../speech.js";
+import { canPlayWord } from "../speech.js";
+import { prefetch } from "../audio.js";
 import {
   AGAIN, EASY, GOOD, HARD, LEARNING, NEW, RELEARNING, grade, introduce, isDue, markKnown, previewLabel,
 } from "../srs.js";
@@ -79,7 +80,8 @@ function newSession(queue, { title, practice = false }) {
     started: Date.now(),
     finished: false,
   };
-  // warm caches used by intro cards
+  // warm caches used by intro cards, and the recordings for the first words
+  prefetch(queue.map((q) => q.word));
   loadSentences().catch(() => {});
   loadChars().catch(() => {});
   return session;
@@ -235,7 +237,7 @@ function renderIntro(stage, item, done) {
       e.preventDefault();
       proceed(false);
     } else if (e.key.toLowerCase() === "k") proceed(true);
-    else if (e.key.toLowerCase() === "r") playWord(word);
+    else if (e.key.toLowerCase() === "r") playWord(word, { explicit: true });
   });
   gotBtn.focus({ preventScroll: true });
   if (state.settings.autoplay) playWord(word);
@@ -245,7 +247,7 @@ function renderIntro(stage, item, done) {
 function chooseType(word, card) {
   const style = state.settings.answerStyle;
   if (style === "flip") return "flip";
-  const speech = canSpeakMandarin();
+  const speech = canPlayWord(word);
   const toneable = word.t && /[1-4]/.test(word.t) && [...word.w].length <= 4;
   if (!card || card.s === NEW || card.s === LEARNING) {
     if (!card || card.step === 0) return "meaning";
@@ -370,7 +372,7 @@ function renderQuiz(stage, item, done) {
     if (e.target.closest("input,textarea,select")) return;
     const n = Number(e.key);
     if (!answered && n >= 1 && n <= options.length) answer(n - 1);
-    else if (e.key.toLowerCase() === "r") playWord(word);
+    else if (e.key.toLowerCase() === "r") playWord(word, { explicit: true });
   });
   if (state.settings.autoplay && type === "meaning" && m !== "hanzi") playWord(word);
 }
@@ -420,7 +422,7 @@ function showReveal(feedback, word, right, done, type) {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       go();
-    } else if (e.key.toLowerCase() === "r") playWord(word);
+    } else if (e.key.toLowerCase() === "r") playWord(word, { explicit: true });
   });
   if (state.settings.autoplay && (type !== "meaning" || state.settings.script === "hanzi")) playWord(word);
   if (right) {
@@ -487,7 +489,7 @@ function renderFlip(stage, item, done) {
       e.preventDefault();
       show();
     } else if (shown && ["1", "2", "3", "4"].includes(e.key)) rate(Number(e.key));
-    else if (e.key.toLowerCase() === "r") playWord(word);
+    else if (e.key.toLowerCase() === "r") playWord(word, { explicit: true });
   });
 }
 

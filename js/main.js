@@ -1,7 +1,7 @@
 // App shell: header with the 汉字/pīnyīn switch, navigation, hash routing.
 import { deckById, loadFile, loadMeta } from "./data.js";
 import { initCloud, loadState, onChange, setSetting, state } from "./state.js";
-import { stopSpeaking } from "./speech.js";
+import { initClaudeVoice, stopSpeaking } from "./speech.js";
 import { anySheetOpen, closeTopSheet, h, icon } from "./ui.js";
 import { renderDeck, renderWords } from "./views/words.js";
 import { renderGuide } from "./views/guide.js";
@@ -179,6 +179,7 @@ function boot() {
   const d = deckById(state.settings.deck);
   if (d.kind === "hsk") loadFile("hsk" + d.level).catch(() => {});
   initCloud();
+  initClaudeVoice();
   registerServiceWorker();
 }
 

@@ -1,7 +1,8 @@
 // Guide: how to learn faster, tones, pinyin, HSK 3.0 overview.
 import { loadMeta } from "../data.js";
 import { esc } from "../pinyin.js";
-import { canSpeakMandarin, speak } from "../speech.js";
+import { playRecording } from "../audio.js";
+import { speak } from "../speech.js";
 import { state } from "../state.js";
 import { h, icon, toast, toneContour } from "../ui.js";
 
@@ -143,7 +144,11 @@ export async function renderGuide(root) {
       <div class="ti-text"><b>${tone.name}</b> <span class="muted small">pitch ${tone.chao}</span><span>${esc(tone.shape)}</span></div>
       <div class="ti-word"><span class="hz t${tone.t}" lang="zh-CN">${tone.hz}</span><span class="py t${tone.t}">${tone.py}</span><span class="muted small">${esc(tone.en)}</span></div>`;
     const play = h("button.icon-btn.sound", { type: "button", "aria-label": `Play ${tone.py}`, html: icon("sound") });
-    play.addEventListener("click", () => (canSpeakMandarin() ? speak(tone.hz) : toast("No Mandarin voice found on this device.")));
+    play.addEventListener("click", async () => {
+      const ref = meta?.audio?.tones?.["ma" + tone.t];
+      const ok = (ref && (await playRecording({ a: ref }))) || (await speak(tone.hz));
+      if (!ok) toast("Couldn't play the sound. See Prefs → Audio.");
+    });
     row.append(play);
     tt.append(row);
   }
